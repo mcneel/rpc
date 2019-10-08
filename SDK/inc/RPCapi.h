@@ -137,6 +137,7 @@ public:
 	// These are the classes exported by the RPCapi:
 	class Param;				// Base class of all parameters of an RPC.
 	class Checksum;				// A checksum exists in every RPC file.
+	class Color;				// A color as three floating point values: r, g, b
 	class Content;				// Wrapper class for the content type codes
 	class ContentMgr;			// manages the content for this RPCapi.dll
 	class Creator;				// Used to create an RPC.  Only usable if
@@ -163,7 +164,8 @@ public:
 	class TextureMesh;			// Texture mesh.  Contains texture vertices
 	// and texture faces.
 	class Vector;				// A 3D vector, with x, y, and z components.
-
+	class Material;
+    class Editable;
 
 
 	/*! \class ObjectCodes
@@ -201,7 +203,10 @@ public:
 			PRINT_OPTIONS = 18,
 			STRING = 19,
 			VECTOR = 20,
-			CLIENT_INTERFACE = 21
+			CLIENT_INTERFACE = 21,
+			TYPE_COLOR = 87,		//RPCapi::Color
+			TYPE_MATERIAL = 88,		//RPCapi::Material
+			TYPE_TEXMAP = 89,	//RPCapi::TextureMap
 		} OBJECT_CODE_T;	// end typedef enum OBJECT_CODE
 	};	// end class ObjectCodes
 
@@ -543,7 +548,7 @@ public:
 	class TStringArg {
 	public:
 		const void *strptr;		// The string contained by this object.
-		unsigned char strtype;	// Type of string in strptr (see TString::CHAR_TYPE).
+		int strtype;	// Type of string in strptr (see TString::CHAR_TYPE).
 
 		/*! \function inline void init(unsigned char itype, const void *iptr)
 		*	\brief Initializes.
@@ -551,7 +556,7 @@ public:
 		* This routine initializes this object.
 		* Call it in every constructor.
 		*/
-		inline void init(unsigned char itype, const void *iptr) {
+		inline void init(int itype, const void *iptr) {
 			strtype = itype;
 			strptr = iptr;
 		}
@@ -560,7 +565,7 @@ public:
 		inline TStringArg(void) {
 			init(TString::ACHAR, NULL);
 		}
-		inline TStringArg(const int istr) {	// Always means NULL.
+		inline TStringArg(const int) {	// Always means NULL.
 			init(TString::ACHAR, NULL);
 		}
 		inline TStringArg(const char *istr) {
@@ -579,7 +584,7 @@ public:
 		}
 
 		// Assignment operators.
-		inline TStringArg &operator =(const int istr) {	// Always means NULL.
+		inline TStringArg &operator =(const int) {	// Always means NULL.
 			init(TString::ACHAR, NULL);
 			return *this;
 		}
@@ -985,6 +990,13 @@ public:
 
 	};	// end class ClientInstance
 
+	class Color : public Param
+	{
+	public:
+		float r, g, b;
+	
+		virtual ~Color() {}
+	};
 
 	/*! \class Content
 	*	\brief Type of content of an RPC
@@ -1264,8 +1276,6 @@ public:
 
 	};	// end class Image	
 
-
-
 	/*! \class Instance
 	*	\brief  Single instance of an RPC in a scene.
 	*
@@ -1342,6 +1352,48 @@ public:
 		*/
 		virtual const ID *getID(void) const = 0;
 
+        /*! \function virtual bool hasMaterials() const
+        *   \brief Does the instance have materials.
+        *
+        * This routine returns true if this RPC Instance has materials.
+        * Old RPCs do not have materials, they use textures.
+        * Returns:
+        *       true if this Instance has materials
+        */
+		virtual bool hasMaterials() const = 0;
+
+        /*! \function virtual unsigned int getNumMaterials() const
+        *   \brief Retrieves the number of materials for this Instance.
+        *
+        * This routine retrieves the number of materials for this Instance.
+        * Returns:
+        *       Number of materials
+        */
+		virtual unsigned int getNumMaterials() const = 0;
+
+		/*! \function virtual Mesh *getProxyMesh(void)
+		*	\brief Retrieves the instance's proxy mesh.
+		*
+		* This routine retrieves the proxy mesh for this Instance.
+		* Returns:
+		*		A pointer to a newly allocated copy of the proxy mesh of
+		*		this Instance, or NULL if an error occurred.
+		*/
+		virtual Mesh *getProxyMesh(void) const = 0;
+
+        /*! \function virtual int getRenderData(Mesh *&mesh, Material **&materials, TextureMesh *&textureMesh) const
+        *   \brief Retrieves the instance's meshes and materials associated with it.
+        *
+        * This routine retrieves the render mesh and materials associated with this Instance.
+        * All TextureMesh face indices are pointing to returned array of materials.
+        * Parameters:
+        *       mesh:           Render mesh, newly allocated and returned by reference.
+        *       materials:      Array of materials, newly allocated and returned by reference.
+        *       textureMesh:    Texture mesh, newly allocated and returned by reference.
+        * Returns:
+        *       Number of elements to render
+        */
+		virtual int getRenderData(Mesh *&mesh, Material **&materials, TextureMesh *&textureMesh) const = 0;
 
 		/*! \function virtual Mesh *getMesh(Mesh *mesh,
 		double cx = 0, double cy = 0, double cz = 0)
@@ -1627,6 +1679,8 @@ public:
 		*/
 		virtual double speed(void) const = 0;
 
+        // Get all parameters editable by user
+        virtual int getEditableParameters(const Editable**& params) = 0;
 	};	// end class Instance
 
 
@@ -1701,17 +1755,10 @@ public:
 				// last selection to set
 				// initial selection
 			} WINDOW_OPTIONS_T;	// end typedef enum WINDOW_OPTIONS
-
-			typedef enum MODE_CODE {
-				MODELESS = 1,		// Shows window inside parent
-				FLOATING = 2,		// Shows window in its own border
-				MODAL = 3			// Modal dialog
-			} MODE_CODE_T;
 		};	// end class RPCapi::InstanceInterface::Window
 
 #ifdef PORT_WINDOWS
-		/*!	\function virtual int show(HWND parentWindow, int windowToDisplay, int mode,
-				int x = 0, int y = 0, int w = 0, int h = 0, HWND z = NULL)
+		/*!	\function virtual int show(HWND parentWindow, int windowToDisplay)
 		*	\brief Displays the dialog.
 		*
 		* This routine displays the specified dialog to the screen.
@@ -1719,11 +1766,8 @@ public:
 		*		parentWindow:		handle to the parent window.
 		*		windowToDisplay:	the indicator of which window to display
 		*							see Window::WINDOE_CODE for options
-		*		mode:				the mode of the window to display
-		&							see Window::MODE_CODE
 		*/
-		virtual int show(HWND parentWindow, int windowToDisplay, int mode,
-			int x = 0, int y = 0, int w = 0, int h = 0, HWND z = NULL) = 0;
+		virtual int show(HWND parentWindow, int windowToDisplay) = 0;
 #endif	// ifdef PORT_WINDOWS
 
 #ifdef PORT_MAC
@@ -2200,7 +2244,7 @@ public:
 	* implementation will always return NULL when getConst() is called.
 	*
 	*/
-	class ParamList : public Param {
+	class ParamList : public virtual Param {
 	public:
 		/*!	\function virtual ~ParamList(void)
 		*	\brief Destructor.
@@ -2414,6 +2458,50 @@ public:
 
 	};	// end class PrimP
 
+	class ParameterContainer : public ParamList {
+	public:
+		virtual bool hasParameter(int paramId) = 0;
+		virtual bool getParameter(int paramId, RPCapi::Param*& param) = 0;
+	};
+
+	class TextureMap : public ParameterContainer {
+	};
+
+	class Material : public ParameterContainer {
+	public:
+		virtual const RPCapi::TString* getName() = 0;
+	};
+
+    class Editable : public ParamList
+    {
+    public:
+        virtual const RPCapi::TString* getName() const = 0;
+    };
+
+    class EditableParam : public Editable
+    {
+    public:
+        // Get current value for this parameter
+        virtual Param* getValue() const = 0;
+        // Get default value for this parameter
+        virtual Param* getDefaultValue() const = 0;
+        // Set new value for this parameter
+        virtual bool setValue(Param& value) = 0;
+        // Returns true, if parameter is limited to preset value
+        virtual bool hasPresetValues() const = 0;
+        // Get all values that can be assigned to this parameter.
+        // Parameters:
+        //      values - returned newly allocated array of preset values
+        // Returns:
+        //      Number of preset values
+        virtual int getPresetValues(const RPCapi::Param**& values) const = 0;
+        // Get all keys affected by this parameter
+        virtual int getAffectedKeys(const TString**& keys) const = 0;
+    };
+
+    class EditableParamGroup : public Editable
+    {
+    };
 
 	/*! \class PrintOptions
 	*	\brief  Print options for an RPC
@@ -3143,7 +3231,7 @@ public:
 * Returns:
 *		A pointer to the global API object.
 */
-#ifdef PORT_MAC_OR_UNIX
+#if defined(PORT_MAC_OR_UNIX) || defined(RPC_STATIC_LIB)
 #ifdef PORT_MAC
 #pragma export on
 #endif	// ifdef PORT_MAC

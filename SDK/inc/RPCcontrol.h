@@ -84,6 +84,9 @@ public:
 	// Get the visible state of this control.
 	virtual bool visibleGet(void) const = 0;
 
+    // Reset control to the default value
+    virtual void reset(){}
+
 	// (Un)register a callback w/ this Control.
 	virtual void rpcConCallbackRegister(Callback *cb, bool reg) = 0;
 };	// class BaseControl
@@ -368,6 +371,60 @@ public:
 	} TYPE_CODES_T;	// typedef enum TYPE_CODES
 	virtual ~StaticText(void) {}
 };	// class StaticText
+
+
+// A control to select a color.
+class ColorPicker : public BaseControl
+{
+public:
+    typedef enum TYPE_CODE {
+        TYPE_CODE = 92
+    } TYPE_CODES_T;
+
+    // Call this routine to launch an RPCapi provided dialog to select a color.
+    virtual void launchDlg() = 0;
+
+    // These routines get / set the value of this control.
+    virtual const RPCapi::Color& valueGet() const = 0;
+    virtual void valueSet(const RPCapi::Color& value) = 0;
+};
+
+class ImageSlider : public BaseControl
+{
+public:
+    typedef enum TYPE_CODE {
+        TYPE_CODE = 93
+    } TYPE_CODES_T;
+
+    // Get number of images in the collection
+    virtual int count() const = 0;
+
+    // These routines switch to the previous / next image in the collection
+    virtual void previous() = 0;
+    virtual void next() = 0;
+
+    // These routines get / set the index of selected image
+    virtual int  getIndex() const = 0;
+    virtual void setIndex(int index) = 0;
+
+    // Get the recommended width / height for the image control
+    virtual void getImageDimensions(int& width, int& height) const = 0;
+
+    // Get the image to display.
+    // Parameters:
+    //      hwndDlg:  If not NULL, this dialog is used to scale
+    //                the resulting image according to its dialog units.
+    //      width:    If hwndDlg is NULL, and value is positive,
+    //                then this is the desired image width.
+    //      height:   If hwndDlg is NULL, and value is positive,
+    //                then this is the desired image height.
+    virtual HBITMAP getBitmap(HWND hwndDlg, int width = -1, int height = -1) = 0;
+
+    // Get the path to the image.
+    // Path can be a filename, or a reference to internal RPC image
+    // (path should start with "__RPC:" prefix).
+    virtual const TString& getImagePath() const = 0;
+};
 
 };	// class RPCcon
 #endif	// ifndef _RPC_CONTROL_H_
