@@ -65,6 +65,6 @@ private:
 	UUID m_idObject;
 	unsigned int m_idDoc;
 	mutable CLBPString m_sName;
-	RPCapiEx::InstanceInterfaceEx* m_pEditInterface;
+	RPCapi::InstanceInterface* m_pEditInterface;
 	IEditDialogCallback* m_pEditDlgCallback;
 };

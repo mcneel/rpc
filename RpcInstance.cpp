@@ -302,7 +302,7 @@ bool CRpcInstance::EditUi(HWND hWndParent, IEditDialogCallback* pCallback)
 
 	KillEditUi();
 
-	m_pEditInterface = dynamic_cast<RPCapiEx::InstanceInterfaceEx *>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE_INTERFACE));
+	m_pEditInterface = dynamic_cast<RPCapi::InstanceInterface *>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE_INTERFACE));
 	if (NULL == m_pEditInterface) return false;
 
 	m_pEditInterface->setInstance(m_pInstance);
@@ -311,7 +311,7 @@ bool CRpcInstance::EditUi(HWND hWndParent, IEditDialogCallback* pCallback)
 	const double dScale = (NULL != pDoc) ? ON::UnitScale(ON::LengthUnitSystem::Inches, pDoc->ModelUnits()) : 1.0;
 
 	m_pEditInterface->setUnits(RPCapi::Units::LINEAR_UNITS, dScale);
-	m_pEditInterface->show(hWndParent, RPCapi::InstanceInterface::Window::PARAMETERS, RPCapiEx::InstanceInterfaceEx::WindowEx::MODE_CODE::MODELESS);
+	m_pEditInterface->show(hWndParent, RPCapi::InstanceInterface::Window::PARAMETERS);
 
 	return true;
 }
