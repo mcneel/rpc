@@ -1,5 +1,4 @@
 #pragma once
-#include <map>
 
 enum class MaterialParams {
 	MATERIAL_MODE,
@@ -74,5 +73,5 @@ enum class MaterialMaps {
 	CUTOUT_MAP
 };
 
-extern const std::map<MaterialParams, const RPCapi::TStringArg> PARAM_NAMES;
-extern const std::map<MaterialMaps, const RPCapi::TStringArg> MAP_NAMES;
+const RPCapi::TStringArg getParamName(MaterialParams param);
+const RPCapi::TStringArg getMapName(MaterialMaps param);

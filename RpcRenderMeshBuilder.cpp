@@ -467,17 +467,17 @@ bool CRpcRenderMeshBuilder::Alpha2Material(RPCapi::Texture& RpcTexture, CRhRdkBa
 void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial)
 {
 	float baseWeight = 1.0f;
-	RPCapi::Color* pColor = GetColor(aRpcMaterial.get(PARAM_NAMES.at(MaterialParams::BASE_COLOR)));
+	RPCapi::Color* pColor = GetColor(aRpcMaterial.get(getParamName(MaterialParams::BASE_COLOR)));
 
 	if (pColor)
 	{
 		ON_Color *color = new ON_Color();
-		GetPrimValue<float>(aRpcMaterial.get(PARAM_NAMES.at(MaterialParams::BASE_WEIGHT)), baseWeight);
+		GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::BASE_WEIGHT)), baseWeight);
 		color->SetFractionalRGB(pColor->r *baseWeight, pColor->g*baseWeight, pColor->b*baseWeight);
 		aMaterial.SetDiffuse(*color);
 	}
 	
-	RPCapi::Param* param = aRpcMaterial.get(MAP_NAMES.at(MaterialMaps::BASE_COLOR_MAP));
+	RPCapi::Param* param = aRpcMaterial.get(getMapName(MaterialMaps::BASE_COLOR_MAP));
 
 	if ((param) && (param->typeCode() == RPCapi::ObjectCodes::TYPE_TEXMAP))
 	{

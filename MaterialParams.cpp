@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "MaterialParams.h"
+#include <map>
 
 
 const std::map<MaterialParams, const RPCapi::TStringArg> PARAM_NAMES = {
@@ -47,6 +48,12 @@ const std::map<MaterialParams, const RPCapi::TStringArg> PARAM_NAMES = {
 	{MaterialParams::COAT_IOR, RPCapi::TStringArg("coat_ior")}
 };
 
+const RPCapi::TStringArg getParamName(MaterialParams param)
+{
+	auto it = PARAM_NAMES.find(param);
+	return it != PARAM_NAMES.end() ? it->second : "";
+}
+
 const std::map<MaterialMaps, const RPCapi::TStringArg> MAP_NAMES = {
 	{MaterialMaps::BASE_WEIGHT_MAP, RPCapi::TStringArg("base_weight_map")},
 	{MaterialMaps::BASE_COLOR_MAP, RPCapi::TStringArg("base_color_map")},
@@ -74,3 +81,9 @@ const std::map<MaterialMaps, const RPCapi::TStringArg> MAP_NAMES = {
 	{MaterialMaps::DISPLACEMENT_MAP, RPCapi::TStringArg("displacement_map")},
 	{MaterialMaps::CUTOUT_MAP, RPCapi::TStringArg("cutout_map")}
 };
+
+const RPCapi::TStringArg getMapName(MaterialMaps param)
+{
+	auto it = MAP_NAMES.find(param);
+	return it != MAP_NAMES.end() ? it->second : "";
+}
