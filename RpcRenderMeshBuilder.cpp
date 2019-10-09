@@ -77,11 +77,9 @@ void CRpcRenderMeshBuilder::RpcMaterial2RhinoMaterial(const ON_SimpleArray<RPCap
 		{
 			continue;
 		}
-		RPCapi::Material* mat = aRpcMaterials[i];
 
+		RPCapi::Material* mat = aRpcMaterials[i];
 		SetColor(*mat, *aMaterials[i]);
-	   
-		
 	}
 }
 
@@ -119,11 +117,11 @@ bool CRpcRenderMeshBuilder::BuildNew(ON_SimpleArray<ON_Mesh*>& aMeshes,
 		aMeshes[i]->Transform(xformUnitsScale);
 	}
 
-	if (NULL != pRpcMaterials)
+	if (pRpcMaterials)
 	{
 		for (int i = 0; i < numMaterials; i++)
 		{
-			if (NULL != pRpcMaterials[i])
+			if (pRpcMaterials[i])
 			{
 				delete pRpcMaterials[i];
 				pRpcMaterials[i] = NULL;
@@ -138,7 +136,7 @@ bool CRpcRenderMeshBuilder::BuildNew(ON_SimpleArray<ON_Mesh*>& aMeshes,
 	return true;
 }
 
-bool CRpcRenderMeshBuilder::Build(const ON_3dPoint& ptCamera, ON_SimpleArray<ON_Mesh*>& aMeshes,
+bool CRpcRenderMeshBuilder::BuildOld(const ON_3dPoint& ptCamera, ON_SimpleArray<ON_Mesh*>& aMeshes,
 								  ON_SimpleArray<CRhRdkBasicMaterial*>& aMaterials)
 {
 	const RPCapi::Mesh* pRpcMesh = m_Rpc.getMesh(NULL, ptCamera.x, ptCamera.y, ptCamera.z);
@@ -466,29 +464,36 @@ bool CRpcRenderMeshBuilder::Alpha2Material(RPCapi::Texture& RpcTexture, CRhRdkBa
 	return true;
 }
 
-void CRpcRenderMeshBuilder::SetColor(RPCapi::Material & aRpcMaterial, CRhRdkBasicMaterial & aMaterial)
+void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial)
 {
-	float baseWeight = GetPrimValue<float>(aRpcMaterial.get(PARAM_NAMES.at(MaterialParams::BASE_WEIGHT)));
-	RPCapi::Color* pColor = GetColor(aRpcMaterial.get(PARAM_NAMES.at(MaterialParams::BASE_COLOR)));	
-	ON_Color *color = new ON_Color();
-	color->SetFractionalRGB(pColor->r *baseWeight, pColor->g*baseWeight, pColor->b*baseWeight);
-	aMaterial.SetDiffuse(*color);
+	float baseWeight = 1.0f;
+	RPCapi::Color* pColor = GetColor(aRpcMaterial.get(PARAM_NAMES.at(MaterialParams::BASE_COLOR)));
 
-
+	if (pColor)
+	{
+		ON_Color *color = new ON_Color();
+		GetPrimValue<float>(aRpcMaterial.get(PARAM_NAMES.at(MaterialParams::BASE_WEIGHT)), baseWeight);
+		color->SetFractionalRGB(pColor->r *baseWeight, pColor->g*baseWeight, pColor->b*baseWeight);
+		aMaterial.SetDiffuse(*color);
+	}
+	
 	RPCapi::Param* param = aRpcMaterial.get(MAP_NAMES.at(MaterialMaps::BASE_COLOR_MAP));
 
-	if ((nullptr != param) && (param->typeCode() == RPCapi::ObjectCodes::TYPE_TEXMAP))
+	if ((param) && (param->typeCode() == RPCapi::ObjectCodes::TYPE_TEXMAP))
 	{
-		RPCapi::TextureMap* pMap = dynamic_cast<RPCapi::TextureMap*>(param);
-		if (pMap == nullptr) {
-			throw std::exception("Type conversion exception.");
+		auto pMap = dynamic_cast<RPCapi::TextureMap*>(param);
+
+		if (!pMap)
+		{
+			return;
 		}
+
 		const RPCapi::TStringArg MAP("map_name");
 		RPCapi::Param *param = pMap->get(MAP);
 
-		if (param == NULL)
+		if (!param)
 		{
-			throw std::bad_cast();
+			return;
 		}
 
 		RPCapi::Image *image = dynamic_cast<RPCapi::Image*>(param);
@@ -498,36 +503,33 @@ void CRpcRenderMeshBuilder::SetColor(RPCapi::Material & aRpcMaterial, CRhRdkBasi
 }
 
 template <typename T>
-T CRpcRenderMeshBuilder::GetPrimValue(RPCapi::Param * param)
+bool CRpcRenderMeshBuilder::GetPrimValue(RPCapi::Param* param, T& value)
 {
-	if (param == nullptr)
+	if (!param)
 	{
-		throw std::exception("The parameter is null.");
+		return false;
 	}
 
 	RPCapi::PrimP<T>* tVal = dynamic_cast<RPCapi::PrimP<T>*>(param);
 
-	if (tVal == nullptr)
+	if (!tVal)
 	{
-		throw std::exception("Type conversion exception.");
+		return false;
 	}
 
-	return tVal->getValue();
+	value = tVal->getValue();
+
+	return true;
 }
 
-RPCapi::Color * CRpcRenderMeshBuilder::GetColor(RPCapi::Param * param)
+RPCapi::Color* CRpcRenderMeshBuilder::GetColor(RPCapi::Param* param)
 {
-	if (param == nullptr)
+	if (!param)
 	{
-		throw std::exception("The parameter is null.");
+		return nullptr;
 	}
 
-	RPCapi::Color* color = dynamic_cast<RPCapi::Color*>(param);
-
-	if (color == nullptr)
-	{
-		throw std::exception("Type conversion exception.");
-	}
+	auto color = dynamic_cast<RPCapi::Color*>(param);
 
 	return color;
 }
