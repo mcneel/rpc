@@ -58,7 +58,7 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 
 	const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(pObject);
 	if (NULL == pBlock) return false;
-
+	
 	ON_Xform xformInstance = pBlock->InstanceXform();
 	xformInstance.Invert();
 
@@ -81,19 +81,22 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 			ON_SimpleArray<CRhRdkBasicMaterial*> aMaterials;
 
 			CRpcRenderMeshBuilder mb(doc, *pRpcInstance);
-			if (mb.Build(ptCamera, aMeshes, aMaterials))
+
+			if (pRpcInstance->hasMaterials())
+				mb.BuildNew(aMeshes, aMaterials);
+			else
+				mb.BuildOld(ptCamera, aMeshes, aMaterials);
+
+			for (int i = 0; i < aMeshes.Count(); i++)
 			{
-				for (int i=0; i<aMeshes.Count(); i++)
-				{
-					ON_Mesh* pRhinoMesh = aMeshes[i];
-					pRhinoMesh->Transform(pBlock->InstanceXform());
+				ON_Mesh* pRhinoMesh = aMeshes[i];
+				pRhinoMesh->Transform(pBlock->InstanceXform());
 
-					CRhRdkBasicMaterial* pRdkMaterial = NULL;
+				CRhRdkBasicMaterial* pRdkMaterial = NULL;
 
-					pRdkMaterial = aMaterials[i];
+				pRdkMaterial = aMaterials[i];
 
-					crmInOut.Add(pRhinoMesh, pRdkMaterial);
-				}
+				crmInOut.Add(pRhinoMesh, pRdkMaterial);
 			}
 		}
 	}

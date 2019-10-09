@@ -122,6 +122,24 @@ public:
 	};	// class IDex
 
 
+	class InstanceInterfaceEx : public RPCapi::InstanceInterface {
+	public:
+
+		class WindowEx : public RPCapi::InstanceInterface::Window
+		{
+		public:
+			typedef enum MODE_CODE {
+				MODELESS = 1,		// Shows window inside parent
+				FLOATING = 2,		// Shows window in its own border
+				MODAL = 3			// Modal dialog
+			} MODE_CODE_T;
+		};
+
+		virtual int show(HWND parentWindow, int windowToDisplay, int mode,
+			int x = 0, int y = 0, int w = 0, int h = 0, HWND z = NULL) = 0;
+	};  // class InstanceInterfaceEx
+
+
 	// This routine determines if the API will
 	// automatically attempt to acquire content
 	// when the first RPCapi::Instance is created.

@@ -2,6 +2,7 @@
 #include "StdAfx.h"
 #include "RpcRenderMeshBuilder.h"
 #include "RpcUtilities.h"
+#include "MaterialParams.h"
 
 static class CTestRpcGamma : public CRhinoTestCommand
 {
@@ -65,7 +66,77 @@ void CRpcRenderMeshBuilder::Flush(ON_SimpleArray<ON_Mesh*>& aMeshes,
 	aMaterials.Destroy();
 }
 
-bool CRpcRenderMeshBuilder::Build(const ON_3dPoint& ptCamera, ON_SimpleArray<ON_Mesh*>& aMeshes,
+void CRpcRenderMeshBuilder::RpcMaterial2RhinoMaterial(const ON_SimpleArray<RPCapi::Material*>& aRpcMaterials, ON_SimpleArray<CRhRdkBasicMaterial*>& aMaterials)
+{
+	for (int i = 0; i < aRpcMaterials.Count(); i++)
+	{
+		aMaterials.Append(CreateNewBasicMaterial());
+
+		// Skipping of empty material.
+		if (aRpcMaterials[i]->count() <= 1)
+		{
+			continue;
+		}
+
+		RPCapi::Material* mat = aRpcMaterials[i];
+		SetColor(*mat, *aMaterials[i]);
+	}
+}
+
+bool CRpcRenderMeshBuilder::BuildNew(ON_SimpleArray<ON_Mesh*>& aMeshes,
+	ON_SimpleArray<CRhRdkBasicMaterial*>& aMaterials)
+{
+	RPCapi::Mesh *pRpcMesh;
+	RPCapi::TextureMesh *pTextureMesh;
+	RPCapi::Material **pRpcMaterials = NULL;
+	int numMaterials;
+
+	const double dUnitsScale = ON::UnitScale(ON::LengthUnitSystem::Inches, m_doc.ModelUnits());
+	ON_Xform xformUnitsScale = ON_Xform::DiagonalTransformation(dUnitsScale, dUnitsScale, dUnitsScale);
+
+	numMaterials = m_Rpc.getRenderData(pRpcMesh, pRpcMaterials, pTextureMesh);
+
+	if (numMaterials == 0)
+	{
+		return false;
+	}
+
+	ON_SimpleArray<RPCapi::Material*> aRpcMaterials;
+
+	for (int i = 0; i < numMaterials; i++)
+	{
+		aRpcMaterials.Append(pRpcMaterials[i]);
+		aMeshes.Append(new ON_Mesh);
+	}
+
+	RpcMesh2RhinoMeshes(*pRpcMesh, *pTextureMesh, aMeshes);
+	RpcMaterial2RhinoMaterial(aRpcMaterials, aMaterials);
+
+	for (int i = 0; i < aMeshes.Count(); i++)
+	{
+		aMeshes[i]->Transform(xformUnitsScale);
+	}
+
+	if (pRpcMaterials)
+	{
+		for (int i = 0; i < numMaterials; i++)
+		{
+			if (pRpcMaterials[i])
+			{
+				delete pRpcMaterials[i];
+				pRpcMaterials[i] = NULL;
+			}
+		}
+		delete[] pRpcMaterials;
+	}
+
+	delete pTextureMesh;
+	delete pRpcMesh;
+
+	return true;
+}
+
+bool CRpcRenderMeshBuilder::BuildOld(const ON_3dPoint& ptCamera, ON_SimpleArray<ON_Mesh*>& aMeshes,
 								  ON_SimpleArray<CRhRdkBasicMaterial*>& aMaterials)
 {
 	const RPCapi::Mesh* pRpcMesh = m_Rpc.getMesh(NULL, ptCamera.x, ptCamera.y, ptCamera.z);
@@ -285,7 +356,8 @@ void CRpcRenderMeshBuilder::RpcMesh2RhinoMeshes(const RPCapi::Mesh& RpcMesh,
 	delete [] pSourceVertexIndexLists;
 }
 
-bool CRpcRenderMeshBuilder::Rgb2Material(RPCapi::Texture& RpcTexture, CRhRdkBasicMaterial& Material)
+template <typename T>
+bool CRpcRenderMeshBuilder::Rgb2Material(T& RpcTexture, CRhRdkBasicMaterial& Material, const wchar_t* textureType)
 {
 	int iWidth = 0;
 	int iHeight = 0;
@@ -333,8 +405,8 @@ bool CRpcRenderMeshBuilder::Rgb2Material(RPCapi::Texture& RpcTexture, CRhRdkBasi
 	slot.m_dAmount = 1.0;
 	slot.m_bFilterOn = true;
 	Material.SetTextureSlot(CRhRdkMaterial::ChildSlotUsage::Diffuse, slot);
-
-	VERIFY(Material.SetChild(pRdkTexture, RDK_BASIC_MAT_BITMAP_TEXTURE));
+	
+	VERIFY(Material.SetChild(pRdkTexture, textureType));
 
 	delete[] pRGB;
 
@@ -392,6 +464,76 @@ bool CRpcRenderMeshBuilder::Alpha2Material(RPCapi::Texture& RpcTexture, CRhRdkBa
 	return true;
 }
 
+void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial)
+{
+	float baseWeight = 1.0f;
+	RPCapi::Color* pColor = GetColor(aRpcMaterial.get(getParamName(MaterialParams::BASE_COLOR)));
+
+	if (pColor)
+	{
+		ON_Color *color = new ON_Color();
+		GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::BASE_WEIGHT)), baseWeight);
+		color->SetFractionalRGB(pColor->r *baseWeight, pColor->g*baseWeight, pColor->b*baseWeight);
+		aMaterial.SetDiffuse(*color);
+	}
+	
+	RPCapi::Param* param = aRpcMaterial.get(getMapName(MaterialMaps::BASE_COLOR_MAP));
+
+	if ((param) && (param->typeCode() == RPCapi::ObjectCodes::TYPE_TEXMAP))
+	{
+		auto pMap = dynamic_cast<RPCapi::TextureMap*>(param);
+
+		if (!pMap)
+		{
+			return;
+		}
+
+		const RPCapi::TStringArg MAP("map_name");
+		RPCapi::Param *param = pMap->get(MAP);
+
+		if (!param)
+		{
+			return;
+		}
+
+		RPCapi::Image *image = dynamic_cast<RPCapi::Image*>(param);
+
+		Rgb2Material(*image, aMaterial, RDK_BASIC_MAT_BITMAP_TEXTURE);
+	}
+}
+
+template <typename T>
+bool CRpcRenderMeshBuilder::GetPrimValue(RPCapi::Param* param, T& value)
+{
+	if (!param)
+	{
+		return false;
+	}
+
+	RPCapi::PrimP<T>* tVal = dynamic_cast<RPCapi::PrimP<T>*>(param);
+
+	if (!tVal)
+	{
+		return false;
+	}
+
+	value = tVal->getValue();
+
+	return true;
+}
+
+RPCapi::Color* CRpcRenderMeshBuilder::GetColor(RPCapi::Param* param)
+{
+	if (!param)
+	{
+		return nullptr;
+	}
+
+	auto color = dynamic_cast<RPCapi::Color*>(param);
+
+	return color;
+}
+
 void CRpcRenderMeshBuilder::RpcTexture2RhinoMaterial(const ON_SimpleArray<RPCapi::Texture*>& aTextures,
 													 ON_SimpleArray<CRhRdkBasicMaterial*>& aMaterials)
 {
@@ -407,7 +549,7 @@ void CRpcRenderMeshBuilder::RpcTexture2RhinoMaterial(const ON_SimpleArray<RPCapi
 
 			pRdkMaterial->SetInstanceName(L"RpcSpecialMaterial");
 
-			if (!Rgb2Material(*pRpcTexture, *pRdkMaterial))
+			if (!Rgb2Material(*pRpcTexture, *pRdkMaterial, RDK_BASIC_MAT_BITMAP_TEXTURE))
 			{
 				pRdkMaterial->Uninitialize();
 				delete pRdkMaterial;

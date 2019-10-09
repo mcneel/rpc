@@ -311,7 +311,7 @@ bool CRpcInstance::EditUi(HWND hWndParent, IEditDialogCallback* pCallback)
 	const double dScale = (NULL != pDoc) ? ON::UnitScale(ON::LengthUnitSystem::Inches, pDoc->ModelUnits()) : 1.0;
 
 	m_pEditInterface->setUnits(RPCapi::Units::LINEAR_UNITS, dScale);
-	m_pEditInterface->show(hWndParent, RPCapi::InstanceInterface::Window::PARAMETERS, RPCapi::InstanceInterface::Window::MODE_CODE::MODELESS);
+	m_pEditInterface->show(hWndParent, RPCapi::InstanceInterface::Window::PARAMETERS);
 
 	return true;
 }

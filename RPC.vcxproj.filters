@@ -153,6 +153,9 @@
     <ClCompile Include="LBPBitmapPreview.cpp">
       <Filter>Source Files\LBP</Filter>
     </ClCompile>
+    <ClCompile Include="MaterialParams.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RPCApp.h">
@@ -322,6 +325,9 @@
     </ClInclude>
     <ClInclude Include="LBPException.h">
       <Filter>Header Files\LBP</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialParams.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

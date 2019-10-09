@@ -28,6 +28,7 @@
     <ClCompile Include="LBP_UTF.cpp" />
     <ClCompile Include="LBP_UUID.cpp" />
     <ClCompile Include="LBP_XML.cpp" />
+    <ClCompile Include="MaterialParams.cpp" />
     <ClCompile Include="RpcAddCmd.cpp" />
     <ClCompile Include="RpcAnimationFrameRrp.cpp" />
     <ClCompile Include="RPCApp.cpp" />
@@ -83,6 +84,7 @@
     <ClInclude Include="LBP_UTF.h" />
     <ClInclude Include="LBP_UUID.h" />
     <ClInclude Include="LBP_XML.h" />
+    <ClInclude Include="MaterialParams.h" />
     <ClInclude Include="ON_SimpleMap.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RhRdkRegisteredPropertiesEventSink.h" />
@@ -190,7 +192,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)$(ProjectName)\SDK\lib\Release\*.*" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)SDK\lib\Release\*.*" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
