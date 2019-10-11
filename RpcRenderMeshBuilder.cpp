@@ -493,7 +493,7 @@ void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasic
 			return;
 
 		const RPCapi::TStringArg MAP("map_name");
-		auto param = pMap->get(MAP);
+		param = pMap->get(MAP);
 		auto image = dynamic_cast<RPCapi::Image*>(param);
 
 		if (!image)
@@ -502,10 +502,11 @@ void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasic
 		Rgb2Material(*image, aMaterial, CRhRdkMaterial::ChildSlotUsage::Diffuse, RDK_BASIC_MAT_BITMAP_TEXTURE);
 		aMaterial.SetReflectivityColor(ON_Color());
 	}
-	//Any value other than zero replaces the color texture with a reflection color.
+	//Any value other than zero replaces the color texture with a reflection/emission color.
 	else
 	{
 		SetReflectivity(aRpcMaterial, aMaterial);
+		SetEmission(aRpcMaterial, aMaterial);
 	}
 }
 
@@ -555,7 +556,7 @@ void CRpcRenderMeshBuilder::SetTransparency(RPCapi::Material & aRpcMaterial, CRh
 
 	auto param = aRpcMaterial.get(getMapName(MaterialMaps::TRANSPARENCY_MAP));
 
-	if (!param && (param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP))
+	if (!param || param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP)
 		return;
 
 	auto pMap = dynamic_cast<RPCapi::TextureMap*>(param);
@@ -564,7 +565,7 @@ void CRpcRenderMeshBuilder::SetTransparency(RPCapi::Material & aRpcMaterial, CRh
 		return;
 
 	const RPCapi::TStringArg MAP("map_name");
-	auto param = pMap->get(MAP);
+	param = pMap->get(MAP);
 	auto image = dynamic_cast<RPCapi::Image*>(param);
 
 	if (!image)
@@ -601,7 +602,7 @@ void CRpcRenderMeshBuilder::SetReflectivity(RPCapi::Material & aRpcMaterial, CRh
 
 	aMaterial.SetReflectivity(roughness);
 
-	if (!param && (param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP))
+	if (!param || param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP)
 		return;
 
 	auto pMap = dynamic_cast<RPCapi::TextureMap*>(param);
@@ -610,7 +611,7 @@ void CRpcRenderMeshBuilder::SetReflectivity(RPCapi::Material & aRpcMaterial, CRh
 		return;
 
 	const RPCapi::TStringArg MAP("map_name");
-	auto param = pMap->get(MAP);
+	param = pMap->get(MAP);
 	auto image = dynamic_cast<RPCapi::Image*>(param);
 
 	if (!image)
@@ -623,8 +624,9 @@ void CRpcRenderMeshBuilder::SetBump(RPCapi::Material & aRpcMaterial, CRhRdkBasic
 {
 	auto param = aRpcMaterial.get(getMapName(MaterialMaps::BUMP_MAP));
 
-	if (!param && (param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP))
+	if (!param || param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP)
 		return;
+
 	auto pMap = dynamic_cast<RPCapi::TextureMap*>(param);
 
 	if (!pMap)
@@ -644,7 +646,7 @@ void CRpcRenderMeshBuilder::SetAlphaTransparency(RPCapi::Material & aRpcMaterial
 {
 	auto param = aRpcMaterial.get(getMapName(MaterialMaps::CUTOUT_MAP));
 
-	if (!param && (param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP))
+	if (!param || param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP)
 		return;
 
 	auto pMap = dynamic_cast<RPCapi::TextureMap*>(param);
@@ -662,6 +664,26 @@ void CRpcRenderMeshBuilder::SetAlphaTransparency(RPCapi::Material & aRpcMaterial
 	Rgb2Material(*image, aMaterial, CRhRdkMaterial::ChildSlotUsage::Diffuse, RDK_BASIC_MAT_BITMAP_TEXTURE);
 	aMaterial.EnableAlphaTransparency(true);
 
+}
+
+void CRpcRenderMeshBuilder::SetEmission(RPCapi::Material & aRpcMaterial, CRhRdkBasicMaterial & aMaterial)
+{
+	float emission = 0.0f;
+	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::EMISSION)), emission);
+
+	if (emission==0.0f)
+		return;
+
+	aMaterial.SetDisableLighting(true);
+
+	auto pColor = GetColor(aRpcMaterial.get(getParamName(MaterialParams::EMISSION_COLOR)));
+
+	if (pColor)
+	{
+		ON_Color *color = new ON_Color();
+		color->SetFractionalRGB(pColor->r*emission, pColor->g*emission, pColor->b*emission);
+		aMaterial.SetEmission(*color);
+	}
 }
 
 template <typename T>
