@@ -23,16 +23,16 @@ private:
 
 	template <typename T>
 	bool Rgb2Material(T& RpcTexture, CRhRdkBasicMaterial& Material, const wchar_t* textureType);
-	bool Alpha2Material(RPCapi::Texture& RpcTexture, CRhRdkBasicMaterial& Material);
-
+	template <typename T>
+	bool Alpha2Material(T& RpcTexture, CRhRdkBasicMaterial& Material);
 
 	void SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial);
 	void SetTransparency(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial);
-	void SetMetalness(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial);
-	void SetSpecularity(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial);
-	void SetRoughness(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial);
+	void SetGlossFinish(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial);
+	void SetReflectivity(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial);
+	void SetBump(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial);
+	void SetAlphaTransparency(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial);
 	void SetEmission(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial);
-	void SetNormal(RPCapi::Material& aRpcMaterial, CRhRdkBasicMaterial& aMaterial);
 
 	template <typename T>
 	bool GetPrimValue(RPCapi::Param* param, T& value);

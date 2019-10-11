@@ -80,6 +80,7 @@ void CRpcRenderMeshBuilder::RpcMaterial2RhinoMaterial(const ON_SimpleArray<RPCap
 
 		RPCapi::Material* mat = aRpcMaterials[i];
 		SetColor(*mat, *aMaterials[i]);
+		SetTransparency(*mat, *aMaterials[i]);
 	}
 }
 
@@ -413,7 +414,8 @@ bool CRpcRenderMeshBuilder::Rgb2Material(T& RpcTexture, CRhRdkBasicMaterial& Mat
 	return true;
 }
 
-bool CRpcRenderMeshBuilder::Alpha2Material(RPCapi::Texture& RpcTexture, CRhRdkBasicMaterial& Material)
+template <typename T>
+bool CRpcRenderMeshBuilder::Alpha2Material(T& RpcTexture, CRhRdkBasicMaterial& Material)
 {
 	int iAlphaWidth = 0;
 	int iAlphaHeight = 0;
@@ -499,6 +501,32 @@ void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasic
 		RPCapi::Image *image = dynamic_cast<RPCapi::Image*>(param);
 
 		Rgb2Material(*image, aMaterial, RDK_BASIC_MAT_BITMAP_TEXTURE);
+	}
+}
+
+void CRpcRenderMeshBuilder::SetTransparency(RPCapi::Material & aRpcMaterial, CRhRdkBasicMaterial & aMaterial)
+{
+	RPCapi::Param* param = aRpcMaterial.get(getMapName(MaterialMaps::TRANSPARENCY_MAP));
+
+	if ((param) && (param->typeCode() == RPCapi::ObjectCodes::TYPE_TEXMAP))
+	{
+		auto pMap = dynamic_cast<RPCapi::TextureMap*>(param);
+
+		if (!pMap)
+		{
+			return;
+		}
+
+		const RPCapi::TStringArg MAP("map_name");
+		RPCapi::Param *param = pMap->get(MAP);
+
+		if (!param)
+		{
+			return;
+		}
+
+		RPCapi::Image *image = dynamic_cast<RPCapi::Image*>(param);
+		Alpha2Material(*image, aMaterial);
 	}
 }
 
