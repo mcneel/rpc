@@ -83,6 +83,7 @@ void CRpcRenderMeshBuilder::RpcMaterial2RhinoMaterial(const ON_SimpleArray<RPCap
 		SetTransparency(*mat, *aMaterials[i]);
 		SetGlossFinish(*mat, *aMaterials[i]);
 		SetBump(*mat, *aMaterials[i]);
+		SetAlphaTransparency(*mat, *aMaterials[i]);
 	}
 }
 
@@ -637,6 +638,30 @@ void CRpcRenderMeshBuilder::SetBump(RPCapi::Material & aRpcMaterial, CRhRdkBasic
 		return;
 
 	Rgb2Material(*image, aMaterial, CRhRdkMaterial::ChildSlotUsage::Bump, RDK_BASIC_MAT_BUMP_TEXTURE);
+}
+
+void CRpcRenderMeshBuilder::SetAlphaTransparency(RPCapi::Material & aRpcMaterial, CRhRdkBasicMaterial & aMaterial)
+{
+	auto param = aRpcMaterial.get(getMapName(MaterialMaps::CUTOUT_MAP));
+
+	if (!param && (param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP))
+		return;
+
+	auto pMap = dynamic_cast<RPCapi::TextureMap*>(param);
+
+	if (!pMap)
+		return;
+
+	const RPCapi::TStringArg MAP("map_name");
+	param = pMap->get(MAP);
+	auto *image = dynamic_cast<RPCapi::Image*>(param);
+
+	if (!image)
+		return;
+
+	Rgb2Material(*image, aMaterial, CRhRdkMaterial::ChildSlotUsage::Diffuse, RDK_BASIC_MAT_BITMAP_TEXTURE);
+	aMaterial.EnableAlphaTransparency(true);
+
 }
 
 template <typename T>
