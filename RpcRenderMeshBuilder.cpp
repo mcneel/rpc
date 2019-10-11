@@ -81,6 +81,7 @@ void CRpcRenderMeshBuilder::RpcMaterial2RhinoMaterial(const ON_SimpleArray<RPCap
 		RPCapi::Material* mat = aRpcMaterials[i];
 		SetColor(*mat, *aMaterials[i]);
 		SetTransparency(*mat, *aMaterials[i]);
+		SetBump(*mat, *aMaterials[i]);
 	}
 }
 
@@ -358,7 +359,7 @@ void CRpcRenderMeshBuilder::RpcMesh2RhinoMeshes(const RPCapi::Mesh& RpcMesh,
 }
 
 template <typename T>
-bool CRpcRenderMeshBuilder::Rgb2Material(T& RpcTexture, CRhRdkBasicMaterial& Material, const wchar_t* textureType)
+bool CRpcRenderMeshBuilder::Rgb2Material(T& RpcTexture, CRhRdkBasicMaterial& Material, CRhRdkMaterial::ChildSlotUsage slotType, const wchar_t* textureType)
 {
 	int iWidth = 0;
 	int iHeight = 0;
@@ -401,11 +402,11 @@ bool CRpcRenderMeshBuilder::Rgb2Material(T& RpcTexture, CRhRdkBasicMaterial& Mat
 		pRdkTexture->SetAdjustmentGamma(CTestRpcGamma::m_dGamma);
 	}
 
-	CRhRdkBasicMaterial::CTextureSlot slot = Material.TextureSlot(CRhRdkMaterial::ChildSlotUsage::Diffuse);
+	CRhRdkBasicMaterial::CTextureSlot slot = Material.TextureSlot(slotType);
 	slot.m_bOn = true;
 	slot.m_dAmount = 1.0;
 	slot.m_bFilterOn = true;
-	Material.SetTextureSlot(CRhRdkMaterial::ChildSlotUsage::Diffuse, slot);
+	Material.SetTextureSlot(slotType, slot);
 	
 	VERIFY(Material.SetChild(pRdkTexture, textureType));
 
@@ -500,7 +501,7 @@ void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasic
 
 		RPCapi::Image *image = dynamic_cast<RPCapi::Image*>(param);
 
-		Rgb2Material(*image, aMaterial, RDK_BASIC_MAT_BITMAP_TEXTURE);
+		Rgb2Material(*image, aMaterial, CRhRdkMaterial::ChildSlotUsage::Diffuse, RDK_BASIC_MAT_BITMAP_TEXTURE);
 	}
 }
 
@@ -527,6 +528,29 @@ void CRpcRenderMeshBuilder::SetTransparency(RPCapi::Material & aRpcMaterial, CRh
 
 		RPCapi::Image *image = dynamic_cast<RPCapi::Image*>(param);
 		Alpha2Material(*image, aMaterial);
+	}
+}
+
+void CRpcRenderMeshBuilder::SetBump(RPCapi::Material & aRpcMaterial, CRhRdkBasicMaterial & aMaterial)
+{
+	RPCapi::Param* param = aRpcMaterial.get(getMapName(MaterialMaps::BUMP_MAP));
+
+	if ((param) && (param->typeCode() == RPCapi::ObjectCodes::TYPE_TEXMAP))
+	{
+		auto pMap = dynamic_cast<RPCapi::TextureMap*>(param);
+		if (!pMap)
+		{
+			return;
+		}
+		const RPCapi::TStringArg MAP("map_name");
+		param = pMap->get(MAP);
+
+		if (!param)
+		{
+			return;
+		}
+		RPCapi::Image *image = dynamic_cast<RPCapi::Image*>(param);
+		Rgb2Material(*image, aMaterial, CRhRdkMaterial::ChildSlotUsage::Bump, RDK_BASIC_MAT_BUMP_TEXTURE);
 	}
 }
 
@@ -577,7 +601,7 @@ void CRpcRenderMeshBuilder::RpcTexture2RhinoMaterial(const ON_SimpleArray<RPCapi
 
 			pRdkMaterial->SetInstanceName(L"RpcSpecialMaterial");
 
-			if (!Rgb2Material(*pRpcTexture, *pRdkMaterial, RDK_BASIC_MAT_BITMAP_TEXTURE))
+			if (!Rgb2Material(*pRpcTexture, *pRdkMaterial, CRhRdkMaterial::ChildSlotUsage::Diffuse, RDK_BASIC_MAT_BITMAP_TEXTURE))
 			{
 				pRdkMaterial->Uninitialize();
 				delete pRdkMaterial;

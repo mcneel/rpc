@@ -22,7 +22,7 @@ private:
 	void RpcMaterial2RhinoMaterial(const ON_SimpleArray<RPCapi::Material*>& aRpcMaterials, ON_SimpleArray<CRhRdkBasicMaterial*>& aMaterials);
 
 	template <typename T>
-	bool Rgb2Material(T& RpcTexture, CRhRdkBasicMaterial& Material, const wchar_t* textureType);
+	bool Rgb2Material(T& RpcTexture, CRhRdkBasicMaterial& Material, CRhRdkMaterial::ChildSlotUsage slotType, const wchar_t* textureType);
 	template <typename T>
 	bool Alpha2Material(T& RpcTexture, CRhRdkBasicMaterial& Material);
 
