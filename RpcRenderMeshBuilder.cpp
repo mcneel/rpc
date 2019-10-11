@@ -479,6 +479,7 @@ void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasic
 		GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::BASE_WEIGHT)), baseWeight);
 		color->SetFractionalRGB(pColor->r *baseWeight, pColor->g*baseWeight, pColor->b*baseWeight);
 		aMaterial.SetDiffuse(*color);
+		aMaterial.SetReflectivityColor(*color);
 	}
 	
 	auto param = aRpcMaterial.get(getMapName(MaterialMaps::BASE_COLOR_MAP));
@@ -498,6 +499,7 @@ void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasic
 			return;
 
 		Rgb2Material(*image, aMaterial, CRhRdkMaterial::ChildSlotUsage::Diffuse, RDK_BASIC_MAT_BITMAP_TEXTURE);
+		aMaterial.SetReflectivityColor(ON_Color());
 	}
 	//Any value other than zero replaces the color texture with a reflection color.
 	else
@@ -572,18 +574,31 @@ void CRpcRenderMeshBuilder::SetTransparency(RPCapi::Material & aRpcMaterial, CRh
 
 void CRpcRenderMeshBuilder::SetReflectivity(RPCapi::Material & aRpcMaterial, CRhRdkBasicMaterial & aMaterial)
 {
+	bool inversion = false;
+	float roughness = 1.0f;
 	bool transRoughnessLock = false;
 	GetPrimValue<bool>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_ROUGHNESS_LOCK)), transRoughnessLock);
 	RPCapi::Param* param = nullptr;
 
 	if (transRoughnessLock)
 	{
+		GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::ROUGHNESS)), roughness);
+		GetPrimValue<bool>(aRpcMaterial.get(getParamName(MaterialParams::ROUGHNESS_INVERSION)), inversion);
 		param = aRpcMaterial.get(getMapName(MaterialMaps::ROUGHNESS_MAP));
 	}
 	else
 	{
+		GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_ROUGHNESS)), roughness);
+		GetPrimValue<bool>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_ROUGHNESS_INVERSION)), inversion);
 		param = aRpcMaterial.get(getMapName(MaterialMaps::TRANSPARENCY_ROUGH_MAP));
 	}
+
+	if (!inversion)
+	{
+		roughness = 1.0f - roughness;
+	}
+
+	aMaterial.SetReflectivity(roughness);
 
 	if (!param && (param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP))
 		return;
