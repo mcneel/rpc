@@ -491,10 +491,6 @@ void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasic
 
 		const RPCapi::TStringArg MAP("map_name");
 		auto param = pMap->get(MAP);
-
-		if (!param)
-			return;
-
 		auto image = dynamic_cast<RPCapi::Image*>(param);
 
 		if (!image)
@@ -511,6 +507,33 @@ void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasic
 
 void CRpcRenderMeshBuilder::SetTransparency(RPCapi::Material & aRpcMaterial, CRhRdkBasicMaterial & aMaterial)
 {
+	float transparency = 0.0f;
+	float IOR = 1.0f;
+	bool thinWalled = false;
+	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY)), transparency);
+	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_IOR)), IOR);
+	GetPrimValue<bool>(aRpcMaterial.get(getParamName(MaterialParams::THIN_WALLED)), thinWalled);
+	auto pColor = GetColor(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_COLOR)));
+
+	if (pColor)
+	{
+		ON_Color *color = new ON_Color();
+		color->SetFractionalRGB(pColor->r, pColor->g, pColor->b);
+		aMaterial.SetTransparencyColor(*color);
+	}
+
+	if (transparency > 0.0f)
+	{
+		aMaterial.EnableFresnel(true);
+		aMaterial.SetTransparency(transparency);
+		aMaterial.SetIOR(IOR);
+	}
+
+	if (thinWalled)
+	{
+		aMaterial.EnableFresnel(false);
+	}
+
 	auto param = aRpcMaterial.get(getMapName(MaterialMaps::TRANSPARENCY_MAP));
 
 	if (!param && (param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP))
@@ -523,10 +546,6 @@ void CRpcRenderMeshBuilder::SetTransparency(RPCapi::Material & aRpcMaterial, CRh
 
 	const RPCapi::TStringArg MAP("map_name");
 	auto param = pMap->get(MAP);
-
-	if (!param)
-		return;
-
 	auto image = dynamic_cast<RPCapi::Image*>(param);
 
 	if (!image)
@@ -560,10 +579,6 @@ void CRpcRenderMeshBuilder::SetReflectivity(RPCapi::Material & aRpcMaterial, CRh
 
 	const RPCapi::TStringArg MAP("map_name");
 	auto param = pMap->get(MAP);
-
-	if (!param)
-		return;
-
 	auto image = dynamic_cast<RPCapi::Image*>(param);
 
 	if (!image)
@@ -585,10 +600,6 @@ void CRpcRenderMeshBuilder::SetBump(RPCapi::Material & aRpcMaterial, CRhRdkBasic
 
 	const RPCapi::TStringArg MAP("map_name");
 	param = pMap->get(MAP);
-
-	if (!param)
-		return;
-
 	auto image = dynamic_cast<RPCapi::Image*>(param);
 
 	if (!image)
