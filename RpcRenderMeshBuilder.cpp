@@ -81,6 +81,7 @@ void CRpcRenderMeshBuilder::RpcMaterial2RhinoMaterial(const ON_SimpleArray<RPCap
 		RPCapi::Material* mat = aRpcMaterials[i];
 		SetColor(*mat, *aMaterials[i]);
 		SetTransparency(*mat, *aMaterials[i]);
+		SetGlossFinish(*mat, *aMaterials[i]);
 		SetBump(*mat, *aMaterials[i]);
 	}
 }
@@ -502,6 +503,21 @@ void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasic
 	else
 	{
 		SetReflectivity(aRpcMaterial, aMaterial);
+	}
+}
+
+void CRpcRenderMeshBuilder::SetGlossFinish(RPCapi::Material & aRpcMaterial, CRhRdkBasicMaterial & aMaterial)
+{
+	float gloss = 1.0f;
+	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::REFLECTIVITY)), gloss);
+	aMaterial.SetGlossFinish(gloss);
+	auto pColor = GetColor(aRpcMaterial.get(getParamName(MaterialParams::REFLECTION_COLOR)));
+
+	if (pColor)
+	{
+		ON_Color *color = new ON_Color();
+		color->SetFractionalRGB(pColor->r, pColor->g, pColor->b);
+		aMaterial.SetGloss(*color);
 	}
 }
 
