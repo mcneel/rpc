@@ -69,5 +69,4 @@ private:
 	mutable CLBPString m_sName;
 	RPCapi::InstanceInterface* m_pEditInterface;
 	IEditDialogCallback* m_pEditDlgCallback;
-	wchar_t *categoryName, *contentName;
 };

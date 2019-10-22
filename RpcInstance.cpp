@@ -67,14 +67,6 @@ void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBP
 	{
 		return;
 	}
-
-	RPCapi::ParamList* pRpcFile = Mains().RpcClient().RPCgetAPI()->openRPCFile(FileName().T());
-	if (NULL != pRpcFile)
-	{
-		categoryName = dynamic_cast<RPCapi::TString*>(pRpcFile->get("/metadata/categoryName"))->extractW();
-		contentName = dynamic_cast<RPCapi::TString*>(pRpcFile->get("/metadata/contentName"))->extractW();
-		delete pRpcFile;
-	}
 }
 
 bool CRpcInstance::IsValidRpc(const CLBPString& s) // static
@@ -330,7 +322,7 @@ CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc)
 	const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(Object());
 	if (NULL == pBlock) return NULL;
 
-	int layer_index = Object()->Attributes().m_layer_index;
+	int layerIndex = Object()->Attributes().m_layer_index;
 
 	const int iInstanceDefintionId = pBlock->InstanceDefinition()->Index();
 	const ON_Xform xformInstance = pBlock->InstanceXform();
@@ -340,13 +332,13 @@ CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc)
 	if (!doc.DeleteObject(CRhinoObjRef(pBlock)))
 		return NULL;
 
-	CRhinoInstanceDefinitionTable& def_table = doc.m_instance_definition_table;
-	def_table.DeleteInstanceDefinition(iInstanceDefintionId, false, true);
+	CRhinoInstanceDefinitionTable& defTable = doc.m_instance_definition_table;
+	defTable.DeleteInstanceDefinition(iInstanceDefintionId, false, true);
 
 	if (IsCreated)
 	{
-		CRhinoLayerTable& layer_table = RhinoApp().ActiveDoc()->m_layer_table;
-		layer_table.DeleteLayer(layer_index, true);
+		CRhinoLayerTable& layerTable = RhinoApp().ActiveDoc()->m_layer_table;
+		layerTable.DeleteLayer(layerIndex, true);
 	}
 
 	CRhinoInstanceObject* pAddedObject = AddToDocument(doc, sName, xformInstance);
@@ -374,10 +366,20 @@ const CRhinoObject* CRpcInstance::Object(void) const
 
 int CRpcInstance::CreateLayer(wstring& rpcName)
 {
-	
+	constexpr int NotFoundIndex = -2;
+	constexpr int MultipleFoundIndex = -1;
+	wchar_t* categoryName = nullptr;
+	wchar_t* contentName = nullptr;
+
+	if (auto rpcFile = m_pInstance->getRPCFile())
+	{
+		categoryName = dynamic_cast<RPCapi::TString*>(rpcFile->get("/metadata/categoryName"))->extractW();
+		contentName = dynamic_cast<RPCapi::TString*>(rpcFile->get("/metadata/contentName"))->extractW();
+		delete rpcFile;
+	}
+
 	CRhinoLayerTable& layerTable = RhinoApp().ActiveDoc()->m_layer_table;
-	
-	int parentLayerIndex = layerTable.CurrentLayerIndex();	
+	int parentLayerIndex = layerTable.CurrentLayerIndex();
 
 	if (layerTable.CurrentLayer().Name() != L"RPC Assets")
 	{
@@ -389,11 +391,10 @@ int CRpcInstance::CreateLayer(wstring& rpcName)
 	}
 
 	const CRhinoLayer& layer = layerTable[parentLayerIndex];
-
-	int check = layerTable.FindLayerFromName(categoryName, false, false, -2, -1);
+	int check = layerTable.FindLayerFromName(categoryName, false, false, NotFoundIndex, MultipleFoundIndex);
 	int childLayerIndex = check;
 
-	if (check == -2)
+	if (check == NotFoundIndex)
 	{
 		ON_Layer childLayer;
 		childLayer.SetParentLayerId(layer.Id());
@@ -402,26 +403,21 @@ int CRpcInstance::CreateLayer(wstring& rpcName)
 	}
 
 	const CRhinoLayer& subLayer = layerTable[childLayerIndex];
-	
 	int counter = 1;
 	ON_Layer nameLayer;
 	nameLayer.SetParentLayerId(subLayer.Id());
+	wstring wideString;
 
-	std::wstring content(contentName);
-	string temp(content.begin(), content.end());
-	std::wstring wide_string;
-	
 	do
 	{
 		std::stringstream ss;
 		ss << std::setw(3) << std::setfill('0') << counter;
-		string str = temp + "_" + ss.str();
-		wide_string = wstring(str.begin(), str.end());
+		wideString = wstring (contentName) + L"_" + wstring(ss.str().begin(), ss.str().end());
 		counter++;
-	} while (layerTable.FindLayerFromName(wide_string.c_str(), false, false, -2, -1) != -2);
+	} while (layerTable.FindLayerFromName(wideString.c_str(), false, false, NotFoundIndex, MultipleFoundIndex) != NotFoundIndex);
 
-	rpcName = wide_string;
-	nameLayer.SetName(wide_string.c_str());
+	rpcName = wideString;
+	nameLayer.SetName(wideString.c_str());
 
 	return layerTable.AddLayer(nameLayer);
 }
@@ -455,14 +451,14 @@ CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const CLBPStri
 	CRhinoMeshObject* pMesh = new CRhinoMeshObject;
 	pMesh->SetMesh(pRhinoMesh);
 
-	CRhinoInstanceDefinitionTable& def_table = doc.m_instance_definition_table;
+	CRhinoInstanceDefinitionTable& defTable = doc.m_instance_definition_table;
 	
 	const ON_wString sDefName = UnusedInstanceDefinitionName(doc).Wide();
 
 	ON_InstanceDefinition idef;
 	idef.SetName(sDefName);
 
-	const int iIndex = def_table.AddInstanceDefinition(idef, pMesh);
+	const int iIndex = defTable.AddInstanceDefinition(idef, pMesh);
 	
     CRhinoInstanceObject* pInstObj = doc.m_instance_definition_table.AddInstanceObject(iIndex, xform);
 	if (NULL != pInstObj)
@@ -473,7 +469,7 @@ CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const CLBPStri
 
 		attr.m_layer_index = CreateLayer(rpcName);
 		wstring wcs = L"*_RPC_" + wstring(rpcName);
-		def_table.SetName(iIndex, wcs.c_str());
+		defTable.SetName(iIndex, wcs.c_str());
 
 		pInstObj->ModifyAttributes(attr);
 
