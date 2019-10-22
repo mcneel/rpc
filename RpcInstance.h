@@ -6,11 +6,12 @@ class CRpcInstance : public RPCapi::ClientInstance
 public:
 	CRpcInstance(const CRhinoDoc& doc, const CLBPString& sFullPath);
 	CRpcInstance(const CRhinoDoc& doc, const CRhinoObject& obj);
-	
+
 	virtual ~CRpcInstance();
 
 public:
 	bool IsValid(void) const;
+	int CreateLayer(wstring& rpcName);
 
 	CLBPString FileName(void) const;
 	CLBPString ObjectName(void) const;
