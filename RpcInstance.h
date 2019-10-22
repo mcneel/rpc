@@ -6,8 +6,7 @@ class CRpcInstance : public RPCapi::ClientInstance
 public:
 	CRpcInstance(const CRhinoDoc& doc, const CLBPString& sFullPath);
 	CRpcInstance(const CRhinoDoc& doc, const CRhinoObject& obj);
-	bool IsCreated = false;
-	
+
 	virtual ~CRpcInstance();
 
 public:
