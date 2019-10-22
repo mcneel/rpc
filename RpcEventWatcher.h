@@ -17,6 +17,7 @@ public:
 	virtual void OnNewDocument(CRhinoDoc& doc);
 	virtual void OnBeginOpenDocument(CRhinoDoc& doc, const wchar_t* filename, BOOL bMerge, BOOL bReference);
 	virtual void OnEndOpenDocument(CRhinoDoc& doc, const wchar_t* filename, BOOL bMerge, BOOL bReference);
+	virtual void OnEndCommand(const CRhinoCommand &command, const CRhinoCommandContext &context, CRhinoCommand::result rc);
 
 private:
 	bool m_bMergeDocument;

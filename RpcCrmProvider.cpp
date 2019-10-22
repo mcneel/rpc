@@ -16,6 +16,47 @@ CRpcCrmProvider::~CRpcCrmProvider(void)
 {
 }
 
+void CRpcCrmProvider::CustomRender(const CRhinoInstanceObject& pBlock, ON_SimpleArray<ON_Mesh*>& aMeshes, ON_SimpleArray<CRhRdkBasicMaterial*>& aMaterials) const
+{
+	const int iInstanceDefintionId = pBlock.InstanceDefinition()->Index();
+	CRhinoMaterialTable& matTable = RhinoApp().ActiveDoc()->m_material_table;
+	CRhinoInstanceDefinitionTable& defTable = RhinoApp().ActiveDoc()->m_instance_definition_table;
+	ObjectArray objects;
+
+	for (int i = 0; i < aMeshes.Count(); i++)
+	{
+		ON_Mesh* pRhinoMesh = aMeshes[i];
+		CRhRdkBasicMaterial* pRdkMaterial = aMaterials[i];
+
+		CRhinoMeshObject* rhinoMesh = new CRhinoMeshObject;
+		rhinoMesh->SetMesh(pRhinoMesh);
+
+		ON_Material material = pRdkMaterial->SimulatedMaterial();
+		int matIndex = matTable.AddMaterial(material);
+
+		ON_3dmObjectAttributes attr;
+		attr.SetMaterialSource(ON::material_from_object);
+		attr.m_material_index = matIndex;
+		rhinoMesh->ModifyAttributes(attr);
+
+		objects.Append((CRhinoObject*)rhinoMesh);
+	}
+
+	defTable.ModifyInstanceDefinitionGeometry(iInstanceDefintionId, objects, true);
+}
+
+void CRpcCrmProvider::RhinoRender(const CRhinoInstanceObject& pBlock,ON_SimpleArray<ON_Mesh*>& aMeshes,
+	ON_SimpleArray<CRhRdkBasicMaterial*>& aMaterials, IRhRdkCustomRenderMeshes& crmInOut) const
+{
+	for (int i = 0; i < aMeshes.Count(); i++)
+	{
+		ON_Mesh* pRhinoMesh = aMeshes[i];
+		pRhinoMesh->Transform(pBlock.InstanceXform());
+
+		crmInOut.Add(pRhinoMesh, aMaterials[i]);
+	}
+}
+
 UUID CRpcCrmProvider::ProviderId(void) const
 {
 	// {70D82ED4-1CFC-4d06-8E20-01C76D262923}
@@ -36,7 +77,7 @@ ON_wString CRpcCrmProvider::Name(void) const
 bool CRpcCrmProvider::WillBuildCustomMesh(const ON_Viewport& vp, const CRhinoObject* pObject, const CRhinoDoc& /*doc*/, 
                                           const UUID& uuidRequestingPlugIn, const CDisplayPipelineAttributes* pAttributes) const
 {
-	if (nullptr != pAttributes)	
+	if (pAttributes)
 		return false;
 
 	CRpcObject ro(pObject);
@@ -58,7 +99,7 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 
 	const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(pObject);
 	if (NULL == pBlock) return false;
-	
+
 	ON_Xform xformInstance = pBlock->InstanceXform();
 	xformInstance.Invert();
 
@@ -68,38 +109,44 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 
 	crmInOut.SetAutoDeleteMeshesOn();
 	crmInOut.SetAutoDeleteMaterialsOn();
-			
+
 	CRpcInstance rpc(doc, *pBlock);
 	if (rpc.IsValid())
 	{
 		const RPCapi::Instance* pRpcInstance = rpc.Instance();
+		
 		if (NULL != pRpcInstance)
 		{
 			// DebugSaveTexturesToRoot(*pRpcInstance, ptCamera);
+
+			//Rhino Render ID = {5DC0192D-73DC-44F5-9141-8E72542E792D}
+			constexpr UUID RhinoRenderID = { 0x5dc0192d ,0x73dc, 0x44f5, { 0x91, 0x41, 0x8e, 0x72, 0x54, 0x2e, 0x79, 0x2d} };
 
 			ON_SimpleArray<ON_Mesh*> aMeshes;
 			ON_SimpleArray<CRhRdkBasicMaterial*> aMaterials;
 
 			CRpcRenderMeshBuilder mb(doc, *pRpcInstance);
-
+			
 			if (pRpcInstance->hasMaterials())
 				mb.BuildNew(aMeshes, aMaterials);
 			else
 				mb.BuildOld(ptCamera, aMeshes, aMaterials);
 
-			for (int i = 0; i < aMeshes.Count(); i++)
+			CRhRdkRenderPlugIn* plug = FindCurrentRenderPlugIn();
+			CRhinoPlugIn& rend = plug->RhinoPlugIn();
+
+			if (rend.PlugInID()==RhinoRenderID)
 			{
-				ON_Mesh* pRhinoMesh = aMeshes[i];
-				pRhinoMesh->Transform(pBlock->InstanceXform());
-
-				CRhRdkBasicMaterial* pRdkMaterial = NULL;
-
-				pRdkMaterial = aMaterials[i];
-
-				crmInOut.Add(pRhinoMesh, pRdkMaterial);
+				RhinoRender(*pBlock, aMeshes, aMaterials, crmInOut);
+			}
+			else
+			{
+				CustomRender(*pBlock, aMeshes, aMaterials);
 			}
 		}
 	}
+
+	RhinoApp().ActiveView()->EnableDrawing(false);
 
 	return true;
 }
