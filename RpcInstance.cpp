@@ -7,6 +7,7 @@
 #include "RpcObject.h"
 #include "RpcUtilities.h"
 #include "RpcDocument.h"
+#include <iomanip>
 
 
 CRpcInstance::CRpcInstance(const CRhinoDoc& doc, const CLBPString& sFullPath)
@@ -59,12 +60,20 @@ void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBP
 	else
 	if (NULL != pObject)
 	{
-		m_idObject	= pObject->ModelObjectId();
+		m_idObject = pObject->ModelObjectId();
 		CopyToRpc(*pObject);
 	}
 	else
 	{
 		return;
+	}
+
+	RPCapi::ParamList* pRpcFile = Mains().RpcClient().RPCgetAPI()->openRPCFile(FileName().T());
+	if (NULL != pRpcFile)
+	{
+		categoryName = dynamic_cast<RPCapi::TString*>(pRpcFile->get("/metadata/categoryName"))->extractW();
+		contentName = dynamic_cast<RPCapi::TString*>(pRpcFile->get("/metadata/contentName"))->extractW();
+		delete pRpcFile;
 	}
 }
 
@@ -321,6 +330,8 @@ CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc)
 	const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(Object());
 	if (NULL == pBlock) return NULL;
 
+	int layer_index = Object()->Attributes().m_layer_index;
+
 	const int iInstanceDefintionId = pBlock->InstanceDefinition()->Index();
 	const ON_Xform xformInstance = pBlock->InstanceXform();
 	const CRhinoObjectAttributes attr = pBlock->Attributes();
@@ -331,6 +342,12 @@ CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc)
 
 	CRhinoInstanceDefinitionTable& def_table = doc.m_instance_definition_table;
 	def_table.DeleteInstanceDefinition(iInstanceDefintionId, false, true);
+
+	if (IsCreated)
+	{
+		CRhinoLayerTable& layer_table = RhinoApp().ActiveDoc()->m_layer_table;
+		layer_table.DeleteLayer(layer_index, true);
+	}
 
 	CRhinoInstanceObject* pAddedObject = AddToDocument(doc, sName, xformInstance);
 	return pAddedObject;
@@ -353,6 +370,60 @@ const CRhinoObject* CRpcInstance::Object(void) const
 		return pDoc->LookupObject(m_idObject);
 	}
 	return NULL;
+}
+
+int CRpcInstance::CreateLayer(wstring& rpcName)
+{
+	
+	CRhinoLayerTable& layerTable = RhinoApp().ActiveDoc()->m_layer_table;
+	
+	int parentLayerIndex = layerTable.CurrentLayerIndex();	
+
+	if (layerTable.CurrentLayer().Name() != L"RPC Assets")
+	{
+		ON_Layer parentLayer;
+		parentLayer.SetName(L"RPC Assets");
+
+		parentLayerIndex = layerTable.AddLayer(parentLayer);
+		layerTable.SetCurrentLayerIndex(parentLayerIndex);
+	}
+
+	const CRhinoLayer& layer = layerTable[parentLayerIndex];
+
+	int check = layerTable.FindLayerFromName(categoryName, false, false, -2, -1);
+	int childLayerIndex = check;
+
+	if (check == -2)
+	{
+		ON_Layer childLayer;
+		childLayer.SetParentLayerId(layer.Id());
+		childLayer.SetName(categoryName);
+		childLayerIndex = layerTable.AddLayer(childLayer);
+	}
+
+	const CRhinoLayer& subLayer = layerTable[childLayerIndex];
+	
+	int counter = 1;
+	ON_Layer nameLayer;
+	nameLayer.SetParentLayerId(subLayer.Id());
+
+	std::wstring content(contentName);
+	string temp(content.begin(), content.end());
+	std::wstring wide_string;
+	
+	do
+	{
+		std::stringstream ss;
+		ss << std::setw(3) << std::setfill('0') << counter;
+		string str = temp + "_" + ss.str();
+		wide_string = wstring(str.begin(), str.end());
+		counter++;
+	} while (layerTable.FindLayerFromName(wide_string.c_str(), false, false, -2, -1) != -2);
+
+	rpcName = wide_string;
+	nameLayer.SetName(wide_string.c_str());
+
+	return layerTable.AddLayer(nameLayer);
 }
 
 CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const CLBPString& sName,
@@ -385,19 +456,25 @@ CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const CLBPStri
 	pMesh->SetMesh(pRhinoMesh);
 
 	CRhinoInstanceDefinitionTable& def_table = doc.m_instance_definition_table;
-
+	
 	const ON_wString sDefName = UnusedInstanceDefinitionName(doc).Wide();
 
 	ON_InstanceDefinition idef;
 	idef.SetName(sDefName);
 
 	const int iIndex = def_table.AddInstanceDefinition(idef, pMesh);
-    
+	
     CRhinoInstanceObject* pInstObj = doc.m_instance_definition_table.AddInstanceObject(iIndex, xform);
 	if (NULL != pInstObj)
 	{
+		wstring rpcName;
 		CRhinoObjectAttributes attr = pInstObj->Attributes();
 		attr.m_name = sName.Wide();
+
+		attr.m_layer_index = CreateLayer(rpcName);
+		wstring wcs = L"*_RPC_" + wstring(rpcName);
+		def_table.SetName(iIndex, wcs.c_str());
+
 		pInstObj->ModifyAttributes(attr);
 
 		CopyFromRpc(*pInstObj);
