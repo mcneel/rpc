@@ -325,19 +325,7 @@ void CRpcRenderMeshBuilder::RpcMesh2RhinoMeshes(const RPCapi::Mesh& RpcMesh,
 			face.vi[3] = face.vi[2];
 
 			pRhinoMesh->m_F.Append(face);
-			ASSERT(pRhinoMesh->IsValid());
-
-			/*if (!IsDegenerateTriangle(*pRhinoMesh, face))
-			{
-				pRhinoMesh->m_F.Append(face);
-				ASSERT(pRhinoMesh->IsValid());
-			}
-			else
-			{
-				iBadFaces++;
-				pRhinoMesh->m_V.SetCount(iVertexCount);
-				pRhinoMesh->m_T.SetCount(iVertexCount);
-			}*/		
+			ASSERT(pRhinoMesh->IsValid());	
 		}
 		else
 		{
@@ -528,7 +516,7 @@ void CRpcRenderMeshBuilder::SetColor(RPCapi::Material& aRpcMaterial, CRhRdkBasic
 
 void CRpcRenderMeshBuilder::SetGlossFinish(RPCapi::Material & aRpcMaterial, CRhRdkBasicMaterial & aMaterial)
 {
-	float gloss = .5f;
+	float gloss = 0.5f;
 	aMaterial.SetGlossFinish(gloss);
 	aMaterial.SetGloss(ON_Color());
 }
