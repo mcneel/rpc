@@ -428,12 +428,13 @@ CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const CLBPStri
 	if (NULL == m_pInstance)
 		return NULL;
 
-	RPCapi::Mesh* pRpcMesh = m_pInstance->getEditMesh();
-	if (NULL == pRpcMesh)
+	RPCapi::Mesh* pRpcMesh = m_pInstance->getProxyMesh();
+
+	if (!pRpcMesh)
 	{
 		// const CLBPString sRpc = rpc.Name();
 		// const CLBPString sMsg = L"RPC: " + sRpc + L" has no mesh. Invalid RPC.\n";
-		RhinoApp().Print(_RhLocalizeString( L"RPC invalid: selected RPC has no mesh.\n", 36080));
+		RhinoApp().Print(_RhLocalizeString(L"RPC invalid: selected RPC has no mesh.\n", 36080));
 		return NULL;
 	}
 	
