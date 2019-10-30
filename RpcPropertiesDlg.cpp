@@ -82,7 +82,7 @@ void CRpcPropertiesDlg::UpdatePage(IRhinoPropertiesPanelPageEventArgs&)
 
 	if (0 == m_iUpdateUiTimer)
 	{
-		m_iUpdateUiTimer = SetTimer(UPDATE_UI, 100, NULL);
+		m_iUpdateUiTimer = SetTimer(UPDATE_UI, 100, nullptr);
 	}
 }
 
@@ -92,7 +92,7 @@ bool CRpcPropertiesDlg::IncludeInNavigationControl(IRhinoPropertiesPanelPageEven
 	if (sel.Count() < 1)
 		return false;
 
-	for (auto pObject = sel.First(); nullptr != pObject; pObject = sel.Next())
+	for (auto pObject = sel.First(); pObject; pObject = sel.Next())
 	{
 		CRpcObject ro(pObject);
 		if (ro.IsTagged())
@@ -117,7 +117,7 @@ void CRpcPropertiesDlg::UpdateParameterEditor(void)
 
 	ON_SimpleArray<const CRhinoObject*> aSelectedRpcs;
 
-	for (auto pObject = sel.First(); nullptr != pObject; pObject = sel.Next())
+	for (auto pObject = sel.First(); pObject; pObject = sel.Next())
 	{
 		CRpcObject ro(pObject);
 		if (ro.IsTagged())
@@ -127,26 +127,26 @@ void CRpcPropertiesDlg::UpdateParameterEditor(void)
 	}
 
 	const int iSelected = aSelectedRpcs.Count();
-	if (0 == iSelected)
+	if (iSelected == 0)
 	{
 		return;
 	}
-	else if (1 == iSelected)
+	else if (iSelected == 1)
 		{
 			const auto pDoc = aSelectedRpcs[0]->Document();
-			if (nullptr == pDoc)
+			if (!pDoc)
 				return;
 
-			if (Mains().GetRPCInstanceTable().Lookup(uuid))
+			if (auto rpc = Mains().GetRPCInstanceTable().Lookup(uuid))
 				if (uuid!= aSelectedRpcs[0]->Id())
-					(*Mains().GetRPCInstanceTable().Lookup(uuid))->KillEditUi();
+					(*rpc)->KillEditUi();
 
 			uuid = aSelectedRpcs[0]->Id();
 		}
 	else
 	{
-		if (Mains().GetRPCInstanceTable().Lookup(uuid))
-			(*Mains().GetRPCInstanceTable().Lookup(uuid))->KillEditUi();
+		if (auto rpc = Mains().GetRPCInstanceTable().Lookup(uuid))
+			(*rpc)->KillEditUi();
 	}
 
 	CreateRpcUI((iSelected > 1) ? true : false);
@@ -171,9 +171,9 @@ CRect CRpcPropertiesDlg::HackRpcUiRect(void)
 	CRect rcOut;
 	rcOut.SetRectEmpty();
 
-	HWND hWnd = ::FindWindowEx(GetSafeHwnd(), NULL, L"#32770", NULL);
+	HWND hWnd = ::FindWindowEx(GetSafeHwnd(), nullptr, L"#32770", nullptr);
 	CWnd* pWndUI = CWnd::FromHandle(hWnd);
-	if (nullptr != pWndUI)
+	if (pWndUI)
 	{
 		CRect rc;
 		pWndUI->GetClientRect(rc);
@@ -210,8 +210,11 @@ void CRpcPropertiesDlg::CreateRpcUI(bool bMultipleSelection)
 	}
 	else
 	{
-		if ((*Mains().GetRPCInstanceTable().Lookup(uuid))->EditUi(GetSafeHwnd(), this))
-			m_rcRpcUiWnd = HackRpcUiRect();
+		if (auto rpc = *Mains().GetRPCInstanceTable().Lookup(uuid))
+		{
+			if (rpc->EditUi(GetSafeHwnd(), this))
+				m_rcRpcUiWnd = HackRpcUiRect();
+		}
 	}
 }
 
@@ -241,16 +244,18 @@ void CRpcPropertiesDlg::OnRpcParameterChanged()
 	if (!IsWindowVisible())
 		return;
 
-	if (!Mains().GetRPCInstanceTable().Lookup(uuid))
+	auto rpc = (*Mains().GetRPCInstanceTable().Lookup(uuid));
+
+	if (!rpc)
 		return;
 
-	const auto pRhinoDoc = CRhinoDoc::FromRuntimeSerialNumber((*Mains().GetRPCInstanceTable().Lookup(uuid))->Document());
+	const auto pRhinoDoc = CRhinoDoc::FromRuntimeSerialNumber(rpc->Document());
 
 	if (!pRhinoDoc)
 		return;
 
 	m_bSelectionChangeByUi = true;
-	const CRhinoInstanceObject* pBlock = (*Mains().GetRPCInstanceTable().Lookup(uuid))->Replace(*pRhinoDoc);
+	const CRhinoInstanceObject* pBlock = rpc->Replace(*pRhinoDoc);
 
 	if (pBlock)
 	{
@@ -270,7 +275,7 @@ void CRpcPropertiesDlg::OnButtonClickedEditMass()
 
 BOOL CRpcPropertiesDlg::PreTranslateMessage(MSG* pMsg) 
 {
-	if ((nullptr != pMsg) && (WM_KEYDOWN == pMsg->message))
+	if ((pMsg) && (WM_KEYDOWN == pMsg->message))
 	{
 		if (VK_RETURN == pMsg->wParam)
 		{

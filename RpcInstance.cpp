@@ -12,7 +12,7 @@
 
 CRpcInstance::CRpcInstance(const CRhinoDoc& doc, const CLBPString& sFullPath)
 {
-	Construct(doc.RuntimeSerialNumber(), NULL, sFullPath);
+	Construct(doc.RuntimeSerialNumber(), nullptr, sFullPath);
 }
 
 CRpcInstance::CRpcInstance(const CRhinoDoc& doc, const CRhinoObject& obj)
@@ -28,10 +28,9 @@ CRpcInstance::~CRpcInstance()
 
 void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBPString& sRpcPath)
 {
-	m_pEditInterface = NULL;
-	m_pEditDlgCallback = NULL;
-	m_pEditInterfaceSel = NULL;
-	m_pEditDlgCallbackS = NULL;
+	m_pEditInterface = nullptr;
+	m_pEditDlgCallback = nullptr;
+	selectionInterface = nullptr;
 	m_idObject = ON_nil_uuid;
 	m_idDoc = idDoc;
 
@@ -41,8 +40,9 @@ void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBP
 	}
 
 	m_pInstance = dynamic_cast<RPCapi::Instance*>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE));
-	if (NULL == m_pInstance) return;
 
+	if (!m_pInstance) 
+		return;
 
 	m_pInstance->setClientInstance(this);
 
@@ -51,7 +51,8 @@ void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBP
 		if (!m_pInstance->setRPCFileName(sRpcPath.T()))
 		{
 			RPCapi::ParamList* pRpcFile = Mains().RpcClient().RPCgetAPI()->openRPCFile(sRpcPath.T());
-			if (NULL != pRpcFile)
+
+			if (pRpcFile)
 			{
 				RPCapi::ID* pRpcId = dynamic_cast<RPCapi::ID*>(pRpcFile->get("/metadata/id"));
 				delete pRpcFile;
@@ -61,30 +62,26 @@ void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBP
 		}
 	}
 	else
-		if (NULL != pObject)
+		if (pObject)
 		{
 			m_idObject = pObject->ModelObjectId();
 			CopyToRpc(*pObject);
 		}
 		else
-		{
 			return;
-		}
 }
 
 CRhinoMeshObject* CRpcInstance::CreateProxyMesh(CRhinoDoc& doc)
 {
-	if (NULL == m_pInstance)
-		return NULL;
+	if (!m_pInstance)
+		return nullptr;
 
 	RPCapi::Mesh* pRpcMesh = m_pInstance->getProxyMesh();
 
 	if (!pRpcMesh)
 	{
-		// const CLBPString sRpc = rpc.Name();
-		// const CLBPString sMsg = L"RPC: " + sRpc + L" has no mesh. Invalid RPC.\n";
 		RhinoApp().Print(_RhLocalizeString(L"RPC invalid: selected RPC has no mesh.\n", 36080));
-		return NULL;
+		return nullptr;
 	}
 
 	const double dUnitsScale = ON::UnitScale(ON::LengthUnitSystem::Inches, doc.ModelUnits());
@@ -107,10 +104,12 @@ CRhinoMeshObject* CRpcInstance::CreateProxyMesh(CRhinoDoc& doc)
 bool CRpcInstance::IsValidRpc(const CLBPString& s) // static
 {
 	RPCapi* pApi = Mains().RpcClient().RPCgetAPI();
-	if (NULL == pApi) return false;
+	if (!pApi) 
+		return false;
 
 	RPCapi::ParamList* pRpcFile = pApi->openRPCFile(s.T());
-	if (NULL == pRpcFile) return false;
+	if (!pRpcFile)
+		return false;
 
 	delete pRpcFile;
 	return true;
@@ -119,7 +118,8 @@ bool CRpcInstance::IsValidRpc(const CLBPString& s) // static
 bool CRpcInstance::IsValid(void) const
 {
 	RPCapi* pApi = Mains().RpcClient().RPCgetAPI();
-	if (NULL == pApi) return false;
+	if (!pApi) 
+		return false;
 
 	CLBPString sPath = FileName();
 	if (sPath.IsEmpty())
@@ -129,10 +129,8 @@ bool CRpcInstance::IsValid(void) const
 	}
 
 	RPCapi::ParamList* pRpcFile = pApi->openRPCFile(sPath.T());
-	if (NULL == pRpcFile)
-	{
+	if (!pRpcFile)
 		return false;
-	}
 
 	delete pRpcFile;
 	return true;
@@ -140,7 +138,7 @@ bool CRpcInstance::IsValid(void) const
 
 void CRpcInstance::SetId(const RPCapi::ID *id)
 {
-	if (NULL == m_pInstance)
+	if (!m_pInstance)
 		return;
 
 	m_pInstance->setRpcId(id);
@@ -148,15 +146,15 @@ void CRpcInstance::SetId(const RPCapi::ID *id)
 
 const RPCapi::ID* CRpcInstance::Id(void) const
 {
-	if (NULL == m_pInstance)
-		return NULL;
+	if (!m_pInstance)
+		return nullptr;
 
 	return m_pInstance->getID();
 }
 
 CLBPString CRpcInstance::FileName(void) const
 {
-	if (NULL == m_pInstance)
+	if (!m_pInstance)
 		return L"";
 
 	const TString & s = m_pInstance->getRPCFileName();
@@ -168,7 +166,7 @@ CLBPString CRpcInstance::ObjectName(void) const
 {
 	const CRhinoObject* pObject = Object();
 
-	if (NULL == pObject)
+	if (!pObject)
 	{
 		m_sName = L"";
 	}
@@ -182,11 +180,11 @@ CLBPString CRpcInstance::ObjectName(void) const
 
 CLBPString CRpcInstance::RpcName(void) const
 {
-	if (NULL == m_pInstance)
+	if (!m_pInstance)
 		return L"";
 
 	TString* pName = m_pInstance->getName();
-	if (NULL == pName) return L"";
+	if (!pName) return L"";
 
 	CLBPString s = pName->getA();
 	delete pName;
@@ -223,10 +221,8 @@ int CRpcInstance::RPCgetTime(void)
 bool CRpcInstance::RPCisSelected(void)
 {
 	const CRhinoObject* pObject = Object();
-	if (NULL == pObject)
-	{
+	if (!pObject)
 		return false;
-	}
 
 	return (0 == pObject->IsSelected()) ? false : true;
 }
@@ -242,7 +238,8 @@ void CRpcInstance::RPCparameterChangeNotification(bool newInstance, const TStrin
 void CRpcInstance::RPCselect(bool select)
 {
 	const CRhinoObject* pObject = Object();
-	if (NULL != pObject)
+
+	if (pObject)
 	{
 		pObject->Select(select);
 	}
@@ -272,7 +269,7 @@ bool CRpcInstance::Data(CLBPBuffer& buf) const
 
 void CRpcInstance::SetData(const CLBPBuffer& buf)
 {
-	if (NULL == m_pInstance)
+	if (!m_pInstance)
 		return;
 
 	const int iType = m_pInstance->typeCode();
@@ -323,19 +320,17 @@ void CRpcInstance::KillEditUi(void)
 	{
 		m_pEditInterface->hide();
 		delete m_pEditInterface;
-		m_pEditInterface = NULL;
-		//m_pEditDlgCallback = NULL;
+		m_pEditInterface = nullptr;
 	}
 }
 
 void CRpcInstance::KillEditSelUi(void)
 {
-	if (m_pEditInterfaceSel)
+	if (selectionInterface)
 	{
-		m_pEditInterfaceSel->hide();
-		delete m_pEditInterfaceSel;
-		m_pEditInterfaceSel = NULL;
-		m_pEditDlgCallbackS = NULL;
+		selectionInterface->hide();
+		delete selectionInterface;
+		selectionInterface = nullptr;
 	}
 }
 
@@ -344,19 +339,18 @@ bool CRpcInstance::EditSelUI(HWND hWndParent, IEditDialogCallback* pCallback)
 	if (!m_pInstance)
 		return false;
 
-	m_pEditDlgCallbackS = pCallback;
-
 	KillEditSelUi();
 
-	m_pEditInterfaceSel = dynamic_cast<RPCapi::InstanceInterface *>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE_INTERFACE));
-	if (!m_pEditInterfaceSel) return false;
+	selectionInterface = dynamic_cast<RPCapi::InstanceInterface *>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE_INTERFACE));
+	if (!selectionInterface)
+		return false;
 
-	m_pEditInterfaceSel->setInstance(m_pInstance);
+	selectionInterface->setInstance(m_pInstance);
 
 	CRhinoDoc* pDoc = CRhinoDoc::FromRuntimeSerialNumber(m_idDoc);
 	const double dScale = (pDoc) ? ON::UnitScale(ON::LengthUnitSystem::Inches, pDoc->ModelUnits()) : 1.0;
-	m_pEditInterfaceSel->setUnits(RPCapi::Units::LINEAR_UNITS, dScale);
-	m_pEditInterfaceSel->show(hWndParent, RPCapi::InstanceInterface::Window::SELECTION);
+	selectionInterface->setUnits(RPCapi::Units::LINEAR_UNITS, dScale);
+	selectionInterface->show(hWndParent, RPCapi::InstanceInterface::Window::SELECTION);
 	return true;
 }
 
@@ -370,7 +364,8 @@ bool CRpcInstance::EditUi(HWND hWndParent, IEditDialogCallback* pCallback)
 	KillEditUi();
 
 	m_pEditInterface = dynamic_cast<RPCapi::InstanceInterface *>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE_INTERFACE));
-	if (!m_pEditInterface) return false;
+	if (!m_pEditInterface) 
+		return false;
 
 	m_pEditInterface->setInstance(m_pInstance);
 
@@ -385,7 +380,8 @@ bool CRpcInstance::EditUi(HWND hWndParent, IEditDialogCallback* pCallback)
 CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc)
 {
 	const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(Object());
-	if (NULL == pBlock) return NULL;
+	if (!pBlock) 
+		return nullptr;
 
 	const int iInstanceDefintionId = pBlock->InstanceDefinition()->Index();
 	ObjectArray objects;
@@ -410,11 +406,11 @@ CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const ON_3dPoi
 const CRhinoObject* CRpcInstance::Object(void) const
 {
 	const CRhinoDoc* pDoc = CRhinoDoc::FromRuntimeSerialNumber(m_idDoc);
-	if (NULL != pDoc)
-	{
+
+	if (pDoc)
 		return  pDoc->LookupObject(m_idObject);
-	}
-	return NULL;
+
+	return nullptr;
 }
 
 int CRpcInstance::CreateLayer(wstring& rpcName)

@@ -28,7 +28,7 @@ UUID CRpcAddCmd::CommandUUID()
 CRhinoCommand::result CRpcAddCmd::RunRpcCommand(const CRhinoCommandContext& context)
 {
 	CRhinoDoc* pDoc = context.Document();
-	if (NULL == pDoc)
+	if (!pDoc)
 		return failure;
 
 	pDoc->UnselectAll();
@@ -39,7 +39,10 @@ CRhinoCommand::result CRpcAddCmd::RunRpcCommand(const CRhinoCommandContext& cont
 
 	CRpcInstance* rpc = new CRpcInstance(*pDoc, sRpc);
 	if (!rpc->IsValid())
+	{
+		delete rpc;
 		return failure;
+	}
 
 	CRhinoGetPoint gp;
 	gp.SetCommandPrompt(_RhLocalizeString( L"RPC base point", 36075));
@@ -49,7 +52,7 @@ CRhinoCommand::result CRpcAddCmd::RunRpcCommand(const CRhinoCommandContext& cont
 	const ON_3dPoint ptInsertion = gp.Point();
 
 	CRhinoInstanceObject* pBlock = rpc->AddToDocument(*pDoc, ptInsertion);
-	if (NULL == pBlock)
+	if (!pBlock)
 		return cancel;
 
 	pBlock->Select();

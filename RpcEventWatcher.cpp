@@ -72,7 +72,8 @@ void CRpcEventWatcher::OnEndCommand(const CRhinoCommand & command, const CRhinoC
 
 	while (pObject)
 	{
-		(*Mains().GetRPCInstanceTable().Lookup(pObject->Id()))->Replace(*doc);
+		if (auto rpc = Mains().GetRPCInstanceTable().Lookup(pObject->Id()))
+			(*rpc)->Replace(*doc);
 		pObject = it.Next();
 	}
 
