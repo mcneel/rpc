@@ -38,10 +38,13 @@ public:
 	};
 
 	bool EditUi(HWND hWndParent, IEditDialogCallback* pCallback = NULL);
+	bool EditSelUI(HWND hWndParent, IEditDialogCallback* pCallback = NULL);
+	void KillEditUi(void);
+	void KillEditSelUi(void);
 
 public:
 	RPCapi::Instance* Instance(void);
-
+	CRhinoMeshObject* CreateProxyMesh(CRhinoDoc& doc);
 	static bool IsValidRpc(const CLBPString& s);
 	
 private:
@@ -56,7 +59,6 @@ private:
 
 private:
 	void Construct(UINT idDoc, const CRhinoObject* pObject, const CLBPString& sRpcPath);
-	void KillEditUi(void);
 
 	CRhinoInstanceObject* AddToDocument(CRhinoDoc& doc, const CLBPString& sName, const ON_Xform& xform);
 	const CRhinoObject* Object(void) const;
@@ -66,6 +68,7 @@ private:
 	UUID m_idObject;
 	unsigned int m_idDoc;
 	mutable CLBPString m_sName;
+	RPCapi::InstanceInterface* selectionInterface;
 	RPCapi::InstanceInterface* m_pEditInterface;
 	IEditDialogCallback* m_pEditDlgCallback;
 };
