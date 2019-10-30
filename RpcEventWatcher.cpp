@@ -63,17 +63,16 @@ void CRpcEventWatcher::OnEndOpenDocument(CRhinoDoc& doc, const wchar_t* filename
 void CRpcEventWatcher::OnEndCommand(const CRhinoCommand & command, const CRhinoCommandContext & context, CRhinoCommand::result rc)
 {
 	if (wcscmp(command.EnglishCommandName(), L"vrayRender") != 0
-		& wcscmp(command.EnglishCommandName(), L"Render") != 0)
+		&& wcscmp(command.EnglishCommandName(), L"Render") != 0)
 		return;
 
 	CRhinoDoc* doc = RhinoApp().ActiveDoc();
 	CRhinoObjectIterator it(*doc, CRhinoObjectIterator::normal_or_locked_objects, CRhinoObjectIterator::active_and_reference_objects);
 	const CRhinoObject* pObject = it.First();
 
-	while (pObject != NULL)
+	while (pObject)
 	{
-		CRpcInstance rpc(*doc, *pObject);
-		rpc.Replace(*doc);
+		(*Mains().GetRPCInstanceTable().Lookup(pObject->Id()))->Replace(*doc);
 		pObject = it.Next();
 	}
 

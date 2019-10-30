@@ -7,6 +7,7 @@
 #include "RPCPlugIn.h"
 #include "RpcUtilities.h"
 #include "LBPRhObjectSelection.h"
+#include "RpcMains.h"
 
 #define RPC_PARAM_CHANGED 005
 #define UPDATE_UI 006
@@ -18,7 +19,6 @@ CRpcPropertiesDlg::CRpcPropertiesDlg(CWnd*)
 	m_Resize(this),
 	TRhinoPropertiesPanelPage<CRhinoDialog>(IDD, IDI_PROP_RPC, false)
 {
-	m_pRpcInstance = nullptr;
 	m_iRpcParamChangedTimer = 0;
 	m_iUpdateUiTimer = 0;
 	m_bSelectionChangeByUi = false;
@@ -27,9 +27,6 @@ CRpcPropertiesDlg::CRpcPropertiesDlg(CWnd*)
 
 void CRpcPropertiesDlg::KillUI(void)
 {
-	delete m_pRpcInstance;
-	m_pRpcInstance = nullptr;
-
 	m_btMassEditButton.ShowWindow(SW_HIDE);
 
 	m_rcRpcUiWnd.SetRectEmpty();
@@ -134,14 +131,22 @@ void CRpcPropertiesDlg::UpdateParameterEditor(void)
 	{
 		return;
 	}
-	else
-	if (1 == iSelected)
-	{
-		const auto pDoc = aSelectedRpcs[0]->Document();
-		if (nullptr == pDoc)
-			return;
+	else if (1 == iSelected)
+		{
+			const auto pDoc = aSelectedRpcs[0]->Document();
+			if (nullptr == pDoc)
+				return;
 
-		m_pRpcInstance = new CRpcInstance(*pDoc, *aSelectedRpcs[0]);
+			if (Mains().GetRPCInstanceTable().Lookup(uuid))
+				if (uuid!= aSelectedRpcs[0]->Id())
+					(*Mains().GetRPCInstanceTable().Lookup(uuid))->KillEditUi();
+
+			uuid = aSelectedRpcs[0]->Id();
+		}
+	else
+	{
+		if (Mains().GetRPCInstanceTable().Lookup(uuid))
+			(*Mains().GetRPCInstanceTable().Lookup(uuid))->KillEditUi();
 	}
 
 	CreateRpcUI((iSelected > 1) ? true : false);
@@ -205,7 +210,7 @@ void CRpcPropertiesDlg::CreateRpcUI(bool bMultipleSelection)
 	}
 	else
 	{
-		if (m_pRpcInstance->EditUi(GetSafeHwnd(), this))
+		if ((*Mains().GetRPCInstanceTable().Lookup(uuid))->EditUi(GetSafeHwnd(), this))
 			m_rcRpcUiWnd = HackRpcUiRect();
 	}
 }
@@ -236,19 +241,21 @@ void CRpcPropertiesDlg::OnRpcParameterChanged()
 	if (!IsWindowVisible())
 		return;
 
-	if (nullptr == m_pRpcInstance)
+	if (!Mains().GetRPCInstanceTable().Lookup(uuid))
 		return;
 
-	const auto pRhinoDoc = CRhinoDoc::FromRuntimeSerialNumber(m_pRpcInstance->Document());
-	if (nullptr == pRhinoDoc)
+	const auto pRhinoDoc = CRhinoDoc::FromRuntimeSerialNumber((*Mains().GetRPCInstanceTable().Lookup(uuid))->Document());
+
+	if (!pRhinoDoc)
 		return;
 
 	m_bSelectionChangeByUi = true;
+	const CRhinoInstanceObject* pBlock = (*Mains().GetRPCInstanceTable().Lookup(uuid))->Replace(*pRhinoDoc);
 
-	CRhinoInstanceObject* pObject = m_pRpcInstance->Replace(*pRhinoDoc);
-	if (nullptr != pObject)
+	if (pBlock)
 	{
-		pObject->Select();
+		pBlock->Select();
+		SetRedraw();
 		pRhinoDoc->Redraw();
 	}
 

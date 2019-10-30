@@ -30,6 +30,8 @@ void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBP
 {
 	m_pEditInterface = NULL;
 	m_pEditDlgCallback = NULL;
+	m_pEditInterfaceSel = NULL;
+	m_pEditDlgCallbackS = NULL;
 	m_idObject = ON_nil_uuid;
 	m_idDoc = idDoc;
 
@@ -38,8 +40,9 @@ void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBP
 		Mains().RpcClient().OnRpcInstanceWillBeCreated(m_idDoc, sRpcPath);
 	}
 
-	m_pInstance = dynamic_cast<RPCapi::Instance *>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE));
+	m_pInstance = dynamic_cast<RPCapi::Instance*>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE));
 	if (NULL == m_pInstance) return;
+
 
 	m_pInstance->setClientInstance(this);
 
@@ -58,15 +61,47 @@ void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBP
 		}
 	}
 	else
-	if (NULL != pObject)
+		if (NULL != pObject)
+		{
+			m_idObject = pObject->ModelObjectId();
+			CopyToRpc(*pObject);
+		}
+		else
+		{
+			return;
+		}
+}
+
+CRhinoMeshObject* CRpcInstance::CreateProxyMesh(CRhinoDoc& doc)
+{
+	if (NULL == m_pInstance)
+		return NULL;
+
+	RPCapi::Mesh* pRpcMesh = m_pInstance->getProxyMesh();
+
+	if (!pRpcMesh)
 	{
-		m_idObject = pObject->ModelObjectId();
-		CopyToRpc(*pObject);
+		// const CLBPString sRpc = rpc.Name();
+		// const CLBPString sMsg = L"RPC: " + sRpc + L" has no mesh. Invalid RPC.\n";
+		RhinoApp().Print(_RhLocalizeString(L"RPC invalid: selected RPC has no mesh.\n", 36080));
+		return NULL;
 	}
-	else
-	{
-		return;
-	}
+
+	const double dUnitsScale = ON::UnitScale(ON::LengthUnitSystem::Inches, doc.ModelUnits());
+	ON_Xform xformUnitsScale = ON_Xform::DiagonalTransformation(dUnitsScale, dUnitsScale, dUnitsScale);
+
+	ON_Mesh* pRhinoMesh = new  ON_Mesh;
+
+	RpcMesh2RhinoMesh(*pRpcMesh, *pRhinoMesh);
+
+	delete pRpcMesh;
+
+	pRhinoMesh->Transform(xformUnitsScale);
+
+	CRhinoMeshObject* pMesh = new CRhinoMeshObject;
+	pMesh->SetMesh(pRhinoMesh);
+
+	return pMesh;
 }
 
 bool CRpcInstance::IsValidRpc(const CLBPString& s) // static
@@ -198,7 +233,7 @@ bool CRpcInstance::RPCisSelected(void)
 
 void CRpcInstance::RPCparameterChangeNotification(bool newInstance, const TString **params, int num)
 {
-	if (NULL != m_pEditDlgCallback)
+	if (m_pEditDlgCallback)
 	{
 		m_pEditDlgCallback->OnRpcParameterChanged();
 	}
@@ -248,7 +283,6 @@ void CRpcInstance::SetData(const CLBPBuffer& buf)
 
 	string str(sz, iSize);
 	stringstream streamIn(str);
-
 	m_pInstance->fromStream(streamIn, 0, iType);
 
 	Mains().RpcClient().OnRpcInstanceWillBeCreated(m_idDoc, FileName());
@@ -285,18 +319,50 @@ bool CRpcInstance::CopyFromRpc(const CRhinoObject& obj) const
 
 void CRpcInstance::KillEditUi(void)
 {
-	if (NULL != m_pEditInterface)
+	if (m_pEditInterface)
 	{
 		m_pEditInterface->hide();
 		delete m_pEditInterface;
 		m_pEditInterface = NULL;
-		m_pEditDlgCallback = NULL;
+		//m_pEditDlgCallback = NULL;
 	}
+}
+
+void CRpcInstance::KillEditSelUi(void)
+{
+	if (m_pEditInterfaceSel)
+	{
+		m_pEditInterfaceSel->hide();
+		delete m_pEditInterfaceSel;
+		m_pEditInterfaceSel = NULL;
+		m_pEditDlgCallbackS = NULL;
+	}
+}
+
+bool CRpcInstance::EditSelUI(HWND hWndParent, IEditDialogCallback* pCallback)
+{
+	if (!m_pInstance)
+		return false;
+
+	m_pEditDlgCallbackS = pCallback;
+
+	KillEditSelUi();
+
+	m_pEditInterfaceSel = dynamic_cast<RPCapi::InstanceInterface *>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE_INTERFACE));
+	if (!m_pEditInterfaceSel) return false;
+
+	m_pEditInterfaceSel->setInstance(m_pInstance);
+
+	CRhinoDoc* pDoc = CRhinoDoc::FromRuntimeSerialNumber(m_idDoc);
+	const double dScale = (pDoc) ? ON::UnitScale(ON::LengthUnitSystem::Inches, pDoc->ModelUnits()) : 1.0;
+	m_pEditInterfaceSel->setUnits(RPCapi::Units::LINEAR_UNITS, dScale);
+	m_pEditInterfaceSel->show(hWndParent, RPCapi::InstanceInterface::Window::SELECTION);
+	return true;
 }
 
 bool CRpcInstance::EditUi(HWND hWndParent, IEditDialogCallback* pCallback)
 {
-	if (NULL == m_pInstance)
+	if (!m_pInstance)
 		return false;
 
 	m_pEditDlgCallback = pCallback;
@@ -304,16 +370,15 @@ bool CRpcInstance::EditUi(HWND hWndParent, IEditDialogCallback* pCallback)
 	KillEditUi();
 
 	m_pEditInterface = dynamic_cast<RPCapi::InstanceInterface *>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE_INTERFACE));
-	if (NULL == m_pEditInterface) return false;
+	if (!m_pEditInterface) return false;
 
 	m_pEditInterface->setInstance(m_pInstance);
 
 	CRhinoDoc* pDoc = CRhinoDoc::FromRuntimeSerialNumber(m_idDoc);
-	const double dScale = (NULL != pDoc) ? ON::UnitScale(ON::LengthUnitSystem::Inches, pDoc->ModelUnits()) : 1.0;
+	const double dScale = (pDoc) ? ON::UnitScale(ON::LengthUnitSystem::Inches, pDoc->ModelUnits()) : 1.0;
 
 	m_pEditInterface->setUnits(RPCapi::Units::LINEAR_UNITS, dScale);
 	m_pEditInterface->show(hWndParent, RPCapi::InstanceInterface::Window::PARAMETERS);
-
 	return true;
 }
 
@@ -323,18 +388,14 @@ CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc)
 	if (NULL == pBlock) return NULL;
 
 	const int iInstanceDefintionId = pBlock->InstanceDefinition()->Index();
-	const ON_Xform xformInstance = pBlock->InstanceXform();
-	const CRhinoObjectAttributes attr = pBlock->Attributes();
-	const CLBPString sName = attr.m_name;
-
-	if (!doc.DeleteObject(CRhinoObjRef(pBlock)))
-		return NULL;
+	ObjectArray objects;
+	objects.Append(CreateProxyMesh(doc));
 
 	CRhinoInstanceDefinitionTable& defTable = doc.m_instance_definition_table;
-	defTable.DeleteInstanceDefinition(iInstanceDefintionId, false, true);
+	defTable.ModifyInstanceDefinition(*pBlock->InstanceDefinition(), iInstanceDefintionId, ON_InstanceDefinition::all_idef_settings, true);
+	defTable.ModifyInstanceDefinitionGeometry(iInstanceDefintionId, objects, true);
 
-	CRhinoInstanceObject* pAddedObject = AddToDocument(doc, sName, xformInstance);
-	return pAddedObject;
+	return (CRhinoInstanceObject*) pBlock;
 }
 
 CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const ON_3dPoint& pt)
@@ -351,7 +412,7 @@ const CRhinoObject* CRpcInstance::Object(void) const
 	const CRhinoDoc* pDoc = CRhinoDoc::FromRuntimeSerialNumber(m_idDoc);
 	if (NULL != pDoc)
 	{
-		return pDoc->LookupObject(m_idObject);
+		return  pDoc->LookupObject(m_idObject);
 	}
 	return NULL;
 }
@@ -425,58 +486,32 @@ int CRpcInstance::CreateLayer(wstring& rpcName)
 CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const CLBPString& sName,
 												  const ON_Xform& xform)
 {
-	if (NULL == m_pInstance)
-		return NULL;
-
-	RPCapi::Mesh* pRpcMesh = m_pInstance->getProxyMesh();
-
-	if (!pRpcMesh)
-	{
-		// const CLBPString sRpc = rpc.Name();
-		// const CLBPString sMsg = L"RPC: " + sRpc + L" has no mesh. Invalid RPC.\n";
-		RhinoApp().Print(_RhLocalizeString(L"RPC invalid: selected RPC has no mesh.\n", 36080));
-		return NULL;
-	}
-	
-	const double dUnitsScale = ON::UnitScale(ON::LengthUnitSystem::Inches, doc.ModelUnits());
-	ON_Xform xformUnitsScale = ON_Xform::DiagonalTransformation(dUnitsScale, dUnitsScale, dUnitsScale);
-
-	ON_Mesh* pRhinoMesh = new  ON_Mesh;
-
-	RpcMesh2RhinoMesh(*pRpcMesh, *pRhinoMesh);
-	
-	delete pRpcMesh;
-
-	pRhinoMesh->Transform(xformUnitsScale);
-
-	CRhinoMeshObject* pMesh = new CRhinoMeshObject;
-	pMesh->SetMesh(pRhinoMesh);
-
 	CRhinoInstanceDefinitionTable& defTable = doc.m_instance_definition_table;
-	
+
 	const ON_wString sDefName = UnusedInstanceDefinitionName(doc).Wide();
 
 	ON_InstanceDefinition idef;
 	idef.SetName(sDefName);
 
-	const int iIndex = defTable.AddInstanceDefinition(idef, pMesh);
-	
-    CRhinoInstanceObject* pInstObj = doc.m_instance_definition_table.AddInstanceObject(iIndex, xform);
-	if (NULL != pInstObj)
+	const int iIndex = defTable.AddInstanceDefinition(idef, CreateProxyMesh(doc));
+
+	ON_3dmObjectAttributes* attr = new ON_3dmObjectAttributes();
+	wstring rpcName = sName.Wide();
+	attr->m_layer_index = CreateLayer(rpcName);
+	attr->SetName(rpcName.c_str(), true);
+	wstring objectName = L"*_RPC_" + wstring(rpcName);
+	defTable.SetName(iIndex, objectName.c_str());
+
+    CRhinoInstanceObject* pInstObj = defTable.AddInstanceObject(iIndex, xform, attr);
+
+	if (pInstObj)
 	{
-		wstring rpcName = sName.Wide();
-		CRhinoObjectAttributes attr = pInstObj->Attributes();
-		attr.m_layer_index = CreateLayer(rpcName);
-		attr.SetName(rpcName.c_str(), true);
-		wstring objectName = L"*_RPC_" + wstring(rpcName);
-		defTable.SetName(iIndex, objectName.c_str());
-
-		pInstObj->ModifyAttributes(attr);
-
 		CopyFromRpc(*pInstObj);
 		m_idObject = pInstObj->ModelObjectId();
 		m_idDoc = doc.RuntimeSerialNumber();
 	}
+
+	Mains().GetRPCInstanceTable().SetAt(pInstObj->Id(), this);
 
 	return pInstObj;
 }

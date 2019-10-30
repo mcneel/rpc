@@ -110,12 +110,9 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 	crmInOut.SetAutoDeleteMeshesOn();
 	crmInOut.SetAutoDeleteMaterialsOn();
 
-	CRpcInstance rpc(doc, *pBlock);
-	if (rpc.IsValid())
+	if ((*Mains().GetRPCInstanceTable().Lookup(pBlock->Id()))->IsValid())
 	{
-		const RPCapi::Instance* pRpcInstance = rpc.Instance();
-		
-		if (NULL != pRpcInstance)
+		if ((*Mains().GetRPCInstanceTable().Lookup(pBlock->Id()))->Instance())
 		{
 			// DebugSaveTexturesToRoot(*pRpcInstance, ptCamera);
 
@@ -125,9 +122,9 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 			ON_SimpleArray<ON_Mesh*> aMeshes;
 			ON_SimpleArray<CRhRdkBasicMaterial*> aMaterials;
 
-			CRpcRenderMeshBuilder mb(doc, *pRpcInstance);
+			CRpcRenderMeshBuilder mb(doc, *(*Mains().GetRPCInstanceTable().Lookup(pBlock->Id()))->Instance());
 			
-			if (pRpcInstance->hasMaterials())
+			if ((*Mains().GetRPCInstanceTable().Lookup(pBlock->Id()))->Instance()->hasMaterials())
 				mb.BuildNew(aMeshes, aMaterials);
 			else
 				mb.BuildOld(ptCamera, aMeshes, aMaterials);

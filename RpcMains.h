@@ -9,6 +9,9 @@ class CRpcDocument;
 class CRpcEventWatcher;
 class CRPCPlugIn;
 class CRpcPropertiesDlg;
+class CRpcInstance;
+template <class VALUE>
+class ON_SimpleUuidMap;
 
 
 class CRpcMains
@@ -28,6 +31,7 @@ public:
 	CRpcDocument& RpcDocument(void);
 	CRpcEventWatcher& EventWatcher(void) const;
 	CRpcPropertiesDlg& PropertiesDlg(void);
+	ON_SimpleUuidMap<CRpcInstance*>& GetRPCInstanceTable();
 
 private:
 	void CleanUp(void);
@@ -42,6 +46,7 @@ private:
 	mutable CRpcEventWatcher* m_pEventWatcher;
 	const CRPCPlugIn& m_PlugIn;
 	CRpcPropertiesDlg* m_pRpcPropDlg;
+	ON_SimpleUuidMap<CRpcInstance*>* rpcTable;
 };
 
 
