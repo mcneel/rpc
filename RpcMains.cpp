@@ -40,16 +40,16 @@ CRpcMains& Mains(void)
 
 
 CRpcMains::CRpcMains(const CRPCPlugIn& plug)
-: m_PlugIn(plug)
+: m_PlugIn(plug),
+m_pRpcClient(nullptr),
+m_pRdkPlugIn(nullptr),
+m_pEventMachine(nullptr),
+m_pDragDropHandler(nullptr),
+m_pRpcDocument(nullptr),
+m_pEventWatcher(nullptr),
+m_pRpcPropDlg(nullptr),
+rpcTable(nullptr)
 {
-	m_pRpcClient = nullptr;
-	m_pRdkPlugIn = nullptr;
-	m_pEventMachine = nullptr;
-	m_pDragDropHandler = nullptr;
-	m_pRpcDocument = nullptr;
-	m_pEventWatcher = nullptr;
-	m_pRpcPropDlg = nullptr;
-	rpcTable = nullptr;
 }
 
 CRpcMains::~CRpcMains(void)

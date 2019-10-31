@@ -19,15 +19,15 @@ UUID CRpcHelpCmd::CommandUUID()
 
 CRhinoCommand::result CRpcHelpCmd::RunRpcCommand(const CRhinoCommandContext& context)
 {
-	const TCHAR *arc_help = _T("http://helpcenter.archvision.com");
-	ShellExecute(0, 0, arc_help, 0, 0, SW_SHOW);
+	const TCHAR *arcHelp = _T("http://helpcenter.archvision.com");
+	ShellExecute(0, 0, arcHelp, 0, 0, SW_SHOW);
 	return success;
 }
 
 CRhinoCommand::result CRpcSiteCmd::RunRpcCommand(const CRhinoCommandContext & context)
 {
-	const TCHAR *arc_help = _T("http://archvision.com/");
-	ShellExecute(0, 0, arc_help, 0, 0, SW_SHOW);
+	const TCHAR *arcSite = _T("http://archvision.com/");
+	ShellExecute(0, 0, arcSite, 0, 0, SW_SHOW);
 	return success;
 }
 

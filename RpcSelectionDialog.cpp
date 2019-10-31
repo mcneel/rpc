@@ -134,11 +134,13 @@ void CRpcSelectionDialog::SetPosition()
 	while (parent)
 	{
 		CWnd *child = parent->GetWindow(GW_CHILD);
-		while (child)
+
+		if (child)
 		{
 			parent->SetWindowPos(CWnd::FromHandle(GetSafeHwnd()), x, selectionY, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOREPOSITION);
 			return;
 		}
+
 		parent = parent->GetNextWindow(GW_HWNDNEXT);
 	}
 }

@@ -20,11 +20,11 @@ public:
 	enum { IDD = IDD_SELECTION};
 
 private:
-	virtual void DoDataExchange(CDataExchange* pDX);
-	virtual BOOL OnInitDialog();
-	virtual	void OnBeginCommand(const CRhinoCommand& command,const CRhinoCommandContext& context);
+	void DoDataExchange(CDataExchange* pDX) override;
+	BOOL OnInitDialog() override;
+	void OnBeginCommand(const CRhinoCommand& command,const CRhinoCommandContext& context) override;
 	// Inherited via IEditDialogCallback
-	virtual void OnRpcParameterChanged(void) override {};
+	void OnRpcParameterChanged(void) override {};
 
 	DECLARE_MESSAGE_MAP()
 	afx_msg void OnButtonClickedSelection();

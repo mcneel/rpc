@@ -4,8 +4,8 @@
 class CRpcDashboardCmd : public CRpcTestCommand
 {
 public:
-	virtual CRhinoCommand::result RunRpcCommand(const CRhinoCommandContext& context);
-	virtual const wchar_t * EnglishCommandName();
-	virtual UUID CommandUUID();
+	CRhinoCommand::result RunRpcCommand(const CRhinoCommandContext& context) override;
+	const wchar_t * EnglishCommandName() override;
+	UUID CommandUUID() override;
 };
 

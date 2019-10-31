@@ -12,9 +12,9 @@ public:
 	UUID CommandUUID() override
 	{
 		// {1CB91610-1762-4C93-8582-1D50BFC43152}
-		static const GUID CRpcDockbar_UUID =
+		static const GUID CRpcDockbarUUID =
 		{ 0x1CB91610, 0x1762, 0x4C93, { 0x85, 0x82, 0x1D, 0x50, 0xBF, 0xC4, 0x31, 0x52 } };
-		return CRpcDockbar_UUID;
+		return CRpcDockbarUUID;
 	}
 
 	const wchar_t* EnglishCommandName() override { return L"RPCSelect"; }
@@ -22,7 +22,7 @@ public:
 	CRhinoCommand::result RunCommand(const CRhinoCommandContext& context) override;
 };
 
-static class CRpcDockbar theSampleDockBarDialogCommand;
+static class CRpcDockbar theDockBarDialogCommand;
 
 CRhinoCommand::result CRpcDockbar::RunCommand(const CRhinoCommandContext& context)
 {
@@ -41,24 +41,24 @@ CRhinoCommand::result CRpcDockbar::RunCommand(const CRhinoCommandContext& contex
 
 		CRhinoGetOption go;
 		go.SetCommandPrompt(str);
-		int h_option = go.AddCommandOption(RHCMDOPTNAME(L"Hide"));
-		int s_option = go.AddCommandOption(RHCMDOPTNAME(L"Show"));
-		int t_option = go.AddCommandOption(RHCMDOPTNAME(L"Toggle"));
+		int hOption = go.AddCommandOption(RHCMDOPTNAME(L"Hide"));
+		int sOption = go.AddCommandOption(RHCMDOPTNAME(L"Show"));
+		int tOption = go.AddCommandOption(RHCMDOPTNAME(L"Toggle"));
 		go.GetOption();
 		if (go.CommandResult() != CRhinoCommand::success)
 			return go.CommandResult();
 
 		const CRhinoCommandOption* option = go.Option();
-		if (0 == option)
+		if (option == 0)
 			return CRhinoCommand::failure;
 
-		int option_index = option->m_option_index;
+		int optionIndex = option->m_option_index;
 
-		if (h_option == option_index && bVisible)
+		if (hOption == optionIndex && bVisible)
 			CRhinoTabbedDockBarDialog::ShowDockbarTab(context.m_doc, tabId, false, false, nullptr);
-		else if (s_option == option_index && !bVisible)
+		else if (sOption == optionIndex && !bVisible)
 			CRhinoTabbedDockBarDialog::ShowDockbarTab(context.m_doc, tabId, true, true, nullptr);
-		else if (t_option == option_index)
+		else if (tOption == optionIndex)
 			CRhinoTabbedDockBarDialog::ShowDockbarTab(context.m_doc, tabId, !bVisible, !bVisible, nullptr);
 	}
 

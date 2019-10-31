@@ -141,21 +141,7 @@ BOOL CRPCPlugIn::OnLoadPlugIn()
 
 	// TODO: Add plug-in initialization code here.
 
-	ON_wString path;
-	CRhinoFileUtilities::GetRhinoRoamingProfileDataFolder(path);
-	path += L"UI\\Plug-ins\\";
-
-	ON_wString plugin;
-	GetPlugInFileName(plugin);
-
-	ON_wString fname;
-	ON_wString::SplitPath(plugin, nullptr, nullptr, &fname, nullptr);
-	fname += L".rui";
-
-	path += fname;
-
-	if (CRhinoFileUtilities::FileExists(path))
-		CRhinoFileUtilities::DeleteFile(path);
+	RefreshToolbar();
 
 	m_pMains = new CRpcMains(*this);
 	if (!m_pMains->Initialize())
@@ -199,6 +185,25 @@ void CRPCPlugIn::OnUnloadPlugIn()
 CRpcMains& CRPCPlugIn::Mains(void)
 {
 	return *m_pMains;
+}
+
+void CRPCPlugIn::RefreshToolbar()
+{
+	ON_wString path;
+	CRhinoFileUtilities::GetRhinoRoamingProfileDataFolder(path);
+	path += L"UI\\Plug-ins\\";
+
+	ON_wString plugin;
+	GetPlugInFileName(plugin);
+
+	ON_wString fname;
+	ON_wString::SplitPath(plugin, nullptr, nullptr, &fname, nullptr);
+	fname += L".rui";
+
+	path += fname;
+
+	if (CRhinoFileUtilities::FileExists(path))
+		CRhinoFileUtilities::DeleteFile(path);
 }
 
 void CRPCPlugIn::AddPagesToObjectPropertiesDialog(CRhinoPropertiesPanelPageCollection& collection)

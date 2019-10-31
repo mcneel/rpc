@@ -99,7 +99,8 @@ bool CRpcAddCmd::GetRpcFileName(CRhinoDoc& doc, CLBPString& sRpc)
 	}
 
 	CLBPString sSel = dlgRpcSelect.Selection();
-	if (sSel.IsEmpty()) return false;
+	if (sSel.IsEmpty()) 
+		return false;
 
 	sRpc = sSel;
 	return true;
