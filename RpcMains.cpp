@@ -15,12 +15,18 @@
 #include "RpcAddCmd.h"
 #include "RpcEditCmd.h"
 #include "RpcSetAnimationFrameCmd.h"
+#include "RpcDashboardCmd.h"
+#include "RpcHelpCmd.h"
 
 void CRpcMains::CreateCommands(void)
 {
 	static class CRpcAddCmd theRpcAddCmd;
 	static class CRpcEditCmd theRpcEditCmd;
 	static class CRpcSetAnimationFrameCmd theSetAnimationFrameCmd;
+	static class CRpcDashboardCmd theRpcDashboardCmd;
+	static class CRpcHelpCmd theRpcHelpCmd;
+	static class CRpcSiteCmd theRpcSiteCmd;
+
 }
 
 
@@ -36,14 +42,14 @@ CRpcMains& Mains(void)
 CRpcMains::CRpcMains(const CRPCPlugIn& plug)
 : m_PlugIn(plug)
 {
-	m_pRpcClient = NULL;
-	m_pRdkPlugIn = NULL;
-	m_pEventMachine = NULL;
-	m_pDragDropHandler = NULL;
-	m_pRpcDocument = NULL;
-	m_pEventWatcher = NULL;
-	m_pRpcPropDlg = NULL;
-	rpcTable = NULL;
+	m_pRpcClient = nullptr;
+	m_pRdkPlugIn = nullptr;
+	m_pEventMachine = nullptr;
+	m_pDragDropHandler = nullptr;
+	m_pRpcDocument = nullptr;
+	m_pEventWatcher = nullptr;
+	m_pRpcPropDlg = nullptr;
+	rpcTable = nullptr;
 }
 
 CRpcMains::~CRpcMains(void)
@@ -58,21 +64,21 @@ void CRpcMains::CleanUp(void)
 		m_pEventWatcher->Enable(false);
 		m_pEventWatcher->UnRegister();
 		delete m_pEventWatcher;
-		m_pEventWatcher = NULL;
+		m_pEventWatcher = nullptr;
 	}
 
 	if (m_pRdkPlugIn)
 	{
 		m_pRdkPlugIn->Uninitialize();
 		delete m_pRdkPlugIn;
-		m_pRdkPlugIn = NULL;
+		m_pRdkPlugIn = nullptr;
 	}
 
 	if (m_pRpcClient)
 	{
 		m_pRpcClient->Uninitialize();
 		delete m_pRpcClient;
-		m_pRpcClient = NULL;
+		m_pRpcClient = nullptr;
 	}
 
 	if(m_pEventMachine)
@@ -83,32 +89,32 @@ void CRpcMains::CleanUp(void)
 	if (m_pRpcDocument)
 	{
 		delete m_pRpcDocument;
-		m_pRpcDocument = NULL;
+		m_pRpcDocument = nullptr;
 	}
 
 	if (m_pRpcPropDlg)
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		delete m_pRpcPropDlg;
-		m_pRpcPropDlg = NULL;
+		m_pRpcPropDlg = nullptr;
 	}
 
 	if (m_pEventMachine)
 	{
 		delete m_pEventMachine;
-		m_pEventMachine = NULL;
+		m_pEventMachine = nullptr;
 	}
 
 	if (m_pDragDropHandler)
 	{
 		delete m_pDragDropHandler;
-		m_pDragDropHandler = NULL;
+		m_pDragDropHandler = nullptr;
 	}
 
 	if (rpcTable)
 	{
 		delete rpcTable;
-		rpcTable = NULL;
+		rpcTable = nullptr;
 	}
 }
 
