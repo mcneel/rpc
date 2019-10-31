@@ -94,18 +94,24 @@ BEGIN
 END
 
 IDD_PREVIEWING_FILE_DIALOG DIALOGEX 0, 0, 266, 120
-STYLE DS_3DLOOK | DS_CONTROL | WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
+STYLE DS_SETFONT | DS_3DLOOK | DS_CONTROL | WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN
 EXSTYLE WS_EX_APPWINDOW
 FONT 8, "MS Sans Serif", 0, 0, 0x1
 BEGIN
     LTEXT           "",1119,0,0,163,113
-    LTEXT           "",IDC_STATIC_PREVIEW,171,7,56,55,SS_NOTIFY | NOT
-                    WS_VISIBLE | WS_BORDER
-    CONTROL         "Preview",IDC_CHECK_PREVIEW,"Button",BS_AUTOCHECKBOX |
-                    WS_TABSTOP,171,104,63,8
-    CONTROL         "",IDC_PROGRESS1,"msctls_progress32",WS_BORDER,171,91,32,
-                    7
+    LTEXT           "",IDC_STATIC_PREVIEW,171,7,56,55,SS_NOTIFY | NOT WS_VISIBLE | WS_BORDER
+    CONTROL         "Preview",IDC_CHECK_PREVIEW,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,171,104,63,8
+    CONTROL         "",IDC_PROGRESS1,"msctls_progress32",WS_BORDER,171,91,32,7
 END
+
+IDD_SELECTION DIALOGEX 0, 0, 186, 116
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "RPC",ID_BUTTON_PLACE,1,1,17,14,BS_ICON
+    CTEXT           "Please Click on the RPC Icon to Start adding RPC assets to your model.",IDC_TEXT,17,90,149,24
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -115,12 +121,33 @@ END
 #ifdef APSTUDIO_INVOKED
 GUIDELINES DESIGNINFO
 BEGIN
+    IDD_EMPTY, DIALOG
+    BEGIN
+    END
+
+    IDD_PARAM, DIALOG
+    BEGIN
+    END
+
     IDD_EDIT, DIALOG
     BEGIN
         LEFTMARGIN, 7
         RIGHTMARGIN, 179
         TOPMARGIN, 7
         BOTTOMMARGIN, 88
+    END
+
+    IDD_FILE_DIALOG, DIALOG
+    BEGIN
+    END
+
+    IDD_PREVIEWING_FILE_DIALOG, DIALOG
+    BEGIN
+    END
+
+    IDD_SELECTION, DIALOG
+    BEGIN
+        BOTTOMMARGIN, 114
     END
 END
 #endif    // APSTUDIO_INVOKED
@@ -134,7 +161,22 @@ END
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
 IDI_ACM                 ICON                    "res\\rpc_acm.ico"
+
 IDI_PROP_RPC            ICON                    "res\\Rpc.ico"
+
+IDI_SEL                 ICON                    "res\\selection.ico"
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SELECTION AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 #endif    // Finnish (Finland) resources
 /////////////////////////////////////////////////////////////////////////////
 

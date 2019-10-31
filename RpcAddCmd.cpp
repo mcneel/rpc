@@ -92,25 +92,16 @@ bool CRpcAddCmd::GetRpcFileName(CRhinoDoc& doc, CLBPString& sRpc)
 
 	CRpcAdvancedFileDialog dlg(pParentWnd);
 
-	if (dlg.DoModal() != IDOK)
+	CRpcSelectDlg dlgRpcSelect(doc, (const wchar_t*)dlg.GetPathName());
+	if (dlgRpcSelect.DoModal() != IDOK)
 	{
-		if (!dlg.Advanced())
-			return false;
-
-		CRpcSelectDlg dlgRpcSelect(doc, (const wchar_t*)dlg.GetPathName());
-		if (dlgRpcSelect.DoModal() != IDOK)
-		{
-			return false;
-		}
-
-		CLBPString sSel = dlgRpcSelect.Selection();
-		if (sSel.IsEmpty()) return false;
-
-		sRpc = sSel;
-		return true;
+		return false;
 	}
 
-	sRpc = dlg.GetPathName();
+	CLBPString sSel = dlgRpcSelect.Selection();
+	if (sSel.IsEmpty()) 
+		return false;
 
+	sRpc = sSel;
 	return true;
 }
