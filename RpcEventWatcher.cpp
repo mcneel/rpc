@@ -48,10 +48,21 @@ void CRpcEventWatcher::OnBeginOpenDocument(CRhinoDoc& doc, const wchar_t* filena
 	m_bReferenceDocument = bReference ? true : false;
 	m_bOpeningDocument = true;
 	m_bReadRpcData = false;
+
+
 }
 
 void CRpcEventWatcher::OnEndOpenDocument(CRhinoDoc& doc, const wchar_t* filename, BOOL bMerge, BOOL bReference)
 {
+	CRhinoObjectIterator it(doc, CRhinoObjectIterator::normal_or_locked_objects, CRhinoObjectIterator::active_and_reference_objects);
+	const CRhinoObject* pObject = it.First();
+
+	while (pObject)
+	{
+		Mains().GetRPCInstanceTable().SetAt(pObject->Id(), new CRpcInstance(doc, *pObject));
+		pObject = it.Next();
+	}
+
 	m_bOpeningDocument = false;
 
 	if (!m_bReadRpcData)
@@ -74,10 +85,10 @@ void CRpcEventWatcher::OnEndCommand(const CRhinoCommand & command, const CRhinoC
 	{
 		if (auto rpc = Mains().GetRPCInstanceTable().Lookup(pObject->Id()))
 			(*rpc)->Replace(*doc);
+
 		pObject = it.Next();
 	}
 
-	RhinoRedrawLayerManagerWindow();
 	RhinoApp().ActiveView()->EnableDrawing(true);
 
 }

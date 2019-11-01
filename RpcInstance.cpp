@@ -374,6 +374,7 @@ bool CRpcInstance::EditUi(HWND hWndParent, IEditDialogCallback* pCallback)
 
 	m_pEditInterface->setUnits(RPCapi::Units::LINEAR_UNITS, dScale);
 	m_pEditInterface->show(hWndParent, RPCapi::InstanceInterface::Window::PARAMETERS);
+	CopyFromRpc(*Object());
 	return true;
 }
 
@@ -386,11 +387,9 @@ CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc)
 	const int iInstanceDefintionId = pBlock->InstanceDefinition()->Index();
 	ObjectArray objects;
 	objects.Append(CreateProxyMesh(doc));
-
 	CRhinoInstanceDefinitionTable& defTable = doc.m_instance_definition_table;
 	defTable.ModifyInstanceDefinition(*pBlock->InstanceDefinition(), iInstanceDefintionId, ON_InstanceDefinition::all_idef_settings, true);
 	defTable.ModifyInstanceDefinitionGeometry(iInstanceDefintionId, objects, true);
-
 	return (CRhinoInstanceObject*) pBlock;
 }
 
