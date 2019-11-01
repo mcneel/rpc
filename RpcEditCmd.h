@@ -11,5 +11,5 @@ public:
 	virtual UUID CommandUUID();
 
 private:
-	bool GetRpcBlock(const CRhinoDoc& doc, ON_SimpleArray<const CRhinoInstanceObject*>& aBlock);
+	bool GetRpcBlock(const CRhinoDoc& doc, ON_SimpleArray<ON_UUID>& aBlock);
 };

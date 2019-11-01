@@ -7,16 +7,16 @@ class CRpcInstance;
 class CRpcEditDlg
 {
 public:
-	CRpcEditDlg(const CRhinoDoc& doc, ON_SimpleArray<CRpcInstance*>& aRpc);
+	CRpcEditDlg(const CRhinoDoc& doc, ON_SimpleArray<ON_UUID>& aRpc);
 	~CRpcEditDlg(void);
 
 public:
 	bool Edit(void);
 
 public:
-	ON_SimpleArray<CRpcInstance*>& RPC(void);
+	ON_SimpleArray<ON_UUID>& RPC(void);
 
 private:
-	ON_SimpleArray<CRpcInstance*>& m_aRpc;
+	ON_SimpleArray<ON_UUID>& m_aRpc;
 	const CRhinoDoc& m_doc;
 };
