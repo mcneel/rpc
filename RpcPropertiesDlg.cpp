@@ -212,6 +212,7 @@ void CRpcPropertiesDlg::CreateRpcUI(bool bMultipleSelection)
 	if (bMultipleSelection)
 	{
 		m_btMassEditButton.ShowWindow(SW_SHOW);
+		m_rcRpcUiWnd = HackRpcUiRect();
 	}
 	else
 	{
