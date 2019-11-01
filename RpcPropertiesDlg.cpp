@@ -138,8 +138,10 @@ void CRpcPropertiesDlg::UpdateParameterEditor(void)
 				return;
 
 			if (auto rpc = Mains().GetRPCInstanceTable().Lookup(uuid))
-				if (uuid!= aSelectedRpcs[0]->Id())
+			{
+				if (uuid != aSelectedRpcs[0]->Id())
 					(*rpc)->KillEditUi();
+			}
 
 			uuid = aSelectedRpcs[0]->Id();
 		}
@@ -260,8 +262,7 @@ void CRpcPropertiesDlg::OnRpcParameterChanged()
 	if (pBlock)
 	{
 		pBlock->Select();
-		SetRedraw();
-		pRhinoDoc->Redraw();
+		RhinoApp().RunScript(CRhinoDoc::NullRuntimeSerialNumber, L"SetRedrawOn");
 	}
 
 	m_bSelectionChangeByUi = false;

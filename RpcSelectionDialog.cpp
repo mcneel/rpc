@@ -82,7 +82,6 @@ void CRpcSelectionDialog::OnBeginCommand(const CRhinoCommand & command, const CR
 
 void CRpcSelectionDialog::OpenPanelInDockBarWithOtherPanel(CRhinoDoc& doc, const ON_UUID& panelToOpen, const ON_UUID& otherPanel, bool makeSelectedPanel)
 {
-	CRhinoTabbedDockBarDialog::OpenDockbarTab(doc, otherPanel, false);
 	ON_SimpleArray<CRhinoUiDockBar*> dockbars;
 	CRhinoTabbedDockBarDialog::DockBarsForTab(doc, otherPanel, dockbars);
 	CRhinoTabbedDockBarDialog::OpenTabOnDockBar(dockbars[0], doc, panelToOpen, makeSelectedPanel);
