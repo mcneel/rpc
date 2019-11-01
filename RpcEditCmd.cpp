@@ -4,6 +4,7 @@
 #include "RpcInstance.h"
 #include "RpcEditDlg.h"
 #include "RpcUtilities.h"
+#include "RpcMains.h"
 
 
 const wchar_t * CRpcEditCmd::EnglishCommandName()
@@ -19,7 +20,7 @@ UUID CRpcEditCmd::CommandUUID()
 	return id;
 }
 
-bool CRpcEditCmd::GetRpcBlock(const CRhinoDoc& doc, ON_SimpleArray<const CRhinoInstanceObject*>& aBlock)
+bool CRpcEditCmd::GetRpcBlock(const CRhinoDoc& doc, ON_SimpleArray<ON_UUID>& aBlock)
 {
 	CRhinoGetObject GetBlock;
 	GetBlock.AcceptNothing();
@@ -31,13 +32,9 @@ bool CRpcEditCmd::GetRpcBlock(const CRhinoDoc& doc, ON_SimpleArray<const CRhinoI
 	if(CRhinoGet::object != GetBlock.Result())
 		return false;
 
-	for(int i=0; i<GetBlock.ObjectCount(); i++)
+	for (int i = 0; i < GetBlock.ObjectCount(); i++)
 	{
-		const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(doc.LookupObject(GetBlock.Object(i).ObjectUuid()));
-		if (NULL != pBlock)
-		{
-			aBlock.Append(pBlock);
-		}
+		aBlock.Append(GetBlock.Object(i).ObjectUuid());
 	}
 
 	return (aBlock.Count() > 0) ? true : false;
@@ -49,61 +46,37 @@ CRhinoCommand::result CRpcEditCmd::RunRpcCommand(const CRhinoCommandContext& con
 	if (NULL == pDoc)
 		return failure;
 
-	ON_SimpleArray<const CRhinoInstanceObject*> aBlock;
+	ON_SimpleArray<ON_UUID> aBlock;
 	if (!GetRpcBlock(*pDoc, aBlock))
 		return cancel;
 
-	ON_SimpleArray<CRpcInstance*> aRpc;
-	ON_SimpleArray<int> aBlockIndex;
-	for(int i=0; i<aBlock.Count(); i++)
-	{
-		CRpcInstance* pRpc = new CRpcInstance(*pDoc, *aBlock[i]);
-		if (pRpc->IsValid())
-		{
-			RPCapi::Mesh* pRpcMesh = pRpc->Instance()->getEditMesh();
-			if (NULL != pRpcMesh)
-			{
-				delete pRpcMesh;
-				aRpc.Append(pRpc);
-				aBlockIndex.Append(i);
-			}
-		}
-	}
-
-	if (aRpc.Count() <= 0)
+	if (aBlock.Count() <= 0)
 	{
 		RhinoApp().Print(_RhLocalizeString( L"No valid RPC(s) selected\n", 36078));
 		return cancel;
 	}
 	
-	CRpcEditDlg dlg(*pDoc, aRpc);
+	CRpcEditDlg dlg(*pDoc, aBlock);
 	if (!dlg.Edit())
 	{
-		for (int i=0; i<aRpc.Count(); i++)
-		{
-			delete aRpc[i];
-		}
-
 		return cancel;
 	}
 
-	for(int i=0; i<aRpc.Count(); i++)
+	for(int i=0; i < aBlock.Count(); i++)
 	{
-		CRhinoInstanceObject* pInstObj = aRpc[i]->Replace(*pDoc);
-		if (NULL != pInstObj)
+		auto rpc = (*Mains().GetRPCInstanceTable().Lookup(aBlock[i]));
+		const CRhinoInstanceObject* pBlock = rpc->Replace(*pDoc);
+		
+		if (pBlock)
 		{
-			pInstObj->Select(true);
+			rpc->CopyFromRpc(*pBlock);
+			pBlock->Select();
 		}
-	}
-	
-	for (int i=0; i<aRpc.Count(); i++)
-	{
-		delete aRpc[i];
 	}
 
 	IRhRdkCustomRenderMeshManager& crmm = ::RhRdkCustomRenderMeshManager();
 	crmm.OnRhinoDocumentChanged(*pDoc);
-	
+
 	pDoc->Redraw();
 
 	return success;

@@ -147,8 +147,11 @@ void CRpcPropertiesDlg::UpdateParameterEditor(void)
 		}
 	else
 	{
-		if (auto rpc = Mains().GetRPCInstanceTable().Lookup(uuid))
-			(*rpc)->KillEditUi();
+		for (int i = 0; i < iSelected; i++)
+		{
+			if (auto rpc = Mains().GetRPCInstanceTable().Lookup(aSelectedRpcs[i]->Id()))
+				(*rpc)->KillEditUi();
+		}
 	}
 
 	CreateRpcUI((iSelected > 1) ? true : false);

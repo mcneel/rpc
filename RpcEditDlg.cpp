@@ -6,7 +6,7 @@
 #include "Resource.h"
 
 
-CRpcEditDlg::CRpcEditDlg(const CRhinoDoc& doc, ON_SimpleArray<CRpcInstance*>& aRpc)
+CRpcEditDlg::CRpcEditDlg(const CRhinoDoc& doc, ON_SimpleArray<ON_UUID>& aRpc)
 : m_aRpc(aRpc),
   m_doc(doc)
 {
@@ -18,7 +18,7 @@ CRpcEditDlg::~CRpcEditDlg(void)
 
 }
 
-ON_SimpleArray<CRpcInstance*>& CRpcEditDlg::RPC(void)
+ON_SimpleArray<ON_UUID>& CRpcEditDlg::RPC(void)
 {
 	return m_aRpc;
 }
@@ -36,12 +36,13 @@ bool CRpcEditDlg::Edit(void)
 		RPCapi::MassEditInterface* pEditInterface = dynamic_cast<RPCapi::MassEditInterface *>
 				(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::MASS_EDIT_INTERFACE));
 		
-		if (NULL == pEditInterface)
+		if (!pEditInterface)
 			return false;
 
-		for(int i=0; i<iCount; i++)
+		for (int i = 0; i < iCount; i++)
 		{
-			pEditInterface->addInstance(m_aRpc[i]->Instance());
+			if(auto rpc = Mains().GetRPCInstanceTable().Lookup(m_aRpc[i]))
+				pEditInterface->addInstance((*rpc)->Instance());
 		}
 
 		const double dScale = ON::UnitScale(ON::LengthUnitSystem::Inches, m_doc.ModelUnits());
