@@ -72,8 +72,8 @@ bool CRpcDragDropHandler::OnDropOnRhinoView(CRhinoView* pRhinoView, COleDataObje
 
 	for(int i=0; i<aRpcs.Count(); i++)
 	{
-		CRpcInstance rpc(*pDoc, aRpcs[i]);
-		rpc.AddToDocument(*pDoc, pt3D);
+		CRpcInstance* rpc = new CRpcInstance(*pDoc, aRpcs[i]);
+		rpc->AddToDocument(*pDoc, pt3D);
 	}
 
 	pDoc->Redraw();
