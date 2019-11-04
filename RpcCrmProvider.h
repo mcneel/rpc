@@ -8,11 +8,7 @@ class CRpcCrmProvider : public CRhRdkCustomRenderMeshProvider
 public:
 	
 	CRpcCrmProvider(void);
-	virtual ~CRpcCrmProvider(void);	
-
-	void CustomRender(const CRhinoInstanceObject& pBlock,ON_SimpleArray<ON_Mesh*>& aMeshes, ON_SimpleArray<CRhRdkBasicMaterial*>& aMaterials) const;
-	void RhinoRender(const CRhinoInstanceObject& pBlock, ON_SimpleArray<ON_Mesh*>& aMeshes,
-		ON_SimpleArray<CRhRdkBasicMaterial*>& aMaterials, IRhRdkCustomRenderMeshes& crmInOut) const;	
+	virtual ~CRpcCrmProvider(void);
 
 public:
 	virtual UUID ProviderId(void) const override;

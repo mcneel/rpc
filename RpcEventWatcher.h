@@ -17,7 +17,6 @@ public:
 	void OnNewDocument(CRhinoDoc& doc) override;
 	void OnBeginOpenDocument(CRhinoDoc& doc, const wchar_t* filename, BOOL bMerge, BOOL bReference) override;
 	void OnEndOpenDocument(CRhinoDoc& doc, const wchar_t* filename, BOOL bMerge, BOOL bReference) override;
-	void OnEndCommand(const CRhinoCommand &command, const CRhinoCommandContext &context, CRhinoCommand::result rc) override;
 
 private:
 	bool m_bMergeDocument;
