@@ -55,7 +55,17 @@ void CRpcEventWatcher::OnEndOpenDocument(CRhinoDoc& doc, const wchar_t* filename
 	CRhinoObjectIterator it(doc, CRhinoObjectIterator::normal_or_locked_objects, CRhinoObjectIterator::active_and_reference_objects);
 
 	for (auto pObject = it.First(); pObject; pObject = it.Next())
-		Mains().GetRPCInstanceTable().SetAt(pObject->Id(), new CRpcInstance(doc, *pObject));
+	{
+		if(Mains().GetRPCInstanceTable().Lookup(pObject->Id()))
+			continue;
+
+		auto rpc = new CRpcInstance(doc, *pObject);
+
+		if (!m_bReadRpcData)
+			rpc->Replace(doc, true);
+		else
+			Mains().GetRPCInstanceTable().SetAt(pObject->Id(), rpc);
+	}
 
 	m_bOpeningDocument = false;
 

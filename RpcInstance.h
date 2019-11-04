@@ -11,7 +11,6 @@ public:
 
 public:
 	bool IsValid(void) const;
-	int CreateLayer(wstring& rpcName);
 
 	CLBPString FileName(void) const;
 	CLBPString ObjectName(void) const;
@@ -26,7 +25,7 @@ public:
 	unsigned int Document(void) const { return m_idDoc; } 
 
 	CRhinoInstanceObject* AddToDocument(CRhinoDoc& doc, const ON_3dPoint& pt);
-	CRhinoInstanceObject* Replace(CRhinoDoc& doc);
+	CRhinoInstanceObject* Replace(CRhinoDoc& doc, bool copied = false);
 
 	bool CopyToRpc(const CRhinoObject& obj);
 	bool CopyFromRpc(const CRhinoObject& obj) const;
@@ -59,9 +58,9 @@ private:
 
 private:
 	void Construct(UINT idDoc, const CRhinoObject* pObject, const CLBPString& sRpcPath);
-
-	CRhinoInstanceObject* AddToDocument(CRhinoDoc& doc, const CLBPString& sName, const ON_Xform& xform);
 	const CRhinoObject* Object(void) const;
+	CRhinoInstanceObject* AddToDocument(CRhinoDoc& doc, const CLBPString& sName, const ON_Xform& xform, bool copied = false);
+	int CreateLayer(wstring& rpcName, bool copied);
 
 private:
 	RPCapi::Instance* m_pInstance;
