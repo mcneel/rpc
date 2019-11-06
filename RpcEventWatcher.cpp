@@ -3,6 +3,7 @@
 #include "RpcMains.h"
 #include "RpcDocument.h"
 #include "RpcInstance.h"
+#include "RpcObjectUserData.h"
 
 
 CRpcEventWatcher::CRpcEventWatcher(void)
@@ -73,4 +74,12 @@ void CRpcEventWatcher::OnEndOpenDocument(CRhinoDoc& doc, const wchar_t* filename
 	{
 		Mains().RpcDocument().Defaults();
 	}
+}
+
+void CRpcEventWatcher::OnReplaceObject(CRhinoDoc & doc, CRhinoObject & old_object, CRhinoObject & new_object)
+{
+	const CRhinoObject& object = new_object.Attributes().m_uuid != ON_nil_uuid ? new_object : old_object;
+
+	if (object.Attributes().GetUserData(CRpcObjectUserData::Id()))
+		RhRdkCustomRenderMeshManager().OnRhinoObjectChanged(doc, &object);
 }
