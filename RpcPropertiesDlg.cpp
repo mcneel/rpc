@@ -265,6 +265,7 @@ void CRpcPropertiesDlg::OnRpcParameterChanged()
 	if (pBlock)
 	{
 		pBlock->Select();
+		RhRdkCustomRenderMeshManager().OnRhinoDocumentChanged(*pRhinoDoc);
 		RhinoApp().RunScript(CRhinoDoc::NullRuntimeSerialNumber, L"SetRedrawOn");
 	}
 
