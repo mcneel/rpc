@@ -47,7 +47,7 @@ ON_BoundingBox CRpcCrmProvider::BoundingBox(const ON_Viewport& vp, const CRhinoO
 
 bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidRequestingPlugIn, const CRhinoDoc& doc, IRhRdkCustomRenderMeshes& crmInOut, const CDisplayPipelineAttributes* pAttributes, bool bWillBuildCustomMeshCheck) const
 {
-	if(bWillBuildCustomMeshCheck && !WillBuildCustomMesh(vp, crmInOut.Object(), doc, uuidRequestingPlugIn, pAttributes))
+	if (bWillBuildCustomMeshCheck && !WillBuildCustomMesh(vp, crmInOut.Object(), doc, uuidRequestingPlugIn, pAttributes))
 		return false;
 
 	const CRhinoObject* pObject = crmInOut.Object();
@@ -57,7 +57,7 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 
 	const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(pObject);
 
-	if (!pBlock) 
+	if (!pBlock)
 		return false;
 
 	ON_Xform xformInstance = pBlock->InstanceXform();
@@ -66,28 +66,28 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 	ptCamera.Transform(xformInstance);
 	crmInOut.SetAutoDeleteMeshesOn();
 	crmInOut.SetAutoDeleteMaterialsOn();
-
 	auto rpc = Mains().GetRPCInstanceTable().Lookup(pBlock->Id());
+	auto instance = (rpc && (*rpc)->IsValid()) ? (*rpc)->Instance() : nullptr;
 
-	if (rpc && (*rpc)->IsValid() && (*rpc)->Instance())
+	if (!instance)
+		return false;
+
+	ON_SimpleArray<ON_Mesh*> aMeshes;
+	ON_SimpleArray<CRhRdkBasicMaterial*> aMaterials;
+
+	CRpcRenderMeshBuilder mb(doc, *instance);
+
+	if (instance->hasMaterials())
+		mb.BuildNew(aMeshes, aMaterials);
+	else
+		mb.BuildOld(ptCamera, aMeshes, aMaterials);
+
+	for (int i = 0; i < aMeshes.Count(); i++)
 	{
-		ON_SimpleArray<ON_Mesh*> aMeshes;
-		ON_SimpleArray<CRhRdkBasicMaterial*> aMaterials;
+		ON_Mesh* pRhinoMesh = aMeshes[i];
+		pRhinoMesh->Transform(pBlock->InstanceXform());
 
-		CRpcRenderMeshBuilder mb(doc, *(*rpc)->Instance());
-
-		if ((*rpc)->Instance()->hasMaterials())
-			mb.BuildNew(aMeshes, aMaterials);
-		else
-			mb.BuildOld(ptCamera, aMeshes, aMaterials);
-
-		for (int i = 0; i < aMeshes.Count(); i++)
-		{
-			ON_Mesh* pRhinoMesh = aMeshes[i];
-			pRhinoMesh->Transform(pBlock->InstanceXform());
-
-			crmInOut.Add(pRhinoMesh, aMaterials[i]);
-		}
+		crmInOut.Add(pRhinoMesh, aMaterials[i]);
 	}
 
 	return true;
