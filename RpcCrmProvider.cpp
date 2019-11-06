@@ -36,9 +36,6 @@ ON_wString CRpcCrmProvider::Name(void) const
 bool CRpcCrmProvider::WillBuildCustomMesh(const ON_Viewport& vp, const CRhinoObject* pObject, const CRhinoDoc& /*doc*/, 
                                           const UUID& uuidRequestingPlugIn, const CDisplayPipelineAttributes* pAttributes) const
 {
-	if (pAttributes)
-		return false;
-
 	CRpcObject ro(pObject);
 	return ro.IsTagged();
 }
@@ -54,32 +51,32 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 		return false;
 
 	const CRhinoObject* pObject = crmInOut.Object();
+
 	if (!pObject)
 		return false;
 
 	const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(pObject);
+
 	if (!pBlock) 
 		return false;
 
 	ON_Xform xformInstance = pBlock->InstanceXform();
 	xformInstance.Invert();
-
 	ON_3dPoint ptCamera = vp.CameraLocation();
-
 	ptCamera.Transform(xformInstance);
-
 	crmInOut.SetAutoDeleteMeshesOn();
 	crmInOut.SetAutoDeleteMaterialsOn();
 
-	auto rpc = *Mains().GetRPCInstanceTable().Lookup(pBlock->Id());
-	if (rpc && rpc->IsValid() && rpc->Instance())
+	auto rpc = Mains().GetRPCInstanceTable().Lookup(pBlock->Id());
+
+	if (rpc && (*rpc)->IsValid() && (*rpc)->Instance())
 	{
 		ON_SimpleArray<ON_Mesh*> aMeshes;
 		ON_SimpleArray<CRhRdkBasicMaterial*> aMaterials;
 
-		CRpcRenderMeshBuilder mb(doc, *rpc->Instance());
+		CRpcRenderMeshBuilder mb(doc, *(*rpc)->Instance());
 
-		if (rpc->Instance()->hasMaterials())
+		if ((*rpc)->Instance()->hasMaterials())
 			mb.BuildNew(aMeshes, aMaterials);
 		else
 			mb.BuildOld(ptCamera, aMeshes, aMaterials);
@@ -88,6 +85,7 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 		{
 			ON_Mesh* pRhinoMesh = aMeshes[i];
 			pRhinoMesh->Transform(pBlock->InstanceXform());
+
 			crmInOut.Add(pRhinoMesh, aMaterials[i]);
 		}
 	}
