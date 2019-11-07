@@ -260,7 +260,7 @@ bool UniteVertexNormals(ON_Mesh & mesh, ON_SimpleArray<int> & aSourceVertexIndex
 
 CRhRdkBasicMaterial* CreateNewBasicMaterial(void)
 {
-	const CRhRdkContentFactory* pFactory = RhRdkContentFactoriesEx().FindFactory(uuidBasicMaterialType);
+	const CRhRdkContentFactory* pFactory = RhRdkContentFactories().FindFactory(uuidBasicMaterialType);
 	if (NULL == pFactory)
 		return NULL;
 

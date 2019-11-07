@@ -392,7 +392,7 @@ bool CRpcRenderMeshBuilder::Rgb2Material(T& RpcTexture, CRhRdkBasicMaterial& Mat
 	}
 	
 	// TODO: [HERE] Possible dib ownership problem - check RDK SDK comments.
-	CRhRdkTexture* pRdkTexture = RhRdkNewDibTexture(&rdRGB, Material.DocumentAssoc(), false, true);
+	CRhRdkTexture* pRdkTexture = RhRdkNewDibTexture(&rdRGB, false, true);
 
 	if (CTestRpcGamma::m_dGamma != 1.0)
 	{
@@ -449,7 +449,7 @@ bool CRpcRenderMeshBuilder::Alpha2Material(T& RpcTexture, CRhRdkBasicMaterial& M
 	}
 
 	// TODO: [HERE] Possible dib ownership problem - check RDK SDK comments.
-	CRhRdkTexture* pRdkTextureAlpha = RhRdkNewDibTexture(&rdAlpha, Material.DocumentAssoc(), false, true);
+	CRhRdkTexture* pRdkTextureAlpha = RhRdkNewDibTexture(&rdAlpha, false, true);
 
 	CRhRdkBasicMaterial::CTextureSlot slotAlpha = Material.TextureSlot(CRhRdkMaterial::ChildSlotUsage::Transparency);
 	slotAlpha.m_bOn = true;
