@@ -37,7 +37,6 @@ void CRpcSelectionDialog::DoDataExchange(CDataExchange* pDX)
 		LR_DEFAULTCOLOR
 	);
 	selectionButton.SetIcon(hIcn);
-	
 }
 
 const wchar_t* CRpcSelectionDialog::Caption() const
@@ -69,6 +68,7 @@ BOOL CRpcSelectionDialog::OnInitDialog()
 
 	CRhinoEventWatcher::Register();
 	Enable();
+
 	return TRUE;
 }
 
@@ -88,7 +88,6 @@ void CRpcSelectionDialog::OpenPanelInDockBarWithOtherPanel(CRhinoDoc& doc, const
 }
 
 BEGIN_MESSAGE_MAP(CRpcSelectionDialog, CRhinoTabbedDockBarDialog)
-	ON_WM_DESTROY()
 	ON_WM_ERASEBKGND()
 	ON_BN_CLICKED(ID_BUTTON_PLACE, OnButtonClickedSelection)
 END_MESSAGE_MAP()
@@ -99,15 +98,16 @@ BOOL CRpcSelectionDialog::OnEraseBkgnd(CDC* pDC)
 	GetClientRect(&rect);
 
 	//color of the selection
-	CBrush* myBrush = new CBrush(RGB(240, 240, 240));
+	CBrush* myBrush = new CBrush(GetSysColor(COLOR_3DFACE));
 
 	if (!coloured)
 	{
 		//color of the panel
-		myBrush = new CBrush(RGB(247, 247, 249));
+		ON_Color tabBkColor = RhinoApp().AppSettings().UiPaintColorSettings().m_tab_background;
+		myBrush = new CBrush(tabBkColor);
 	}
 
-	CBrush *pOld = pDC->SelectObject(myBrush);
+	pDC->SelectObject(myBrush);
 	BOOL bRes = pDC->PatBlt(0, 0, rect.Width(), rect.Height(), PATCOPY);
 	
 	return bRes;
@@ -115,7 +115,7 @@ BOOL CRpcSelectionDialog::OnEraseBkgnd(CDC* pDC)
 
 void CRpcSelectionDialog::OnButtonClickedSelection()
 {
-	CRhinoTabbedDockBarDialog::ShowDockbarTab(*RhinoApp().ActiveDoc(), Id(), true, true, &uuidPanelLayers);
+	CRhinoTabbedDockBarDialog::ShowDockbarTab(*RhinoApp().ActiveDoc(), Id(), true, true, &uuidPanelObjectProps);
 	CWnd* pParentWnd = CWnd::FromHandle(RhinoApp().MainWnd());
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	CRpcAdvancedFileDialog dlg(pParentWnd);

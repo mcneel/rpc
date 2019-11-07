@@ -30,7 +30,7 @@ CRhinoCommand::result CRpcDockbar::RunCommand(const CRhinoCommandContext& contex
 
 	if (context.IsInteractive())
 	{
-		CRhinoTabbedDockBarDialog::ShowDockbarTab(context.m_doc, tabId, true,true, &uuidPanelLayers);
+		CRhinoTabbedDockBarDialog::ShowDockbarTab(context.m_doc, tabId, true,true, &uuidPanelObjectProps);
 	}
 	else
 	{
