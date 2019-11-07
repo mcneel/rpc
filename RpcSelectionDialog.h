@@ -42,5 +42,6 @@ private:
 	const int cxy = 32;
 	const int x = 3;
 	const int buttonY = 5;
-	const int selectionY = 35;
+	const int selectionY = 40;
+
 };

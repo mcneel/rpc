@@ -158,7 +158,7 @@ BOOL CRPCPlugIn::OnLoadPlugIn()
 		AfxGetStaticModuleState()
 	);
 
-	CRpcSelectionDialog::OpenPanelInDockBarWithOtherPanel(*RhinoApp().ActiveDoc(), CRpcSelectionDialog::Id(), uuidPanelLayers, false);
+	CRpcSelectionDialog::OpenPanelInDockBarWithOtherPanel(*RhinoApp().ActiveDoc(), CRpcSelectionDialog::Id(), uuidPanelObjectProps, false);
 
 	return TRUE;
 }
