@@ -73,7 +73,7 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 		return false;
 
 	ON_SimpleArray<ON_Mesh*> aMeshes;
-	ON_SimpleArray<CRhRdkBasicMaterial*> aMaterials;
+	ON_SimpleArray<CRhRdkMaterial*> aMaterials;
 
 	CRpcRenderMeshBuilder mb(doc, *instance);
 
@@ -86,7 +86,6 @@ bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidR
 	{
 		ON_Mesh* pRhinoMesh = aMeshes[i];
 		pRhinoMesh->Transform(pBlock->InstanceXform());
-
 		crmInOut.Add(pRhinoMesh, aMaterials[i]);
 	}
 

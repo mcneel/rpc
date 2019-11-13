@@ -260,23 +260,45 @@ bool UniteVertexNormals(ON_Mesh & mesh, ON_SimpleArray<int> & aSourceVertexIndex
 
 CRhRdkBasicMaterial* CreateNewBasicMaterial(void)
 {
-	const CRhRdkContentFactory* pFactory = RhRdkContentFactories().FindFactory(uuidBasicMaterialType);
-	if (NULL == pFactory)
-		return NULL;
+	const CRhRdkContentFactory* pFactory = RhRdkContentFactoriesEx().FindFactory(uuidBasicMaterialType);
+
+	if (!pFactory)
+		return nullptr;
 
 	CRhRdkContent* pContent = pFactory->NewContent();
-	if (NULL == pContent)
-		return NULL;
+	if (!pContent)
+		return nullptr;
 
 	if (!pContent->Initialize())
-		return NULL;
+		return nullptr;
 
 	CRhRdkBasicMaterial* pMaterial = dynamic_cast<CRhRdkBasicMaterial*>(pContent);
-	if (NULL == pMaterial)
+
+	if (!pMaterial)
 	{
 		pContent->Uninitialize();
 		delete pContent;
-		return NULL;
+		return nullptr;
+	}
+
+	return pMaterial;
+}
+
+CRhRdkMaterial* CreatePBMaterial(void)
+{
+	//5A8D7B9B - CDC9 - 49DE - 8C16 - 2EF64FB097AB
+	UUID uuidPBMaterialType = { 0x5a8d7b9b, 0xcdc9, 0x49de, { 0x8c, 0x16, 0x2e, 0xcf6, 0x4f, 0xb0, 0x97, 0xab } };
+	CRhRdkContent* pContent = ::RhRdkContentFactoriesEx().NewContentFromTypeEx(uuidPBMaterialType, RhinoApp().ActiveDoc());
+
+	if (!pContent)
+		return nullptr;
+
+	CRhRdkMaterial* pMaterial = dynamic_cast<CRhRdkMaterial*>(pContent);
+
+	if (!pMaterial)
+	{
+		delete pContent;
+		return nullptr;
 	}
 
 	return pMaterial;
