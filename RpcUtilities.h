@@ -15,6 +15,8 @@ bool UniteVertexNormals(ON_Mesh & mesh, ON_SimpleArray<int> & aSourceVertexIndex
 
 CRhRdkBasicMaterial* CreateNewBasicMaterial(void);
 
+CRhRdkMaterial* CreatePBMaterial(void);
+
 inline const ON_2iPoint  P2P(const CPoint& p) {	return ON_2iPoint(p.x, p.y);}
 
 const wchar_t* _RhLocalizeString( const wchar_t* wsz, int nContext);
