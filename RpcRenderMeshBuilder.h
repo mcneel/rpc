@@ -1,5 +1,22 @@
 #pragma once
 
+constexpr auto
+PBR_BASE_COLOR = L"pbr-base-color",
+PBR_METALLIC = L"pbr-metallic",
+PBR_SPECULAR = L"pbr-specular",
+PBR_SPECULAR_TINT = L"pbr-specular-tint",
+PBR_ROUGHNESS = L"pbr-roughness",
+PBR_ANISOTROPIC = L"pbr-anisotropic",
+PBR_ANISOROTATION = L"pbr-anisotropic-rotation",
+PBR_CLEARCOAT = L"pbr-clearcoat",
+PBR_CLEARCOAT_ROUGH = L"pbr-clearcoat-roughness",
+PBR_OPACITY_IOR = L"pbr-opacity-ior",
+PBR_OPACITY = L"pbr-opacity",
+PBR_OPACITY_ROUGH = L"pbr-opacity-roughness",
+PBR_EMISSION = L"pbr-emission",
+PBR_BUMP = L"pbr-bump",
+PBR_DISPLACEMENT = L"pbr-displacement",
+PBR_CLEARCOAT_BUMP = L"pbr-clearcoat-bump";
 
 class CRpcRenderMeshBuilder
 {
@@ -27,7 +44,7 @@ private:
 		CRhRdkMaterial::ChildSlotUsage slotType, const wchar_t* textureType);
 
 	template <typename T>
-	void SetValue(CRhRdkMaterial& aMaterial, T& value, bool check, wchar_t* paramName);
+	void SetValue(CRhRdkMaterial& aMaterial, T& value, bool check,const wchar_t* paramName);
 	void SetTexture(CRhRdkMaterial& aMaterial,RPCapi::Param* param, const wchar_t* paramName, bool inverse = false);
 	void BaseMetalRoughness(RPCapi::Material& aRpcMaterial, CRhRdkMaterial& aMaterial);
 	void Subsurface(RPCapi::Material& aRpcMaterial, CRhRdkMaterial& aMaterial);
