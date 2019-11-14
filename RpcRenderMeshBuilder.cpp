@@ -4,6 +4,24 @@
 #include "RpcUtilities.h"
 #include "MaterialParams.h"
 
+constexpr auto
+PBR_BASE_COLOR = L"pbr-base-color",
+PBR_METALLIC = L"pbr-metallic",
+PBR_SPECULAR = L"pbr-specular",
+PBR_SPECULAR_TINT = L"pbr-specular-tint",
+PBR_ROUGHNESS = L"pbr-roughness",
+PBR_ANISOTROPIC = L"pbr-anisotropic",
+PBR_ANISOROTATION = L"pbr-anisotropic-rotation",
+PBR_CLEARCOAT = L"pbr-clearcoat",
+PBR_CLEARCOAT_ROUGH = L"pbr-clearcoat-roughness",
+PBR_OPACITY_IOR = L"pbr-opacity-ior",
+PBR_OPACITY = L"pbr-opacity",
+PBR_OPACITY_ROUGH = L"pbr-opacity-roughness",
+PBR_EMISSION = L"pbr-emission",
+PBR_BUMP = L"pbr-bump",
+PBR_DISPLACEMENT = L"pbr-displacement",
+PBR_CLEARCOAT_BUMP = L"pbr-clearcoat-bump";
+
 static class CTestRpcGamma : public CRhinoTestCommand
 {
 	static double m_dGamma;
@@ -589,9 +607,6 @@ void CRpcRenderMeshBuilder::Clearcoat(RPCapi::Material & aRpcMaterial, CRhRdkMat
 	GetPrimValue<bool>(aRpcMaterial.get(getParamName(MaterialParams::COAT_ROUGHNESS_INV)), roughnessInv);
 	float roughness = 0.0f;
 	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::COAT_ROUGHNESS)), roughness);
-
-	if (roughnessInv)
-		roughness = 1.0f - roughness;
 
 	SetValue(aMaterial, roughness, roughness>0.0f, PBR_CLEARCOAT_ROUGH);
 	param = aRpcMaterial.get(getMapName(MaterialMaps::COAT_ROUGH_MAP));
