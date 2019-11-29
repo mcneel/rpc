@@ -87,6 +87,9 @@ public:
     // Reset control to the default value
     virtual void reset(){}
 
+    // Apply random value to the control
+    virtual void randomize(){}
+
 	// (Un)register a callback w/ this Control.
 	virtual void rpcConCallbackRegister(Callback *cb, bool reg) = 0;
 };	// class BaseControl
