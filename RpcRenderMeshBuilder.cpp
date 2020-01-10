@@ -101,7 +101,9 @@ void CRpcRenderMeshBuilder::RpcMaterial2RhinoMaterial(const ON_SimpleArray<RPCap
 		Specularity(*mat, *aMaterials[i]);
 		Opacity(*mat, *aMaterials[i]);
 		Clearcoat(*mat, *aMaterials[i]);
-		Emission(*mat, *aMaterials[i]);
+
+		//It does not work correctly in this assembly of Rhino 7.
+		//Emission(*mat, *aMaterials[i]);
 		BumpDisplacement(*mat, *aMaterials[i]);
 	}
 }
