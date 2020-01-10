@@ -6,7 +6,7 @@ class CRpcInstance : public RPCapi::ClientInstance
 public:
 	CRpcInstance(const CRhinoDoc& doc, const CLBPString& sFullPath);
 	CRpcInstance(const CRhinoDoc& doc, const CRhinoObject& obj);
-	
+
 	virtual ~CRpcInstance();
 
 public:
@@ -25,7 +25,7 @@ public:
 	unsigned int Document(void) const { return m_idDoc; } 
 
 	CRhinoInstanceObject* AddToDocument(CRhinoDoc& doc, const ON_3dPoint& pt);
-	CRhinoInstanceObject* Replace(CRhinoDoc& doc);
+	CRhinoInstanceObject* Replace(CRhinoDoc& doc, bool copied = false);
 
 	bool CopyToRpc(const CRhinoObject& obj);
 	bool CopyFromRpc(const CRhinoObject& obj) const;
@@ -37,10 +37,13 @@ public:
 	};
 
 	bool EditUi(HWND hWndParent, IEditDialogCallback* pCallback = NULL);
+	bool EditSelUI(HWND hWndParent, IEditDialogCallback* pCallback = NULL);
+	void KillEditUi(void);
+	void KillEditSelUi(void);
 
 public:
 	RPCapi::Instance* Instance(void);
-
+	CRhinoMeshObject* CreateProxyMesh(CRhinoDoc& doc);
 	static bool IsValidRpc(const CLBPString& s);
 	
 private:
@@ -55,16 +58,16 @@ private:
 
 private:
 	void Construct(UINT idDoc, const CRhinoObject* pObject, const CLBPString& sRpcPath);
-	void KillEditUi(void);
-
-	CRhinoInstanceObject* AddToDocument(CRhinoDoc& doc, const CLBPString& sName, const ON_Xform& xform);
 	const CRhinoObject* Object(void) const;
+	CRhinoInstanceObject* AddToDocument(CRhinoDoc& doc, const CLBPString& sName, const ON_Xform& xform, bool copied = false);
+	int CreateLayer(wstring& rpcName, bool copied);
 
 private:
 	RPCapi::Instance* m_pInstance;
 	UUID m_idObject;
 	unsigned int m_idDoc;
 	mutable CLBPString m_sName;
+	RPCapi::InstanceInterface* selectionInterface;
 	RPCapi::InstanceInterface* m_pEditInterface;
 	IEditDialogCallback* m_pEditDlgCallback;
 };

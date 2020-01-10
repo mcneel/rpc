@@ -3,6 +3,7 @@
 #include "RpcAddCmd.h"
 #include "RpcObject.h"
 #include "RpcInstance.h"
+#include "RpcMains.h"
 #include "RpcSelectDlg.h"
 #include "RpcFileDlg.h"
 #include "RpcUtilities.h"
@@ -27,7 +28,7 @@ UUID CRpcAddCmd::CommandUUID()
 CRhinoCommand::result CRpcAddCmd::RunRpcCommand(const CRhinoCommandContext& context)
 {
 	CRhinoDoc* pDoc = context.Document();
-	if (NULL == pDoc)
+	if (!pDoc)
 		return failure;
 
 	pDoc->UnselectAll();
@@ -36,12 +37,12 @@ CRhinoCommand::result CRpcAddCmd::RunRpcCommand(const CRhinoCommandContext& cont
 	if (!GetRpcFileName(*pDoc, sRpc))
 		return cancel;
 
-	CRpcInstance rpc(*pDoc, sRpc);
-	if (!rpc.IsValid())
+	CRpcInstance* rpc = new CRpcInstance(*pDoc, sRpc);
+	if (!rpc->IsValid())
+	{
+		delete rpc;
 		return failure;
-
-	ON_SimpleArray<CRpcInstance*> aRpc;
-	aRpc.Append(&rpc);
+	}
 
 	CRhinoGetPoint gp;
 	gp.SetCommandPrompt(_RhLocalizeString( L"RPC base point", 36075));
@@ -50,8 +51,8 @@ CRhinoCommand::result CRpcAddCmd::RunRpcCommand(const CRhinoCommandContext& cont
 
 	const ON_3dPoint ptInsertion = gp.Point();
 
-	CRhinoInstanceObject* pBlock = rpc.AddToDocument(*pDoc, ptInsertion);
-	if (NULL == pBlock)
+	CRhinoInstanceObject* pBlock = rpc->AddToDocument(*pDoc, ptInsertion);
+	if (!pBlock)
 		return cancel;
 
 	pBlock->Select();
@@ -77,7 +78,7 @@ CRhinoCommand::result CRpcAddCmd::RunRpcCommand(const CRhinoCommandContext& cont
 	
 	IRhRdkCustomRenderMeshManager& crmm = ::RhRdkCustomRenderMeshManager();
 	crmm.OnRhinoDocumentChanged(*pDoc);
-	
+
 	pDoc->Redraw();
 	
 	return success;
@@ -87,30 +88,20 @@ bool CRpcAddCmd::GetRpcFileName(CRhinoDoc& doc, CLBPString& sRpc)
 {
 	CWnd* pParentWnd = CWnd::FromHandle(RhinoApp().MainWnd());
 
-	const CLBPString sLastFile;
-
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	CRpcAdvancedFileDialog dlg(pParentWnd);
-	if (dlg.DoModal() != IDOK)
+
+	CRpcSelectDlg dlgRpcSelect(doc, (const wchar_t*)dlg.GetPathName());
+	if (dlgRpcSelect.DoModal() != IDOK)
 	{
-		if (!dlg.Advanced())
-			return false;
-		
-		CRpcSelectDlg dlgRpcSelect(doc, (const wchar_t*)dlg.GetPathName());
-		if (dlgRpcSelect.DoModal() != IDOK)
-		{
-			return false;
-		}
-
-		CLBPString sSel = dlgRpcSelect.Selection();
-		if (sSel.IsEmpty()) return false;
-
-		sRpc = sSel;
-		return true;
+		return false;
 	}
 
-	sRpc = dlg.GetPathName();
+	CLBPString sSel = dlgRpcSelect.Selection();
+	if (sSel.IsEmpty()) 
+		return false;
 
+	sRpc = sSel;
 	return true;
 }

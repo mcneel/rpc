@@ -28,12 +28,14 @@
     <ClCompile Include="LBP_UTF.cpp" />
     <ClCompile Include="LBP_UUID.cpp" />
     <ClCompile Include="LBP_XML.cpp" />
+    <ClCompile Include="MaterialParams.cpp" />
     <ClCompile Include="RpcAddCmd.cpp" />
     <ClCompile Include="RpcAnimationFrameRrp.cpp" />
     <ClCompile Include="RPCApp.cpp" />
     <ClCompile Include="RpcClient.cpp" />
     <ClCompile Include="RpcCommand.cpp" />
     <ClCompile Include="RpcCrmProvider.cpp" />
+    <ClCompile Include="RpcDashboardCmd.cpp" />
     <ClCompile Include="RpcDocument.cpp" />
     <ClCompile Include="RpcDragDropHandler.cpp" />
     <ClCompile Include="RpcEditCmd.cpp" />
@@ -42,6 +44,7 @@
     <ClCompile Include="RpcEventSink.cpp" />
     <ClCompile Include="RpcEventWatcher.cpp" />
     <ClCompile Include="RpcFileDlg.cpp" />
+    <ClCompile Include="RpcHelpCmd.cpp" />
     <ClCompile Include="RpcInstance.cpp" />
     <ClCompile Include="RpcMains.cpp" />
     <ClCompile Include="RpcObject.cpp" />
@@ -52,6 +55,8 @@
     <ClCompile Include="RpcRdkPlugIn.cpp" />
     <ClCompile Include="RpcRenderMeshBuilder.cpp" />
     <ClCompile Include="RpcSelectDlg.cpp" />
+    <ClCompile Include="RpcDockbar.cpp" />
+    <ClCompile Include="RpcSelectionDialog.cpp" />
     <ClCompile Include="RpcSetAnimationFrameCmd.cpp" />
     <ClCompile Include="RpcUtilities.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -83,6 +88,7 @@
     <ClInclude Include="LBP_UTF.h" />
     <ClInclude Include="LBP_UUID.h" />
     <ClInclude Include="LBP_XML.h" />
+    <ClInclude Include="MaterialParams.h" />
     <ClInclude Include="ON_SimpleMap.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RhRdkRegisteredPropertiesEventSink.h" />
@@ -92,6 +98,7 @@
     <ClInclude Include="RpcClient.h" />
     <ClInclude Include="RpcCommand.h" />
     <ClInclude Include="RpcCrmProvider.h" />
+    <ClInclude Include="RpcDashboardCmd.h" />
     <ClInclude Include="RpcDefinitions.h" />
     <ClInclude Include="RpcDocument.h" />
     <ClInclude Include="RpcDragDropHandler.h" />
@@ -101,6 +108,7 @@
     <ClInclude Include="RpcEventSink.h" />
     <ClInclude Include="RpcEventWatcher.h" />
     <ClInclude Include="RpcFileDlg.h" />
+    <ClInclude Include="RpcHelpCmd.h" />
     <ClInclude Include="RpcInstance.h" />
     <ClInclude Include="RpcMains.h" />
     <ClInclude Include="RpcObject.h" />
@@ -112,6 +120,7 @@
     <ClInclude Include="RpcRdkPlugIn.h" />
     <ClInclude Include="RpcRenderMeshBuilder.h" />
     <ClInclude Include="RpcSelectDlg.h" />
+    <ClInclude Include="RpcSelectionDialog.h" />
     <ClInclude Include="RpcSetAnimationFrameCmd.h" />
     <ClInclude Include="RpcUtilities.h" />
     <ClInclude Include="stdafx.h" />
@@ -125,9 +134,14 @@
   <ItemGroup>
     <ResourceCompile Include="RPC.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\rpc_acm.ico" />
+    <Image Include="res\selection.ico" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <Keyword>MFCDLLProj</Keyword>
     <ProjectGuid>{277AA65D-B590-4156-8AB7-8F864F03D158}</ProjectGuid>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -161,9 +175,11 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>ArchVision_RPC</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <TargetName>ArchVision_RPC</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -190,7 +206,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)$(ProjectName)\SDK\lib\Release\*.*" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)SDK\lib\Release\*.*" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -217,7 +233,7 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>copy "$(SolutionDir)$(ProjectName)\SDK\lib\Release\*.*" "$(OutDir)"</Command>
+      <Command>copy "$(SolutionDir)SDK\lib\Release\*.*" "$(OutDir)"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -7,6 +7,7 @@
 #include "Resource.h"
 #include "RpcMains.h"
 #include "RpcPropertiesDlg.h"
+#include "RpcSelectionDialog.h"
 #include "RpcEventWatcher.h"
 #include "RpcDocument.h"
 
@@ -139,6 +140,9 @@ BOOL CRPCPlugIn::OnLoadPlugIn()
 	//    CPlugIn::OnLoadPlugIn() from your derived class.
 
 	// TODO: Add plug-in initialization code here.
+
+	RefreshToolbar();
+
 	m_pMains = new CRpcMains(*this);
 	if (!m_pMains->Initialize())
 	{
@@ -147,6 +151,14 @@ BOOL CRPCPlugIn::OnLoadPlugIn()
 
 		return FALSE;
 	}
+	CRpcSelectionDialog::CRhinoTabbedDockBarDialog::Register(
+		RUNTIME_CLASS(CRpcSelectionDialog),
+		CRpcSelectionDialog::IDD,
+		IDI_PROP_RPC,
+		AfxGetStaticModuleState()
+	);
+
+	CRpcSelectionDialog::OpenPanelInDockBarWithOtherPanel(*RhinoApp().ActiveDoc(), CRpcSelectionDialog::Id(), uuidPanelObjectProps, false);
 
 	return TRUE;
 }
@@ -173,6 +185,25 @@ void CRPCPlugIn::OnUnloadPlugIn()
 CRpcMains& CRPCPlugIn::Mains(void)
 {
 	return *m_pMains;
+}
+
+void CRPCPlugIn::RefreshToolbar()
+{
+	ON_wString path;
+	CRhinoFileUtilities::GetRhinoRoamingProfileDataFolder(path);
+	path += L"UI\\Plug-ins\\";
+
+	ON_wString plugin;
+	GetPlugInFileName(plugin);
+
+	ON_wString fname;
+	ON_wString::SplitPath(plugin, nullptr, nullptr, &fname, nullptr);
+	fname += L".rui";
+
+	path += fname;
+
+	if (CRhinoFileUtilities::FileExists(path))
+		CRhinoFileUtilities::DeleteFile(path);
 }
 
 void CRPCPlugIn::AddPagesToObjectPropertiesDialog(CRhinoPropertiesPanelPageCollection& collection)

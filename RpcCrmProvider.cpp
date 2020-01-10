@@ -36,9 +36,6 @@ ON_wString CRpcCrmProvider::Name(void) const
 bool CRpcCrmProvider::WillBuildCustomMesh(const ON_Viewport& vp, const CRhinoObject* pObject, const CRhinoDoc& /*doc*/, 
                                           const UUID& uuidRequestingPlugIn, const CDisplayPipelineAttributes* pAttributes) const
 {
-	if (nullptr != pAttributes)	
-		return false;
-
 	CRpcObject ro(pObject);
 	return ro.IsTagged();
 }
@@ -50,52 +47,46 @@ ON_BoundingBox CRpcCrmProvider::BoundingBox(const ON_Viewport& vp, const CRhinoO
 
 bool CRpcCrmProvider::BuildCustomMeshes(const ON_Viewport& vp, const UUID& uuidRequestingPlugIn, const CRhinoDoc& doc, IRhRdkCustomRenderMeshes& crmInOut, const CDisplayPipelineAttributes* pAttributes, bool bWillBuildCustomMeshCheck) const
 {
-	if(bWillBuildCustomMeshCheck && !WillBuildCustomMesh(vp, crmInOut.Object(), doc, uuidRequestingPlugIn, pAttributes))
+	if (bWillBuildCustomMeshCheck && !WillBuildCustomMesh(vp, crmInOut.Object(), doc, uuidRequestingPlugIn, pAttributes))
 		return false;
 
 	const CRhinoObject* pObject = crmInOut.Object();
-	if (NULL == pObject) return false;
+
+	if (!pObject)
+		return false;
 
 	const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(pObject);
-	if (NULL == pBlock) return false;
+
+	if (!pBlock)
+		return false;
 
 	ON_Xform xformInstance = pBlock->InstanceXform();
 	xformInstance.Invert();
-
 	ON_3dPoint ptCamera = vp.CameraLocation();
-
 	ptCamera.Transform(xformInstance);
-
 	crmInOut.SetAutoDeleteMeshesOn();
 	crmInOut.SetAutoDeleteMaterialsOn();
-			
-	CRpcInstance rpc(doc, *pBlock);
-	if (rpc.IsValid())
+	auto rpc = Mains().GetRPCInstanceTable().Lookup(pBlock->Id());
+	auto instance = (rpc && (*rpc)->IsValid()) ? (*rpc)->Instance() : nullptr;
+
+	if (!instance)
+		return false;
+
+	ON_SimpleArray<ON_Mesh*> aMeshes;
+	ON_SimpleArray<CRhRdkMaterial*> aMaterials;
+
+	CRpcRenderMeshBuilder mb(doc, *instance);
+
+	if (instance->hasMaterials())
+		mb.BuildNew(aMeshes, aMaterials);
+	else
+		mb.BuildOld(ptCamera, aMeshes, aMaterials);
+
+	for (int i = 0; i < aMeshes.Count(); i++)
 	{
-		const RPCapi::Instance* pRpcInstance = rpc.Instance();
-		if (NULL != pRpcInstance)
-		{
-			// DebugSaveTexturesToRoot(*pRpcInstance, ptCamera);
-
-			ON_SimpleArray<ON_Mesh*> aMeshes;
-			ON_SimpleArray<CRhRdkBasicMaterial*> aMaterials;
-
-			CRpcRenderMeshBuilder mb(doc, *pRpcInstance);
-			if (mb.Build(ptCamera, aMeshes, aMaterials))
-			{
-				for (int i=0; i<aMeshes.Count(); i++)
-				{
-					ON_Mesh* pRhinoMesh = aMeshes[i];
-					pRhinoMesh->Transform(pBlock->InstanceXform());
-
-					CRhRdkBasicMaterial* pRdkMaterial = NULL;
-
-					pRdkMaterial = aMaterials[i];
-
-					crmInOut.Add(pRhinoMesh, pRdkMaterial);
-				}
-			}
-		}
+		ON_Mesh* pRhinoMesh = aMeshes[i];
+		pRhinoMesh->Transform(pBlock->InstanceXform());
+		crmInOut.Add(pRhinoMesh, aMaterials[i]);
 	}
 
 	return true;
