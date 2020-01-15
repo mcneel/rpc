@@ -45,7 +45,7 @@ protected:
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 
 private:
-	CRpcInstance* m_pRpcInstance;
+	ON_UUID uuid;
 	UINT_PTR m_iRpcParamChangedTimer;
 	UINT_PTR m_iUpdateUiTimer;
 	CButton m_btMassEditButton;

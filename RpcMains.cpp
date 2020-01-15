@@ -15,13 +15,18 @@
 #include "RpcAddCmd.h"
 #include "RpcEditCmd.h"
 #include "RpcSetAnimationFrameCmd.h"
-
+#include "RpcDashboardCmd.h"
+#include "RpcHelpCmd.h"
 
 void CRpcMains::CreateCommands(void)
 {
 	static class CRpcAddCmd theRpcAddCmd;
 	static class CRpcEditCmd theRpcEditCmd;
 	static class CRpcSetAnimationFrameCmd theSetAnimationFrameCmd;
+	static class CRpcDashboardCmd theRpcDashboardCmd;
+	static class CRpcHelpCmd theRpcHelpCmd;
+	static class CRpcSiteCmd theRpcSiteCmd;
+
 }
 
 
@@ -35,15 +40,16 @@ CRpcMains& Mains(void)
 
 
 CRpcMains::CRpcMains(const CRPCPlugIn& plug)
-: m_PlugIn(plug)
+: m_PlugIn(plug),
+m_pRpcClient(nullptr),
+m_pRdkPlugIn(nullptr),
+m_pEventMachine(nullptr),
+m_pDragDropHandler(nullptr),
+m_pRpcDocument(nullptr),
+m_pEventWatcher(nullptr),
+m_pRpcPropDlg(nullptr),
+rpcTable(nullptr)
 {
-	m_pRpcClient = NULL;
-	m_pRdkPlugIn = NULL;
-	m_pEventMachine = NULL;
-	m_pDragDropHandler = NULL;
-	m_pRpcDocument = NULL;
-	m_pEventWatcher = NULL;
-	m_pRpcPropDlg = NULL;
 }
 
 CRpcMains::~CRpcMains(void)
@@ -53,56 +59,62 @@ CRpcMains::~CRpcMains(void)
 
 void CRpcMains::CleanUp(void)
 {
-	if (NULL != m_pEventWatcher)
+	if (m_pEventWatcher)
 	{
 		m_pEventWatcher->Enable(false);
 		m_pEventWatcher->UnRegister();
 		delete m_pEventWatcher;
-		m_pEventWatcher = NULL;
+		m_pEventWatcher = nullptr;
 	}
 
-	if (NULL != m_pRdkPlugIn)
+	if (m_pRdkPlugIn)
 	{
 		m_pRdkPlugIn->Uninitialize();
 		delete m_pRdkPlugIn;
-		m_pRdkPlugIn = NULL;
+		m_pRdkPlugIn = nullptr;
 	}
 
-	if (NULL != m_pRpcClient)
+	if (m_pRpcClient)
 	{
 		m_pRpcClient->Uninitialize();
 		delete m_pRpcClient;
-		m_pRpcClient = NULL;
+		m_pRpcClient = nullptr;
 	}
 
-	if(NULL != m_pEventMachine)
+	if(m_pEventMachine)
 	{
 		m_pEventMachine->EnableEvents(false);
 	}
 
-	if (NULL != m_pRpcDocument)
+	if (m_pRpcDocument)
 	{
 		delete m_pRpcDocument;
-		m_pRpcDocument = NULL;
+		m_pRpcDocument = nullptr;
 	}
 
-	if (NULL != m_pRpcPropDlg)
+	if (m_pRpcPropDlg)
 	{
 		AFX_MANAGE_STATE(AfxGetStaticModuleState());
 		delete m_pRpcPropDlg;
-		m_pRpcPropDlg = NULL;
+		m_pRpcPropDlg = nullptr;
 	}
 
-	if (NULL != m_pEventMachine)
+	if (m_pEventMachine)
 	{
 		delete m_pEventMachine;
-		m_pEventMachine = NULL;
+		m_pEventMachine = nullptr;
 	}
 
-	if (NULL != m_pDragDropHandler)
+	if (m_pDragDropHandler)
 	{
 		delete m_pDragDropHandler;
-		m_pDragDropHandler = NULL;
+		m_pDragDropHandler = nullptr;
+	}
+
+	if (rpcTable)
+	{
+		delete rpcTable;
+		rpcTable = nullptr;
 	}
 }
 
@@ -126,6 +138,7 @@ bool CRpcMains::Initialize(void)
 		return false;
 	}
 
+	rpcTable = new ON_SimpleUuidMap<CRpcInstance*>();
 	EventWatcher();
 	EventMachine();
 	RpcDocument();
@@ -160,7 +173,7 @@ CRpcClient& CRpcMains::RpcClient(void)
 
 CRpcEventMachine& CRpcMains::EventMachine(void) const
 {
-	if (NULL == m_pEventMachine)
+	if (!m_pEventMachine)
 	{
 		m_pEventMachine = new CRpcEventMachine;
 		m_pEventMachine->EnableEvents(true);
@@ -171,7 +184,7 @@ CRpcEventMachine& CRpcMains::EventMachine(void) const
 
 CRpcEventWatcher& CRpcMains::EventWatcher(void) const
 {
-	if (NULL == m_pEventWatcher)
+	if (!m_pEventWatcher)
 	{
 		m_pEventWatcher = new CRpcEventWatcher;
 		m_pEventWatcher->Register();
@@ -183,7 +196,7 @@ CRpcEventWatcher& CRpcMains::EventWatcher(void) const
 
 CRpcDocument& CRpcMains::RpcDocument(void)
 {
-	if (NULL == m_pRpcDocument)
+	if (!m_pRpcDocument)
 	{
 		m_pRpcDocument = new CRpcDocument;
 	}
@@ -195,10 +208,20 @@ CRpcPropertiesDlg& CRpcMains::PropertiesDlg(void)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
-	if (NULL == m_pRpcPropDlg)
+	if (!m_pRpcPropDlg)
 	{
 		m_pRpcPropDlg = new CRpcPropertiesDlg;
 	}
 
 	return *m_pRpcPropDlg;
+}
+
+ON_SimpleUuidMap<CRpcInstance*>& CRpcMains::GetRPCInstanceTable()
+{
+	if (!rpcTable)
+	{
+		rpcTable = new ON_SimpleUuidMap<CRpcInstance*>();
+	}
+
+	return *rpcTable;
 }

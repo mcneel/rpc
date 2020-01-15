@@ -68,6 +68,9 @@ public:
   CRpcMains& Mains(void);
 
 private:
+	void RefreshToolbar();
+
+private:
   ON_wString m_plugin_version;
 
   // TODO: Add additional class information here

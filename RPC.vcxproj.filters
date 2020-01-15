@@ -153,6 +153,21 @@
     <ClCompile Include="LBPBitmapPreview.cpp">
       <Filter>Source Files\LBP</Filter>
     </ClCompile>
+    <ClCompile Include="MaterialParams.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RpcDashboardCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RpcHelpCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RpcSelectionDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RpcDockbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RPCApp.h">
@@ -323,6 +338,18 @@
     <ClInclude Include="LBPException.h">
       <Filter>Header Files\LBP</Filter>
     </ClInclude>
+    <ClInclude Include="MaterialParams.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RpcDashboardCmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RpcHelpCmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RpcSelectionDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="RPC.def">
@@ -339,5 +366,13 @@
     <ResourceCompile Include="RPC.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="res\rpc_acm.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\selection.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>
