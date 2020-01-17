@@ -1,12 +1,13 @@
 #include "StdAfx.h"
-#include "RpcDashboardCmd.h"
+#include "RpcAvailDialog.h"
+#include "RpcAvailCmd.h"
 
-const wchar_t * CRpcDashboardCmd::EnglishCommandName()
+const wchar_t * CRpcAvailCmd::EnglishCommandName()
 {
-	return L"RPCDashboard";
+	return L"RPCAvail";
 }
 
-UUID CRpcDashboardCmd::CommandUUID()
+UUID CRpcAvailCmd::CommandUUID()
 {
 	static const UUID uuid =
 	{
@@ -17,19 +18,19 @@ UUID CRpcDashboardCmd::CommandUUID()
 	return uuid;
 }
 
-CRhinoCommand::result CRpcDashboardCmd::RunRpcCommand(const CRhinoCommandContext& context)
+CRhinoCommand::result CRpcAvailCmd::RunRpcCommand(const CRhinoCommandContext& context)
 {
 	const HKEY root = HKEY_LOCAL_MACHINE;
 	const std::wstring name = L"Path";
-	std::wstring key = L"Software\\WOW6432Node\\ArchVision\\Dashboard";
+	std::wstring key = L"Software\\ArchVision\\Beacon\\00F8D4D6-3919-409C-97FB-E3549884989F";
 	HKEY hKey;
 
 	if (RegOpenKeyEx(root, key.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
 	{
-		key = L"Software\\ArchVision\\Dashboard";
+		RpcAvailDialog dlg(CWnd::GetActiveWindow());
 
-		if (RegOpenKeyEx(root, key.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
-			throw "Could not open registry key";
+		if (dlg.DoModal() <= 0)
+			return success;
 	}
 
 	DWORD type, cbData;
@@ -62,6 +63,6 @@ CRhinoCommand::result CRpcDashboardCmd::RunRpcCommand(const CRhinoCommandContext
 		value.resize(firstNull);
 	}
 
-	ShellExecute(NULL, L"open", L"Dashboard.exe", NULL, (LPCWSTR)value.c_str(), SW_SHOWNORMAL);
+	ShellExecute(NULL, L"open", L"AVAIL.exe", NULL, (LPCWSTR)value.c_str(), SW_SHOWNORMAL);
 	return success;
 }
