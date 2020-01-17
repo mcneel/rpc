@@ -1,7 +1,7 @@
 #pragma once
 #include "RpcCommand.h"
 
-class CRpcDashboardCmd : public CRpcTestCommand
+class CRpcAvailCmd : public CRpcTestCommand
 {
 public:
 	CRhinoCommand::result RunRpcCommand(const CRhinoCommandContext& context) override;

@@ -15,7 +15,7 @@
 #include "RpcAddCmd.h"
 #include "RpcEditCmd.h"
 #include "RpcSetAnimationFrameCmd.h"
-#include "RpcDashboardCmd.h"
+#include "RpcAvailCmd.h"
 #include "RpcHelpCmd.h"
 
 void CRpcMains::CreateCommands(void)
@@ -23,7 +23,7 @@ void CRpcMains::CreateCommands(void)
 	static class CRpcAddCmd theRpcAddCmd;
 	static class CRpcEditCmd theRpcEditCmd;
 	static class CRpcSetAnimationFrameCmd theSetAnimationFrameCmd;
-	static class CRpcDashboardCmd theRpcDashboardCmd;
+	static class CRpcAvailCmd theRpcAvailCmd;
 	static class CRpcHelpCmd theRpcHelpCmd;
 	static class CRpcSiteCmd theRpcSiteCmd;
 

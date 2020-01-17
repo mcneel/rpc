@@ -13,47 +13,82 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_AVAIL DIALOGEX 0, 0, 468, 202
+STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         IDB_LABEL,IDC_PREVIEW_LABEL,"Static",SS_BITMAP | SS_CENTERIMAGE,315,16,138,31,WS_EX_TRANSPARENT
+    CONTROL         "<a>www.archvision.com/downloads</a>",IDC_DOWNLOADS,
+                    "SysLink",0x0,318,139,135,10,WS_EX_TRANSPARENT
+    LTEXT           "The ArchVision RPC plugin for Rhino could not find the following application",IDC_TEXT,319,50,134,17,0,WS_EX_TRANSPARENT
+    LTEXT           "The ArchVision-AVAIL APP is required to access, download and manage all the available RPC asset library.",IDC_TEXT2,319,87,134,32,0,WS_EX_TRANSPARENT
+    LTEXT           "** An ArchVision account is required to login and download the ArchVision Software",IDC_TEXT4,318,159,135,25,0,WS_EX_TRANSPARENT
+    CONTROL         IDB_INTERIOR,IDC_PREVIEW_INTERIOR,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_REALSIZEIMAGE,15,16,296,171,WS_EX_TRANSPARENT
+    LTEXT           "To Download the ArchVision-AVAIL Content Manager please visit",IDC_TEXT3,318,124,135,18,0,WS_EX_TRANSPARENT
+    LTEXT           "Avail Content Manager",IDC_TEXT5,319,72,134,9,0,WS_EX_TRANSPARENT
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    IDD_AVAIL, DIALOG
+    BEGIN
+        LEFTMARGIN, 15
+        RIGHTMARGIN, 453
+        TOPMARGIN, 16
+        BOTTOMMARGIN, 187
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_AVAIL AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_INTERIOR            BITMAP                  "res\\Interior_Office_Preview.bmp"
+
+IDB_LABEL               BITMAP                  "res\\Vector Smart Object.bmp"
+
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
 // Finnish (Finland) resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_FIN)
 LANGUAGE LANG_FINNISH, SUBLANG_DEFAULT
 #pragma code_page(1252)
-
-#ifdef APSTUDIO_INVOKED
-/////////////////////////////////////////////////////////////////////////////
-//
-// TEXTINCLUDE
-//
-
-1 TEXTINCLUDE 
-BEGIN
-    "resource.h\0"
-END
-
-2 TEXTINCLUDE 
-BEGIN
-    "#include ""afxres.h""\r\n"
-    "\0"
-END
-
-3 TEXTINCLUDE 
-BEGIN
-    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
-    "#define _AFX_NO_OLE_RESOURCES\r\n"
-    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
-    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
-    "\r\n"
-    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)\r\n"
-    "LANGUAGE 9, 2\r\n"
-    "#pragma code_page(1252)\r\n"
-    "#include ""res/RPC.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
-    "#include ""afxres.rc""     // Standard components\r\n"
-    "#endif\r\n"
-    "\0"
-END
-
-#endif    // APSTUDIO_INVOKED
-
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -155,6 +190,53 @@ END
 
 /////////////////////////////////////////////////////////////////////////////
 //
+// AFX_DIALOG_LAYOUT
+//
+
+IDD_SELECTION AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENG)\r\n"
+    "LANGUAGE 9, 2\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""res/RPC.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
 // Icon
 //
 
@@ -165,17 +247,6 @@ IDI_ACM                 ICON                    "res\\rpc_acm.ico"
 IDI_PROP_RPC            ICON                    "res\\Rpc.ico"
 
 IDI_SEL                 ICON                    "res\\selection.ico"
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// AFX_DIALOG_LAYOUT
-//
-
-IDD_SELECTION AFX_DIALOG_LAYOUT
-BEGIN
-    0
-END
 
 #endif    // Finnish (Finland) resources
 /////////////////////////////////////////////////////////////////////////////
