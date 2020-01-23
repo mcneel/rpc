@@ -559,21 +559,16 @@ void CRpcRenderMeshBuilder::BaseMetalRoughness(RPCapi::Material& aRpcMaterial, C
 void CRpcRenderMeshBuilder::Specularity(RPCapi::Material & aRpcMaterial, CRhRdkMaterial & aMaterial)
 {
 	float F0 = 1.0f;
-	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::REFLECTIVITY)), F0);
+	float IOR = 0.0f;
+	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_IOR)), IOR);
+
+	//F0 represents the range of 0.0 - 0.08
+	F0 = (powf((1.0f - IOR) / (1.0f + IOR), 2)) / 0.08f;
+
 	SetValue(aMaterial, F0, F0 > 0.0f, PBR_SPECULAR);
 
 	auto param = aRpcMaterial.get(getMapName(MaterialMaps::REFLECTIVITY_MAP));
 	SetTexture(aMaterial, param, PBR_SPECULAR);
-
-	auto pColor = GetColor(aRpcMaterial.get(getParamName(MaterialParams::REFLECTION_COLOR)));
-
-	if (pColor)
-	{
-		ON_Color *color = new ON_Color();
-		color->SetFractionalRGB(pColor->r, pColor->g, pColor->b);
-		double tint = color->Value();
-		SetValue(aMaterial, tint, tint > 0.0f, PBR_SPECULAR_TINT);
-	}
 
 	param = aRpcMaterial.get(getMapName(MaterialMaps::REFL_COLOR_MAP));
 	SetTexture(aMaterial, param, PBR_SPECULAR_TINT);
