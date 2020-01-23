@@ -524,7 +524,8 @@ void CRpcRenderMeshBuilder::SetTexture(CRhRdkMaterial & aMaterial, RPCapi::Param
 
 void CRpcRenderMeshBuilder::BaseMetalRoughness(RPCapi::Material& aRpcMaterial, CRhRdkMaterial& aMaterial)
 {
-	auto pColor = GetColor(aRpcMaterial.get(getParamName(MaterialParams::BASE_COLOR)));
+	auto colorParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::BASE_COLOR)));
+	auto pColor = GetColor(colorParam.get());
 
 	if (pColor)
 	{
@@ -533,130 +534,147 @@ void CRpcRenderMeshBuilder::BaseMetalRoughness(RPCapi::Material& aRpcMaterial, C
 		SetValue(aMaterial, *color, true, PBR_BASE_COLOR);
 	}
 
-	auto param = aRpcMaterial.get(getMapName(MaterialMaps::BASE_COLOR_MAP));
-	SetTexture(aMaterial, param, PBR_BASE_COLOR);
+	auto baseColorMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::BASE_COLOR_MAP)));
+	SetTexture(aMaterial, baseColorMap.get(), PBR_BASE_COLOR);
 
 	float metallic = 0.0f;
-	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::METALNESS)), metallic);
+	auto metallicParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::METALNESS)));
+	GetPrimValue<float>(metallicParam.get(), metallic);
 	SetValue(aMaterial, metallic, metallic > 0.0f, PBR_METALLIC);
-	param = aRpcMaterial.get(getMapName(MaterialMaps::METALNESS_MAP));
-	SetTexture(aMaterial, param, PBR_METALLIC);
+	auto metalnessMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::METALNESS_MAP)));
+	SetTexture(aMaterial, metalnessMap.get(), PBR_METALLIC);
 
 	bool roughnessInv = false;
-	GetPrimValue<bool>(aRpcMaterial.get(getParamName(MaterialParams::ROUGHNESS_INVERSION)), roughnessInv);
+	auto roughnessInvParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::ROUGHNESS_INVERSION)));
+	GetPrimValue<bool>(roughnessInvParam.get(), roughnessInv);
 	float roughness = 0.2f;
-	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::ROUGHNESS)), roughness);
+	auto roughnessParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::ROUGHNESS)));
+	GetPrimValue<float>(roughnessParam.get(), roughness);
 
 	if (roughnessInv)
 		roughness = 1.0f - roughness;
 
 	SetValue(aMaterial, roughness, roughness>0.0f, PBR_ROUGHNESS);
 
-	param = aRpcMaterial.get(getMapName(MaterialMaps::ROUGHNESS_MAP));
-	SetTexture(aMaterial, param, PBR_ROUGHNESS, roughnessInv);
+	auto roughnessMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::ROUGHNESS_MAP)));
+	SetTexture(aMaterial, roughnessMap.get(), PBR_ROUGHNESS, roughnessInv);
 }
 
 void CRpcRenderMeshBuilder::Specularity(RPCapi::Material & aRpcMaterial, CRhRdkMaterial & aMaterial)
 {
-	float F0 = 1.0f;
 	float IOR = 0.0f;
-	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_IOR)), IOR);
+	auto iorParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_IOR)));
+	GetPrimValue<float>(iorParam.get(), IOR);
 
 	//F0 represents the range of 0.0 - 0.08
-	F0 = (powf((1.0f - IOR) / (1.0f + IOR), 2)) / 0.08f;
+	float F0 = (powf((1.0f - IOR) / (1.0f + IOR), 2)) / 0.08f;
 
 	SetValue(aMaterial, F0, F0 > 0.0f, PBR_SPECULAR);
 
-	auto param = aRpcMaterial.get(getMapName(MaterialMaps::REFLECTIVITY_MAP));
-	SetTexture(aMaterial, param, PBR_SPECULAR);
+	auto reflectivityMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::REFLECTIVITY_MAP)));
+	SetTexture(aMaterial, reflectivityMap.get(), PBR_SPECULAR);
 
-	param = aRpcMaterial.get(getMapName(MaterialMaps::REFL_COLOR_MAP));
-	SetTexture(aMaterial, param, PBR_SPECULAR_TINT);
+	auto reflColorMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::REFL_COLOR_MAP)));
+	SetTexture(aMaterial, reflColorMap.get(), PBR_SPECULAR_TINT);
 }
 
 void CRpcRenderMeshBuilder::Anisotropy(RPCapi::Material & aRpcMaterial, CRhRdkMaterial & aMaterial)
 {
 	float amount = 0.0f;
-	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::ANISOTROPY)), amount);
+	auto amountParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::ANISOTROPY)));
+	GetPrimValue<float>(amountParam.get(), amount);
 	SetValue(aMaterial, amount, amount > 0.0f, PBR_ANISOTROPIC);
-	auto param = aRpcMaterial.get(getMapName(MaterialMaps::ANISOTROPY_MAP));
-	SetTexture(aMaterial, param, PBR_ANISOTROPIC);
+	auto anisotropyMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::ANISOTROPY_MAP)));
+	SetTexture(aMaterial, anisotropyMap.get(), PBR_ANISOTROPIC);
 
 	float rotation = 0.0f;
-	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::ANISOANGLE)), rotation);
+	auto rotationParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::ANISOANGLE)));
+	GetPrimValue<float>(rotationParam.get(), rotation);
 	SetValue(aMaterial, rotation, rotation > 0.0f, PBR_ANISOROTATION);
-	param = aRpcMaterial.get(getMapName(MaterialMaps::ANISO_ANGLE_MAP));
-	SetTexture(aMaterial, param, PBR_ANISOROTATION);
+	auto anisoAngleMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::ANISO_ANGLE_MAP)));
+	SetTexture(aMaterial, anisoAngleMap.get(), PBR_ANISOROTATION);
 }
 
 void CRpcRenderMeshBuilder::Clearcoat(RPCapi::Material & aRpcMaterial, CRhRdkMaterial & aMaterial)
 {
 	float amount = 0.0f;
-	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::COATING)), amount);
+	auto ampuntParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::COATING)));
+	GetPrimValue<float>(ampuntParam.get(), amount);
 	SetValue(aMaterial, amount, amount > 0.0f, PBR_CLEARCOAT);
-	auto param = aRpcMaterial.get(getMapName(MaterialMaps::COAT_MAP));
-	SetTexture(aMaterial, param, PBR_CLEARCOAT);
+	auto coatMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::COAT_MAP)));
+	SetTexture(aMaterial, coatMap.get(), PBR_CLEARCOAT);
 
-	param = aRpcMaterial.get(getMapName(MaterialMaps::COAT_BUMP_MAP));
-	SetTexture(aMaterial, param, PBR_CLEARCOAT_BUMP);
+	auto coatBumpMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::COAT_BUMP_MAP)));
+	SetTexture(aMaterial, coatBumpMap.get(), PBR_CLEARCOAT_BUMP);
 
 	bool roughnessInv = false;
-	GetPrimValue<bool>(aRpcMaterial.get(getParamName(MaterialParams::COAT_ROUGHNESS_INV)), roughnessInv);
+	auto roughnessInvParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::COAT_ROUGHNESS_INV)));
+	GetPrimValue<bool>(roughnessInvParam.get(), roughnessInv);
 	float roughness = 0.0f;
-	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::COAT_ROUGHNESS)), roughness);
+	auto roughnessParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::COAT_ROUGHNESS)));
+	GetPrimValue<float>(roughnessParam.get(), roughness);
 
 	SetValue(aMaterial, roughness, roughness>0.0f, PBR_CLEARCOAT_ROUGH);
-	param = aRpcMaterial.get(getMapName(MaterialMaps::COAT_ROUGH_MAP));
-	SetTexture(aMaterial, param, PBR_CLEARCOAT_ROUGH, roughnessInv);
+	auto coatRoughMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::COAT_ROUGH_MAP)));
+	SetTexture(aMaterial, coatRoughMap.get(), PBR_CLEARCOAT_ROUGH, roughnessInv);
 }
 
 void CRpcRenderMeshBuilder::Opacity(RPCapi::Material & aRpcMaterial, CRhRdkMaterial & aMaterial)
 {
 	float amount = 1.0f;
-	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY)), amount);
+	auto amountParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY)));
+	GetPrimValue<float>(amountParam.get(), amount);
 	amount = 1.0f - amount;
 	SetValue(aMaterial, amount, amount>0.0f, PBR_OPACITY);
 
-	auto param = aRpcMaterial.get(getMapName(MaterialMaps::CUTOUT_MAP));
+	auto cutoutMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::CUTOUT_MAP)));
 
-	if (!param)
-		param = aRpcMaterial.get(getMapName(MaterialMaps::TRANSPARENCY_MAP));
+	if (!cutoutMap.get())
+		cutoutMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::TRANSPARENCY_MAP)));
 
-	SetTexture(aMaterial, param, PBR_OPACITY);
+	SetTexture(aMaterial, cutoutMap.get(), PBR_OPACITY);
 	float ior = 1.52f;
-	GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_IOR)), ior);
+	auto iorParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_IOR)));
+	GetPrimValue<float>(iorParam.get(), ior);
 	SetValue(aMaterial, ior, ior > 0.0f, PBR_OPACITY_IOR);
-	param = aRpcMaterial.get(getMapName(MaterialMaps::TRANSPARENCY_IOR_MAP));
-	SetTexture(aMaterial, param, PBR_OPACITY_IOR);
+	auto transparencyIorMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::TRANSPARENCY_IOR_MAP)));
+	SetTexture(aMaterial, transparencyIorMap.get(), PBR_OPACITY_IOR);
 
 	bool transRoughLock = true;
-	GetPrimValue<bool>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_ROUGHNESS_LOCK)), transRoughLock);
+	auto transRoughLockParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_ROUGHNESS_LOCK)));
+	GetPrimValue<bool>(transRoughLockParam.get(), transRoughLock);
 	bool transRoughInv = false;
 	float opacityRoughness = 0.0f;
+	std::unique_ptr<RPCapi::Param> roughnessMap;
 
 	if (transRoughLock)
 	{
-		GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::ROUGHNESS)), opacityRoughness);
-		GetPrimValue<bool>(aRpcMaterial.get(getParamName(MaterialParams::ROUGHNESS_INVERSION)), transRoughInv);
-		param = aRpcMaterial.get(getMapName(MaterialMaps::ROUGHNESS_MAP));
+		auto opacityRoughnessParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::ROUGHNESS)));
+		GetPrimValue<float>(opacityRoughnessParam.get(), opacityRoughness);
+		auto transRoughInvParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::ROUGHNESS_INVERSION)));
+		GetPrimValue<bool>(transRoughInvParam.get(), transRoughInv);
+		roughnessMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::ROUGHNESS_MAP)));
 	}
 	else
 	{
-		GetPrimValue<float>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_ROUGHNESS)), opacityRoughness);
-		param = aRpcMaterial.get(getMapName(MaterialMaps::TRANSPARENCY_ROUGH_MAP));
-		GetPrimValue<bool>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_ROUGHNESS_INVERSION)), transRoughInv);
+		auto opacityRoughnessParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_ROUGHNESS)));
+		GetPrimValue<float>(opacityRoughnessParam.get(), opacityRoughness);
+		roughnessMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::TRANSPARENCY_ROUGH_MAP)));
+		auto transRoughInvParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::TRANSPARENCY_ROUGHNESS_INVERSION)));
+		GetPrimValue<bool>(transRoughInvParam.get(), transRoughInv);
 	}
 
 	if (transRoughInv)
 		opacityRoughness = 1.0f - opacityRoughness;
 
 	SetValue(aMaterial, opacityRoughness, opacityRoughness > 0.0f, PBR_OPACITY_ROUGH);
-	SetTexture(aMaterial, param, PBR_OPACITY_ROUGH, transRoughInv);
+	SetTexture(aMaterial, roughnessMap.get(), PBR_OPACITY_ROUGH, transRoughInv);
 }
 
 void CRpcRenderMeshBuilder::Emission(RPCapi::Material & aRpcMaterial, CRhRdkMaterial & aMaterial)
 {
-	auto pColor = GetColor(aRpcMaterial.get(getParamName(MaterialParams::EMISSION_COLOR)));
+	auto colorParam = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getParamName(MaterialParams::EMISSION_COLOR)));
+	auto pColor = GetColor(colorParam.get());
 
 	if (pColor)
 	{
@@ -665,17 +683,17 @@ void CRpcRenderMeshBuilder::Emission(RPCapi::Material & aRpcMaterial, CRhRdkMate
 		SetValue(aMaterial, *color, true, PBR_EMISSION);
 	}
 
-	auto param = aRpcMaterial.get(getMapName(MaterialMaps::EMISSION_COLOR_MAP));
-	SetTexture(aMaterial, param, PBR_EMISSION);
+	auto emissionColorMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::EMISSION_COLOR_MAP)));
+	SetTexture(aMaterial, emissionColorMap.get(), PBR_EMISSION);
 }
 
 void CRpcRenderMeshBuilder::BumpDisplacement(RPCapi::Material & aRpcMaterial, CRhRdkMaterial & aMaterial)
 {
-	auto param = aRpcMaterial.get(getMapName(MaterialMaps::BUMP_MAP));
-	SetTexture(aMaterial, param, PBR_BUMP);
+	auto bumpMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::BUMP_MAP)));
+	SetTexture(aMaterial, bumpMap.get(), PBR_BUMP);
 
-	param = aRpcMaterial.get(getMapName(MaterialMaps::DISPLACEMENT_MAP));
-	SetTexture(aMaterial, param, PBR_DISPLACEMENT);
+	auto displacementMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::DISPLACEMENT_MAP)));
+	SetTexture(aMaterial, displacementMap.get(), PBR_DISPLACEMENT);
 }
 
 template <typename T>
