@@ -48,7 +48,9 @@ m_pDragDropHandler(nullptr),
 m_pRpcDocument(nullptr),
 m_pEventWatcher(nullptr),
 m_pRpcPropDlg(nullptr),
-rpcTable(nullptr)
+rpcTable(nullptr),
+selectedId(nullptr),
+copyOfRpc(false)
 {
 }
 
@@ -224,4 +226,24 @@ ON_SimpleUuidMap<CRpcInstance*>& CRpcMains::GetRPCInstanceTable()
 	}
 
 	return *rpcTable;
+}
+
+const RPCapi::ID* CRpcMains::GetSelectedId()
+{
+	return selectedId.get();
+}
+
+void CRpcMains::SetSelectedId(const RPCapi::ID* id)
+{
+	selectedId.reset((RPCapi::ID*)id->copy());
+}
+
+bool CRpcMains::IsCopy()
+{
+	return copyOfRpc;
+}
+
+void CRpcMains::SetIsCopy(bool copied)
+{
+	copyOfRpc = copied;
 }

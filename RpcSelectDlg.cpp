@@ -29,8 +29,9 @@ INT_PTR CRpcSelectDlg::DoModal(void)
 	if (nullptr == m_pSelInterface) return IDCLOSE;
 
 	m_pSelInterface->registerCallback(this, true);
-	m_pSelInterface->idSet(m_pRpcInstance->Id());
+	m_pSelInterface->idSet(Mains().GetSelectedId());
 	m_pSelInterface->show(RhinoApp().MainWnd(), RPCapiSI::SelectionInterface::THUMBS_PLUS, RPCapiSI::SelectionInterface::MODAL);
+	Mains().SetSelectedId(m_pSelInterface->idGet());
 	return m_ret;
 }
 

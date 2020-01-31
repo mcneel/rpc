@@ -378,9 +378,9 @@ bool CRpcInstance::EditUi(HWND hWndParent, IEditDialogCallback* pCallback)
 	return true;
 }
 
-CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc, bool copied)
+CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc, bool copied, const CRhinoObject* object)
 {
-	const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(Object());
+	const CRhinoInstanceObject* pBlock = (object) ? CRhinoInstanceObject::Cast(object) : CRhinoInstanceObject::Cast(Object());
 
 	if (!pBlock)
 		return nullptr;
@@ -412,7 +412,7 @@ CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc, bool copied)
 
 CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const ON_3dPoint& pt)
 {
-    ON_Xform xform = ON_Xform::TranslationTransformation(pt - ON_origin);
+	ON_Xform xform = ON_Xform::TranslationTransformation(pt - ON_origin);
 
 	const CLBPString sName = UnusedRpcName(RpcName());
 
@@ -505,6 +505,8 @@ CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const CLBPStri
 	ON_InstanceDefinition idef;
 	idef.SetName(sDefName);
 
+	Mains().SetIsCopy(false);
+
 	const int iIndex = defTable.AddInstanceDefinition(idef, CreateProxyMesh(doc));
 
 	ON_3dmObjectAttributes* attr = new ON_3dmObjectAttributes();
@@ -514,7 +516,7 @@ CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const CLBPStri
 	wstring objectName = L"*_RPC_" + wstring(rpcName);
 	defTable.SetName(iIndex, objectName.c_str());
 
-    CRhinoInstanceObject* pInstObj = defTable.AddInstanceObject(iIndex, xform, attr);
+	CRhinoInstanceObject* pInstObj = defTable.AddInstanceObject(iIndex, xform, attr);
 
 	if (pInstObj)
 	{

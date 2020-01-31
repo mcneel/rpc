@@ -25,7 +25,7 @@ public:
 	unsigned int Document(void) const { return m_idDoc; } 
 
 	CRhinoInstanceObject* AddToDocument(CRhinoDoc& doc, const ON_3dPoint& pt);
-	CRhinoInstanceObject* Replace(CRhinoDoc& doc, bool copied = false);
+	CRhinoInstanceObject* Replace(CRhinoDoc& doc, bool copied = false, const CRhinoObject* object = nullptr);
 
 	bool CopyToRpc(const CRhinoObject& obj);
 	bool CopyFromRpc(const CRhinoObject& obj) const;
