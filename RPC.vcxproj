@@ -48,6 +48,7 @@
     <ClCompile Include="RpcHelpCmd.cpp" />
     <ClCompile Include="RpcInstance.cpp" />
     <ClCompile Include="RpcMains.cpp" />
+    <ClCompile Include="RpcMassEditCmd.cpp" />
     <ClCompile Include="RpcObject.cpp" />
     <ClCompile Include="RpcObjectUserData.cpp" />
     <ClCompile Include="RpcObjectUserDataWrapper.cpp" />
@@ -113,6 +114,7 @@
     <ClInclude Include="RpcHelpCmd.h" />
     <ClInclude Include="RpcInstance.h" />
     <ClInclude Include="RpcMains.h" />
+    <ClInclude Include="RpcMassEditCmd.h" />
     <ClInclude Include="RpcObject.h" />
     <ClInclude Include="RpcObjectStorageStrings.h" />
     <ClInclude Include="RpcObjectUserData.h" />
