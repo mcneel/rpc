@@ -120,6 +120,10 @@ void CRpcSelectionDialog::OnButtonClickedSelection()
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	CRpcAdvancedFileDialog dlg(pParentWnd);
 	CRpcInstance* m_pRpcInstance = new CRpcInstance(*RhinoApp().ActiveDoc(), (const wchar_t*)dlg.GetPathName());
+
+	if (Mains().GetSelectedId())
+		m_pRpcInstance->SetId(Mains().GetSelectedId());
+
 	selectionText.ShowWindow(SW_HIDE);
 	selectionButton.EnableWindow(false);
 	coloured = true;
@@ -188,5 +192,7 @@ void CRpcSelectionDialog::Add(CRpcInstance & m_pRpcInstance)
 		ptFirstRef.x, ptFirstRef.y, ptFirstRef.z);
 
 	RhinoApp().RunScript(RhinoApp().ActiveDoc()->TargetDocSerialNumber(), sRotateCmd.Wide());
+	Mains().SetSelectedId(m_pRpcInstance.Id());
 	Add(m_pRpcInstance);
+	Mains().SetIsCopy(false);
 }

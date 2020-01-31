@@ -3,6 +3,7 @@
 #include "RPCPlugIn.h"
 #include "RpcObjectStorageStrings.h"
 #include "RpcUtilities.h"
+#include "RpcMains.h"
 
 ON_OBJECT_IMPLEMENT(CRpcObjectUserData, ON_UserData, "F3E7353B-3C7F-45bc-9F71-32025D6E6C4A");
 
@@ -40,6 +41,7 @@ const CRpcObjectUserData& CRpcObjectUserData::operator = (const CRpcObjectUserDa
 	if(this != &ud)
 	{
 		CLBPRh_XMLUserData::operator = (ud);
+		Mains().SetIsCopy(true);
 	}
 
 	return *this;
