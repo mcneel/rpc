@@ -206,12 +206,18 @@ void CRPCPlugIn::RefreshToolbar()
 		CRhinoFileUtilities::DeleteFile(path);
 }
 
-void CRPCPlugIn::AddPagesToObjectPropertiesDialog(CRhinoPropertiesPanelPageCollection& collection)
+ON_UUID CRPCPlugIn::PropertiesPlugInId() const
+{
+	return ON_UuidFromString(L"334b4fce-860c-415b-89ff-3beaf65ebf52");
+}
+
+void CRPCPlugIn::GetPropertiesPages(CRhinoPropertiesPanelPageCollection& collection)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto page = &Mains().PropertiesDlg();
-  if (page != nullptr)
-	  collection.Add(page);
+
+	if (page)
+		collection.Add(page);
 }
 
 BOOL CRPCPlugIn::CallWriteDocument(const CRhinoFileWriteOptions& options)
