@@ -15,17 +15,19 @@
 #include "RpcAddCmd.h"
 #include "RpcEditCmd.h"
 #include "RpcSetAnimationFrameCmd.h"
-#include "RpcDashboardCmd.h"
+#include "RpcAvailCmd.h"
 #include "RpcHelpCmd.h"
+#include "RpcMassEditCmd.h"
 
 void CRpcMains::CreateCommands(void)
 {
 	static class CRpcAddCmd theRpcAddCmd;
 	static class CRpcEditCmd theRpcEditCmd;
 	static class CRpcSetAnimationFrameCmd theSetAnimationFrameCmd;
-	static class CRpcDashboardCmd theRpcDashboardCmd;
+	static class CRpcAvailCmd theRpcAvailCmd;
 	static class CRpcHelpCmd theRpcHelpCmd;
 	static class CRpcSiteCmd theRpcSiteCmd;
+	static class CRpcMassEditCmd theRpcMassEditCmd;
 
 }
 
@@ -48,7 +50,9 @@ m_pDragDropHandler(nullptr),
 m_pRpcDocument(nullptr),
 m_pEventWatcher(nullptr),
 m_pRpcPropDlg(nullptr),
-rpcTable(nullptr)
+rpcTable(nullptr),
+selectedId(nullptr),
+copyOfRpc(false)
 {
 }
 
@@ -224,4 +228,24 @@ ON_SimpleUuidMap<CRpcInstance*>& CRpcMains::GetRPCInstanceTable()
 	}
 
 	return *rpcTable;
+}
+
+const RPCapi::ID* CRpcMains::GetSelectedId()
+{
+	return selectedId.get();
+}
+
+void CRpcMains::SetSelectedId(const RPCapi::ID* id)
+{
+	selectedId.reset((RPCapi::ID*)id->copy());
+}
+
+bool CRpcMains::IsCopy()
+{
+	return copyOfRpc;
+}
+
+void CRpcMains::SetIsCopy(bool copied)
+{
+	copyOfRpc = copied;
 }

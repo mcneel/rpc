@@ -9,7 +9,7 @@
 class CRpcMains;
 
 
-class CRPCPlugIn : public CRhinoUtilityPlugIn
+class CRPCPlugIn : public CRhinoUtilityPlugIn, IRhinoAddPropertiesPages
 {
 public:
   // CRPCPlugIn constructor. The constructor is called when the
@@ -59,11 +59,9 @@ public:
 
 	plugin_load_time PlugInLoadTime() override { return load_plugin_when_needed_ignore_docked; }
 
-	void AddPagesToObjectPropertiesDialog(CRhinoPropertiesPanelPageCollection& collection) override;
-
-	virtual BOOL CallWriteDocument(const CRhinoFileWriteOptions& options) override;
-	virtual BOOL ReadDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const CRhinoFileReadOptions& options) override;
-	virtual BOOL WriteDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const CRhinoFileWriteOptions& options) override;
+	BOOL CallWriteDocument(const CRhinoFileWriteOptions& options) override;
+	BOOL ReadDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const CRhinoFileReadOptions& options) override;
+	BOOL WriteDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const CRhinoFileWriteOptions& options) override;
 
   CRpcMains& Mains(void);
 
@@ -75,10 +73,11 @@ private:
 
   // TODO: Add additional class information here
 	CRpcMains* m_pMains = nullptr;
+
+	// Inherited via IRhinoAddPropertiesPages
+	ON_UUID PropertiesPlugInId() const override;
+	void GetPropertiesPages(CRhinoPropertiesPanelPageCollection& collection) override;
 };
 
 // Return a reference to the one and only CRPCPlugIn object
 CRPCPlugIn& PlugIn();
-
-
-

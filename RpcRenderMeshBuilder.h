@@ -20,14 +20,15 @@ private:
 	void RpcTexture2RhinoMaterial(const ON_SimpleArray<RPCapi::Texture*>& aTextures, ON_SimpleArray<CRhRdkMaterial*>& aMaterials);
 	void RpcMaterial2RhinoMaterial(const ON_SimpleArray<RPCapi::Material*>& aRpcMaterials, ON_SimpleArray<CRhRdkMaterial*>& aMaterials);
 
-	bool Rgb2Material(RPCapi::Texture& RpcTexture, CRhRdkMaterial& Material, const wchar_t* textureType, bool inverse);
+	void Rgb2Material(RPCapi::Texture& RpcTexture, CRhRdkMaterial& Material, bool inverse, CRhRdkTexture*& pRdkTexture);
 
 	bool OldTexture2Material(RPCapi::Texture& RpcTexture, RPCapi::Texture::Channel::CHANNEL_CODE_T channel, CRhRdkBasicMaterial& Material,
 		CRhRdkMaterial::ChildSlotUsage slotType, const wchar_t* textureType);
 
 	template <typename T>
-	void SetValue(CRhRdkMaterial& aMaterial, T& value, bool check,const wchar_t* paramName);
-	void SetTexture(CRhRdkMaterial& aMaterial,RPCapi::Param* param, const wchar_t* paramName, bool inverse = false);
+	void SetValue(CRhRdkMaterial& aMaterial, T& value, ON_wString paramName);
+	void GetTexture(CRhRdkMaterial& aMaterial, RPCapi::Param* param, CRhRdkTexture*& pRdkTexture, bool inverse);
+	void SetTexture(CRhRdkMaterial& aMaterial, RPCapi::Param* param, const wchar_t* paramName, bool inverse = false, RPCapi::Param* cutout = nullptr);
 	void BaseMetalRoughness(RPCapi::Material& aRpcMaterial, CRhRdkMaterial& aMaterial);
 	void Subsurface(RPCapi::Material& aRpcMaterial, CRhRdkMaterial& aMaterial);
 	void Specularity(RPCapi::Material& aRpcMaterial, CRhRdkMaterial& aMaterial);

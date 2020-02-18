@@ -76,6 +76,18 @@ void CRpcEventWatcher::OnEndOpenDocument(CRhinoDoc& doc, const wchar_t* filename
 	}
 }
 
+void CRpcEventWatcher::OnAddObject(CRhinoDoc& doc, CRhinoObject& object)
+{
+	if (Mains().IsCopy())
+	{
+		if (Mains().GetRPCInstanceTable().Lookup(object.Id()))
+			return;
+
+		auto rpc = new CRpcInstance(doc, object);
+		rpc->Replace(doc, true, &object);
+	}
+}
+
 void CRpcEventWatcher::OnReplaceObject(CRhinoDoc & doc, CRhinoObject & old_object, CRhinoObject & new_object)
 {
 	const CRhinoObject& object = new_object.Attributes().m_uuid != ON_nil_uuid ? new_object : old_object;

@@ -156,9 +156,6 @@
     <ClCompile Include="MaterialParams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RpcDashboardCmd.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="RpcHelpCmd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -166,6 +163,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RpcDockbar.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RpcAvailCmd.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RpcAvailDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RpcMassEditCmd.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -341,13 +347,19 @@
     <ClInclude Include="MaterialParams.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="RpcDashboardCmd.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="RpcHelpCmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RpcSelectionDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RpcAvailCmd.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RpcAvailDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RpcMassEditCmd.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -372,6 +384,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\selection.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Interior_Office_Preview.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\Vector Smart Object.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
