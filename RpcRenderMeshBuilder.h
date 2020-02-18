@@ -26,7 +26,7 @@ private:
 		CRhRdkMaterial::ChildSlotUsage slotType, const wchar_t* textureType);
 
 	template <typename T>
-	void SetValue(CRhRdkMaterial& aMaterial, T& value, bool check, ON_wString paramName);
+	void SetValue(CRhRdkMaterial& aMaterial, T& value, ON_wString paramName);
 	void GetTexture(CRhRdkMaterial& aMaterial, RPCapi::Param* param, CRhRdkTexture*& pRdkTexture, bool inverse);
 	void SetTexture(CRhRdkMaterial& aMaterial, RPCapi::Param* param, const wchar_t* paramName, bool inverse = false, RPCapi::Param* cutout = nullptr);
 	void BaseMetalRoughness(RPCapi::Material& aRpcMaterial, CRhRdkMaterial& aMaterial);
