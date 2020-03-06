@@ -18,6 +18,7 @@
 #include "RpcAvailCmd.h"
 #include "RpcHelpCmd.h"
 #include "RpcMassEditCmd.h"
+#include "RpcPropCmd.h"
 
 void CRpcMains::CreateCommands(void)
 {
@@ -28,7 +29,7 @@ void CRpcMains::CreateCommands(void)
 	static class CRpcHelpCmd theRpcHelpCmd;
 	static class CRpcSiteCmd theRpcSiteCmd;
 	static class CRpcMassEditCmd theRpcMassEditCmd;
-
+	static class CRpcPropCmd theRpcPropCmd;
 }
 
 
