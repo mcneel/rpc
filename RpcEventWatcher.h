@@ -17,7 +17,8 @@ public:
 	void OnNewDocument(CRhinoDoc& doc) override;
 	void OnBeginOpenDocument(CRhinoDoc& doc, const wchar_t* filename, BOOL bMerge, BOOL bReference) override;
 	void OnEndOpenDocument(CRhinoDoc& doc, const wchar_t* filename, BOOL bMerge, BOOL bReference) override;
-	void OnAddObject(CRhinoDoc& doc, CRhinoObject& object);
+	void OnAddObject(CRhinoDoc& doc, CRhinoObject& object) override;
+    void OnDeleteObject(CRhinoDoc& doc, CRhinoObject& object) override;
 	void OnReplaceObject(CRhinoDoc& doc, CRhinoObject& old_object, CRhinoObject& new_object) override;
 
 private:

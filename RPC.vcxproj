@@ -53,6 +53,7 @@
     <ClCompile Include="RpcObjectUserData.cpp" />
     <ClCompile Include="RpcObjectUserDataWrapper.cpp" />
     <ClCompile Include="RPCPlugIn.cpp" />
+    <ClCompile Include="RpcPropCmd.cpp" />
     <ClCompile Include="RpcPropertiesDlg.cpp" />
     <ClCompile Include="RpcRdkPlugIn.cpp" />
     <ClCompile Include="RpcRenderMeshBuilder.cpp" />
@@ -120,6 +121,7 @@
     <ClInclude Include="RpcObjectUserData.h" />
     <ClInclude Include="RpcObjectUserDataWrapper.h" />
     <ClInclude Include="RPCPlugIn.h" />
+    <ClInclude Include="RpcPropCmd.h" />
     <ClInclude Include="RpcPropertiesDlg.h" />
     <ClInclude Include="RpcRdkPlugIn.h" />
     <ClInclude Include="RpcRenderMeshBuilder.h" />
