@@ -10,6 +10,7 @@
 #include "RpcSelectionDialog.h"
 #include "RpcEventWatcher.h"
 #include "RpcDocument.h"
+#include "LBPFileMgr2.h"
 
 // The plug-in object must be constructed before any plug-in classes derived
 // from CRhinoCommand. The #pragma init_seg(lib) ensures that this happens.
@@ -244,4 +245,15 @@ BOOL CRPCPlugIn::WriteDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const 
 		return FALSE;
 
 	return TRUE;
+}
+
+const wchar_t* CRPCPlugIn::getRpcApiFilename()
+{
+	const CLBPString sFullPathToPlugIn = PlugIn().PlugInFileName();
+	CLBPString sPathOnly = CLBPFileMgr2::GetPathOnly(sFullPathToPlugIn);
+	CLBPFileMgr2::RemoveTrailingSlash(sPathOnly);
+
+	const CLBPString sRpcApiDll = sPathOnly + L"\\RPCapi.dll";
+
+	return sRpcApiDll;
 }
