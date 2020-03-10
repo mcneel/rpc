@@ -452,16 +452,17 @@ int CRpcInstance::CreateLayer(wstring& rpcName, bool copied)
 		delete rpcFile;
 	}
 
-	int parentLayerIndex = layerTable.CurrentLayerIndex();
+	int parentLayerIndex = layerTable.FindLayerFromName(RpcLayer, false, false, NotFoundIndex, MultipleFoundIndex);
 
-	if (layerTable.CurrentLayer().Name() != RpcLayer)
+	if (parentLayerIndex < 0)
 	{
 		ON_Layer parentLayer;
 		parentLayer.SetName(RpcLayer);
 
 		parentLayerIndex = layerTable.AddLayer(parentLayer);
-		layerTable.SetCurrentLayerIndex(parentLayerIndex);
 	}
+
+	layerTable.SetCurrentLayerIndex(parentLayerIndex);
 
 	const CRhinoLayer& layer = layerTable[parentLayerIndex];
 	int check = layerTable.FindLayerFromName(categoryName, false, false, NotFoundIndex, MultipleFoundIndex);

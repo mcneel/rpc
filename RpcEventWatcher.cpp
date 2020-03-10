@@ -88,6 +88,34 @@ void CRpcEventWatcher::OnAddObject(CRhinoDoc& doc, CRhinoObject& object)
 	}
 }
 
+void CRpcEventWatcher::OnDeleteObject(CRhinoDoc& doc, CRhinoObject& object)
+{
+	const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(&object);
+
+	if (!pBlock)
+		return;
+
+	CRhinoLayerTable& layerTable = doc.m_layer_table;
+	CRhinoInstanceDefinitionTable& defTable = doc.m_instance_definition_table;
+	int objIndex = object.Attributes().m_layer_index;
+
+	const int iInstanceDefintionId = pBlock->InstanceDefinition()->Index();
+	doc.DeleteObject(CRhinoObjRef(pBlock));
+	defTable.DeleteInstanceDefinition(iInstanceDefintionId, false, true);
+
+	if (layerTable.DeleteLayer(objIndex, true))
+		Mains().GetRPCInstanceTable().Remove(object.Id());
+
+	if (Mains().GetRPCInstanceTable().Count() == 0)
+	{
+		constexpr int NotFoundIndex = -2;
+		constexpr int MultipleFoundIndex = -1;
+		constexpr auto RpcLayer = L"RPC Assets";
+		int assetIndex = layerTable.FindLayerFromName(RpcLayer, false, false, NotFoundIndex, MultipleFoundIndex);
+		layerTable.DeleteLayer(assetIndex, true);
+	}
+}
+
 void CRpcEventWatcher::OnReplaceObject(CRhinoDoc & doc, CRhinoObject & old_object, CRhinoObject & new_object)
 {
 	const CRhinoObject& object = new_object.Attributes().m_uuid != ON_nil_uuid ? new_object : old_object;
