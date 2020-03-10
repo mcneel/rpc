@@ -16,14 +16,15 @@
 #define IDI_SEL                         2013
 #define IDC_TEXT5                       2014
 #define IDC_EDIT1                       2015
-#define IDD_DASHBOARD                   2017
-#define IDD_                            2017
 #define IDD_AVAIL                       2017
 #define IDC_PREVIEW_INTERIOR            2019
 #define IDC_PREVIEW_LABEL               2020
 #define IDC_DOWNLOADS                   2021
+#define IDC_ARCHSITE                    2022
+#define IDC_ABOUT_TEXT                  2023
 #define IDB_INTERIOR                    2031
 #define IDB_LABEL                       2032
+#define IDD_ABOUT                       2033
 #define IDD_FILE_DIALOG                 6033
 #define IDC_STATIC_PREVIEW              6129
 #define IDC_CHECK_PREVIEW               6137

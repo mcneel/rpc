@@ -65,11 +65,7 @@ void track_memory_deallocate(void *ptr, const char *file, int line)
 
 bool CRpcClient::Initialize(void)
 {
-	const CLBPString sFullPathToPlugIn = PlugIn().PlugInFileName();
-	CLBPString sPathOnly = CLBPFileMgr2::GetPathOnly(sFullPathToPlugIn);
-	CLBPFileMgr2::RemoveTrailingSlash(sPathOnly);
-	
-	const CLBPString sRpcApiDll = sPathOnly + L"\\RPCapi.dll";
+	const CLBPString sRpcApiDll = PlugIn().getRpcApiFilename();
 
 	m_hRpcApiHandle = LoadLibrary(sRpcApiDll);
 	if (nullptr != m_hRpcApiHandle)

@@ -29,6 +29,8 @@
     <ClCompile Include="LBP_UUID.cpp" />
     <ClCompile Include="LBP_XML.cpp" />
     <ClCompile Include="MaterialParams.cpp" />
+    <ClCompile Include="RpcAboutCmd.cpp" />
+    <ClCompile Include="RpcAboutDialog.cpp" />
     <ClCompile Include="RpcAddCmd.cpp" />
     <ClCompile Include="RpcAnimationFrameRrp.cpp" />
     <ClCompile Include="RPCApp.cpp" />
@@ -95,6 +97,8 @@
     <ClInclude Include="ON_SimpleMap.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RhRdkRegisteredPropertiesEventSink.h" />
+    <ClInclude Include="RpcAboutCmd.h" />
+    <ClInclude Include="RpcAboutDialog.h" />
     <ClInclude Include="RpcAddCmd.h" />
     <ClInclude Include="RpcAnimationFrameRrp.h" />
     <ClInclude Include="RPCApp.h" />
@@ -203,6 +207,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Version.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -230,6 +235,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Version.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>

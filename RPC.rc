@@ -39,6 +39,15 @@ BEGIN
     LTEXT           "Avail Content Manager",IDC_TEXT5,319,72,134,9,0,WS_EX_TRANSPARENT
 END
 
+IDD_ABOUT DIALOGEX 0, 0, 155, 113
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About RPC"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+CTEXT           "Static", IDC_ABOUT_TEXT, 15, 15, 125, 73
+CONTROL         "<a>www.archvision.com</a>", IDC_ARCHSITE, "SysLink", 0x0, 45, 87, 69, 7
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -55,6 +64,14 @@ BEGIN
         TOPMARGIN, 16
         BOTTOMMARGIN, 187
     END
+
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 15
+        RIGHTMARGIN, 140
+        TOPMARGIN, 15
+        BOTTOMMARGIN, 98
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -65,6 +82,11 @@ END
 //
 
 IDD_AVAIL AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
+IDD_ABOUT AFX_DIALOG_LAYOUT
 BEGIN
     0
 END

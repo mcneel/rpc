@@ -62,6 +62,7 @@ public:
 	BOOL CallWriteDocument(const CRhinoFileWriteOptions& options) override;
 	BOOL ReadDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const CRhinoFileReadOptions& options) override;
 	BOOL WriteDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const CRhinoFileWriteOptions& options) override;
+	const wchar_t* getRpcApiFilename();
 
   CRpcMains& Mains(void);
 
