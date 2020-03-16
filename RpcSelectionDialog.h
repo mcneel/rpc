@@ -11,7 +11,7 @@ public:
 	virtual ~CRpcSelectionDialog();
 
 	static ON_UUID Id();
-	static void OpenPanelInDockBarWithOtherPanel(CRhinoDoc & doc, const ON_UUID & panelToOpen, const ON_UUID & otherPanel, bool makeSelectedPanel);
+	static bool OpenPanelInDockBarWithOtherPanel(CRhinoDoc & doc, const ON_UUID & panelToOpen, const ON_UUID & otherPanel, bool makeSelectedPanel);
 
 	// Required overrides
 	const wchar_t* Caption() const override;

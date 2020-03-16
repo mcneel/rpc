@@ -29,9 +29,12 @@
     <ClCompile Include="LBP_UUID.cpp" />
     <ClCompile Include="LBP_XML.cpp" />
     <ClCompile Include="MaterialParams.cpp" />
+    <ClCompile Include="RpcAboutCmd.cpp" />
+    <ClCompile Include="RpcAboutDialog.cpp" />
     <ClCompile Include="RpcAddCmd.cpp" />
     <ClCompile Include="RpcAnimationFrameRrp.cpp" />
     <ClCompile Include="RPCApp.cpp" />
+    <ClCompile Include="RpcAvailBrowserDialog.cpp" />
     <ClCompile Include="RpcAvailDialog.cpp" />
     <ClCompile Include="RpcClient.cpp" />
     <ClCompile Include="RpcCommand.cpp" />
@@ -53,6 +56,7 @@
     <ClCompile Include="RpcObjectUserData.cpp" />
     <ClCompile Include="RpcObjectUserDataWrapper.cpp" />
     <ClCompile Include="RPCPlugIn.cpp" />
+    <ClCompile Include="RpcPropCmd.cpp" />
     <ClCompile Include="RpcPropertiesDlg.cpp" />
     <ClCompile Include="RpcRdkPlugIn.cpp" />
     <ClCompile Include="RpcRenderMeshBuilder.cpp" />
@@ -94,9 +98,12 @@
     <ClInclude Include="ON_SimpleMap.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="RhRdkRegisteredPropertiesEventSink.h" />
+    <ClInclude Include="RpcAboutCmd.h" />
+    <ClInclude Include="RpcAboutDialog.h" />
     <ClInclude Include="RpcAddCmd.h" />
     <ClInclude Include="RpcAnimationFrameRrp.h" />
     <ClInclude Include="RPCApp.h" />
+    <ClInclude Include="RpcAvailBrowserDialog.h" />
     <ClInclude Include="RpcAvailDialog.h" />
     <ClInclude Include="RpcClient.h" />
     <ClInclude Include="RpcCommand.h" />
@@ -120,6 +127,7 @@
     <ClInclude Include="RpcObjectUserData.h" />
     <ClInclude Include="RpcObjectUserDataWrapper.h" />
     <ClInclude Include="RPCPlugIn.h" />
+    <ClInclude Include="RpcPropCmd.h" />
     <ClInclude Include="RpcPropertiesDlg.h" />
     <ClInclude Include="RpcRdkPlugIn.h" />
     <ClInclude Include="RpcRenderMeshBuilder.h" />
@@ -143,6 +151,7 @@
     <Image Include="res\rpc_acm.ico" />
     <Image Include="res\selection.ico" />
     <Image Include="res\Vector Smart Object.bmp" />
+    <Image Include="res\VectorSmartObjectAvail.bmp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <Keyword>MFCDLLProj</Keyword>
@@ -201,6 +210,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Version.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -228,6 +238,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>Version.lib</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>

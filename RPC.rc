@@ -39,6 +39,23 @@ BEGIN
     LTEXT           "Avail Content Manager",IDC_TEXT5,319,72,134,9,0,WS_EX_TRANSPARENT
 END
 
+IDD_ABOUT DIALOGEX 0, 0, 155, 113
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About RPC"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CTEXT           "Static",IDC_ABOUT_TEXT,15,15,125,73
+    CONTROL         "<a>www.archvision.com</a>",IDC_ARCHSITE,"SysLink",0x0,45,87,69,7
+END
+
+IDD_AVAIL_BROWSER DIALOGEX 0, 0, 129, 136
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         IDB_LABEL_AVAIL, IDC_PREV_LBL, "Static", SS_BITMAP, 9, 0, 111, 23
+    CONTROL         "<a>www.archvision.com/downloads</a>", IDC_DOWNLOADS,"SysLink", 0x0, 12, 116, 107, 10, WS_EX_TRANSPARENT
+    CTEXT           "Static", IDC_AVAILBROW_CONTENT, 9, 34, 111, 85
+END
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -55,6 +72,14 @@ BEGIN
         TOPMARGIN, 16
         BOTTOMMARGIN, 187
     END
+
+    IDD_ABOUT, DIALOG
+    BEGIN
+        LEFTMARGIN, 15
+        RIGHTMARGIN, 140
+        TOPMARGIN, 15
+        BOTTOMMARGIN, 98
+    END
 END
 #endif    // APSTUDIO_INVOKED
 
@@ -69,6 +94,11 @@ BEGIN
     0
 END
 
+IDD_ABOUT AFX_DIALOG_LAYOUT
+BEGIN
+    0
+END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -78,6 +108,8 @@ END
 IDB_INTERIOR            BITMAP                  "res\\Interior_Office_Preview.bmp"
 
 IDB_LABEL               BITMAP                  "res\\Vector Smart Object.bmp"
+
+IDB_LABEL_AVAIL         BITMAP                  "res\\VectorSmartObjectAvail.bmp"
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////

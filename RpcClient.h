@@ -30,16 +30,10 @@ public:
 	virtual TStringArg RPCpluginId(void);
 	virtual bool RPCuserMessage(int msgType, bool ret, const TString &title, const TString &msg);
 
-private:
-	bool IsRpcPathInList(const CLBPString& sPath) const;
-	void AddRpcPathToList(const CLBPString& sPath);
-
 	void Flush(void);
 	
 private:
 	mutable RPCapi* m_pRpcApi;
-	RPCapi::TStringArg* m_RpcPaths;
-	ON_ClassArray<CLBPString> m_aRpcPath;
 	HMODULE m_hRpcApiHandle;
 
 	RPCapi::TStringArg *m_metaKeys;
