@@ -27,6 +27,7 @@ void CRpcMains::CreateCommands(void)
 	static class CRpcEditCmd theRpcEditCmd;
 	static class CRpcSetAnimationFrameCmd theSetAnimationFrameCmd;
 	static class CRpcAvailCmd theRpcAvailCmd;
+	static class CRpcAvailBrowserCmd theRpcAvailBrowserCmd;
 	static class CRpcHelpCmd theRpcHelpCmd;
 	static class CRpcSiteCmd theRpcSiteCmd;
 	static class CRpcMassEditCmd theRpcMassEditCmd;
