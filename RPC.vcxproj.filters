@@ -183,6 +183,9 @@
     <ClCompile Include="RpcAboutDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RpcAvailBrowserDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="RPCApp.h">
@@ -380,6 +383,9 @@
     <ClInclude Include="RpcAboutDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RpcAvailBrowserDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="RPC.def">
@@ -408,6 +414,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="res\Vector Smart Object.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="res\VectorSmartObjectAvail.bmp">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

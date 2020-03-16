@@ -80,15 +80,15 @@ void CRpcSelectionDialog::OnBeginCommand(const CRhinoCommand & command, const CR
 	OnButtonClickedSelection();
 }
 
-void CRpcSelectionDialog::OpenPanelInDockBarWithOtherPanel(CRhinoDoc& doc, const ON_UUID& panelToOpen, const ON_UUID& otherPanel, bool makeSelectedPanel)
+bool CRpcSelectionDialog::OpenPanelInDockBarWithOtherPanel(CRhinoDoc& doc, const ON_UUID& panelToOpen, const ON_UUID& otherPanel, bool makeSelectedPanel)
 {
 	ON_SimpleArray<CRhinoUiDockBar*> dockbars;
 	CRhinoTabbedDockBarDialog::DockBarsForTab(doc, otherPanel, dockbars);
 
 	if (!dockbars)
-		return;
+		return true;
 
-	CRhinoTabbedDockBarDialog::OpenTabOnDockBar(dockbars[0], doc, panelToOpen, makeSelectedPanel);
+	return CRhinoTabbedDockBarDialog::OpenTabOnDockBar(dockbars[0], doc, panelToOpen, makeSelectedPanel);
 }
 
 BEGIN_MESSAGE_MAP(CRpcSelectionDialog, CRhinoTabbedDockBarDialog)
