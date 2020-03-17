@@ -243,33 +243,18 @@ void CRpcPropertiesDlg::OnTimer(UINT_PTR nIDEvent)
 
 void CRpcPropertiesDlg::OnRpcParameterChanged()
 {
-	if (!IsWindow(GetSafeHwnd()))
-		return;
+    if (!IsWindow(GetSafeHwnd()))
+        return;
+    if (!IsWindowVisible())
+        return;
 
-	if (!IsWindowVisible())
-		return;
+    auto rpc = (*Mains().GetRPCInstanceTable().Lookup(uuid));
+    if (!rpc)
+        return;
 
-	auto rpc = (*Mains().GetRPCInstanceTable().Lookup(uuid));
-
-	if (!rpc)
-		return;
-
-	const auto pRhinoDoc = CRhinoDoc::FromRuntimeSerialNumber(rpc->Document());
-
-	if (!pRhinoDoc)
-		return;
-
-	m_bSelectionChangeByUi = true;
-	const CRhinoInstanceObject* pBlock = rpc->Replace(*pRhinoDoc);
-
-	if (pBlock)
-	{
-		pBlock->Select();
-		RhRdkCustomRenderMeshManager().OnRhinoDocumentChanged(*pRhinoDoc);
-		RhinoApp().RunScript(CRhinoDoc::NullRuntimeSerialNumber, L"SetRedrawOn");
-	}
-
-	m_bSelectionChangeByUi = false;
+    m_bSelectionChangeByUi = true;
+    rpc->OnRpcInstanceChanged();
+    m_bSelectionChangeByUi = false;
 }
 
 void CRpcPropertiesDlg::OnButtonClickedEditMass()
