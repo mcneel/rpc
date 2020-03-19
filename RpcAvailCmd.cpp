@@ -1,7 +1,6 @@
 #include "StdAfx.h"
 #include "RpcAvailDialog.h"
 #include "RpcAvailCmd.h"
-#include "RpcAvailBrowserDialog.h"
 #include "RpcSelectionDialog.h"
 
 const wchar_t* CRpcAvailCmd::EnglishCommandName()
@@ -29,7 +28,7 @@ CRhinoCommand::result CRpcAvailCmd::RunRpcCommand(const CRhinoCommandContext& co
 
 	if (RegOpenKeyEx(root, key.c_str(), 0, KEY_READ, &hKey) != ERROR_SUCCESS)
 	{
-		RpcAvailDialog dlg(CWnd::GetActiveWindow());
+		CRpcAvailDialog dlg(CWnd::GetActiveWindow());
 
 		if (dlg.DoModal() <= 0)
 			return success;
@@ -79,7 +78,7 @@ CRhinoCommand::result CRpcAvailBrowserCmd::RunRpcCommand(const CRhinoCommandCont
 
 	if (!CRpcSelectionDialog::OpenPanelInDockBarWithOtherPanel(*RhinoApp().ActiveDoc(), AvailBrowserDockPanel, uuidPanelObjectProps, true))
 	{
-		CRpcAvailBrowserDialog dlg(CWnd::GetActiveWindow());
+		CRpcAvailDialog dlg(CWnd::GetActiveWindow());
 
 		if (dlg.DoModal() <= 0)
 			return success;

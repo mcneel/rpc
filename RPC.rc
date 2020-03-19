@@ -24,21 +24,6 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 // Dialog
 //
 
-IDD_AVAIL DIALOGEX 0, 0, 468, 202
-STYLE DS_SETFONT | DS_FIXEDSYS | WS_POPUP | WS_VISIBLE
-FONT 8, "MS Shell Dlg", 400, 0, 0x1
-BEGIN
-    CONTROL         IDB_LABEL,IDC_PREVIEW_LABEL,"Static",SS_BITMAP | SS_CENTERIMAGE,315,16,138,31,WS_EX_TRANSPARENT
-    CONTROL         "<a>www.archvision.com/downloads</a>",IDC_DOWNLOADS,
-                    "SysLink",0x0,318,139,135,10,WS_EX_TRANSPARENT
-    LTEXT           "The ArchVision RPC plugin for Rhino could not find the following application",IDC_TEXT,319,50,134,17,0,WS_EX_TRANSPARENT
-    LTEXT           "The ArchVision-AVAIL APP is required to access, download and manage all the available RPC asset library.",IDC_TEXT2,319,87,134,32,0,WS_EX_TRANSPARENT
-    LTEXT           "** An ArchVision account is required to login and download the ArchVision Software",IDC_TEXT4,318,159,135,25,0,WS_EX_TRANSPARENT
-    CONTROL         IDB_INTERIOR,IDC_PREVIEW_INTERIOR,"Static",SS_BITMAP | SS_CENTERIMAGE | SS_REALSIZEIMAGE,15,16,296,171,WS_EX_TRANSPARENT
-    LTEXT           "To Download the ArchVision-AVAIL Content Manager please visit",IDC_TEXT3,318,124,135,18,0,WS_EX_TRANSPARENT
-    LTEXT           "Avail Content Manager",IDC_TEXT5,319,72,134,9,0,WS_EX_TRANSPARENT
-END
-
 IDD_ABOUT DIALOGEX 0, 0, 155, 113
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About RPC"
@@ -48,7 +33,7 @@ BEGIN
     CONTROL         "<a>www.archvision.com</a>",IDC_ARCHSITE,"SysLink",0x0,45,87,69,7
 END
 
-IDD_AVAIL_BROWSER DIALOGEX 0, 0, 129, 136
+IDD_AVAIL DIALOGEX 0, 0, 129, 136
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
@@ -105,11 +90,7 @@ END
 // Bitmap
 //
 
-IDB_INTERIOR            BITMAP                  "res\\Interior_Office_Preview.bmp"
-
-IDB_LABEL               BITMAP                  "res\\Vector Smart Object.bmp"
-
-IDB_LABEL_AVAIL         BITMAP                  "res\\VectorSmartObjectAvail.bmp"
+IDB_LABEL_AVAIL         BITMAP                  "res\\Vector Smart Object.bmp"
 
 #endif    // English (United States) resources
 /////////////////////////////////////////////////////////////////////////////
