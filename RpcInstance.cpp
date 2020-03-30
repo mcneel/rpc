@@ -412,18 +412,17 @@ CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc, bool copied, const C
 
 void CRpcInstance::OnRpcInstanceChanged()
 {
-    CRhinoDoc* pRhinoDoc = CRhinoDoc::FromRuntimeSerialNumber(Document());
-    if (!pRhinoDoc)
-        return;
-    CRhinoInstanceObject* pBlock = Replace(*pRhinoDoc);
-    if (!pBlock)
-        return;
+	CRhinoDoc* pRhinoDoc = CRhinoDoc::FromRuntimeSerialNumber(Document());
+	if (!pRhinoDoc)
+		return;
+	CRhinoInstanceObject* pBlock = Replace(*pRhinoDoc);
+	if (!pBlock)
+		return;
 
-    bool selected = pBlock->IsSelected();
-    pBlock->Select();
-    RhRdkCustomRenderMeshManager().OnRhinoDocumentChanged(*pRhinoDoc);
-    RhinoApp().RunScript(CRhinoDoc::NullRuntimeSerialNumber, L"SetRedrawOn");
-    pBlock->Select(selected);
+	bool selected = pBlock->IsSelected();
+	pBlock->Select();
+	RhRdkCustomRenderMeshManager().OnRhinoDocumentChanged(*pRhinoDoc);
+	pBlock->Select(selected);
 }
 
 CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const ON_3dPoint& pt)

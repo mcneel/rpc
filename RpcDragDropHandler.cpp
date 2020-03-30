@@ -1,4 +1,6 @@
 #include "StdAfx.h"
+#include "RpcMains.h"
+#include "RpcClient.h"
 #include "RpcDragDropHandler.h"
 #include "RpcUtilities.h"
 #include "RpcInstance.h"
@@ -46,6 +48,7 @@ bool CRpcDragDropHandler::OnDropOnRhinoView(CRhinoView* pRhinoView, COleDataObje
 	CRhinoDoc* pDoc = pRhinoView->GetDocument();
 	if (NULL == pDoc) return false;
 
+	Mains().RpcClient().RPCgetAPI()->updateACM();
 	ON_ClassArray<CLBPString> aRpcs;
 	RpcPathFromOleData(pDataObject, aRpcs);
 	if (aRpcs.Count () < 1)
