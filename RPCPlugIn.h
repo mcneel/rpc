@@ -57,7 +57,7 @@ public:
   // or tools here.  
   void OnUnloadPlugIn() override;
 
-	plugin_load_time PlugInLoadTime() override { return load_plugin_when_needed_ignore_docked; }
+	plugin_load_time PlugInLoadTime() override { return load_plugin_at_startup; }
 
 	BOOL CallWriteDocument(const CRhinoFileWriteOptions& options) override;
 	BOOL ReadDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const CRhinoFileReadOptions& options) override;
