@@ -41,7 +41,6 @@ const CRpcObjectUserData& CRpcObjectUserData::operator = (const CRpcObjectUserDa
 	if(this != &ud)
 	{
 		CLBPRh_XMLUserData::operator = (ud);
-		Mains().SetIsCopy(true);
 	}
 
 	return *this;
