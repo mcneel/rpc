@@ -34,8 +34,6 @@ public:
 	ON_SimpleUuidMap<CRpcInstance*>& GetRPCInstanceTable();
 	const RPCapi::ID* GetSelectedId();
 	void SetSelectedId(const RPCapi::ID* id);
-	bool IsCopy();
-	void SetIsCopy(bool copied);
 
 private:
 	void CleanUp(void);
@@ -52,7 +50,6 @@ private:
 	CRpcPropertiesDlg* m_pRpcPropDlg;
 	ON_SimpleUuidMap<CRpcInstance*>* rpcTable;
 	std::unique_ptr<RPCapi::ID> selectedId;
-	bool copyOfRpc = false;
 };
 
 
