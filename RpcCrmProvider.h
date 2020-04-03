@@ -15,7 +15,7 @@ public:
 	virtual UUID PlugInId(void) const override;
 	virtual ON_wString Name(void) const override;
 
-	virtual bool IsViewDependent(void) const override { return false; }
+	virtual bool IsViewDependent(void) const override { return true; }
 
 	virtual bool WillBuildCustomMesh(const ON_Viewport& vp, const CRhinoObject* pObject, const CRhinoDoc& doc, 
 	             const UUID& uuidRequestingPlugIn, const CDisplayPipelineAttributes* pAttributes) const override;
