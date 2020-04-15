@@ -60,6 +60,7 @@ private:
 	const CRhinoObject* Object() const;
 	CRhinoInstanceObject* AddToDocument(CRhinoDoc& doc, const CLBPString& sName, const ON_Xform& xform, int copiedLayer = 0);
 	int CreateLayer(wstring& rpcName, int copiedLayer);
+    void UpdatePrevUnitSystem();
 
 private:
 	RPCapi::Instance* m_pInstance;
@@ -69,4 +70,5 @@ private:
 	RPCapi::InstanceInterface* selectionInterface;
 	RPCapi::InstanceInterface* m_pEditInterface;
 	IEditDialogCallback* m_pEditDlgCallback;
+    ON::LengthUnitSystem prevUnitSystem;
 };
