@@ -69,6 +69,8 @@ void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBP
 		}
 		else
 			return;
+
+    UpdatePrevUnitSystem();
 }
 
 CRhinoMeshObject* CRpcInstance::CreateProxyMesh(CRhinoDoc& doc)
@@ -423,10 +425,16 @@ void CRpcInstance::OnRpcInstanceChanged()
 	if (!pBlock)
 		return;
 
+    const double dUnitsScale = 1.0 / ON::UnitScale(prevUnitSystem, pRhinoDoc->ModelUnits());
+    ON_Xform xformUnitsScale = ON_Xform::DiagonalTransformation(dUnitsScale, dUnitsScale, dUnitsScale);
+    pBlock->SetInstanceTransform(pBlock->InstanceXform() * xformUnitsScale);
+
 	bool selected = pBlock->IsSelected();
 	pBlock->Select();
 	RhRdkCustomRenderMeshManager().OnRhinoDocumentChanged(*pRhinoDoc);
 	pBlock->Select(selected);
+
+    UpdatePrevUnitSystem();
 }
 
 CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const ON_3dPoint& pt)
@@ -509,6 +517,13 @@ int CRpcInstance::CreateLayer(wstring& rpcName, int copiedLayer)
 	rpcLayer.SetName(objectName.c_str());
 
 	return layerTable.AddLayer(rpcLayer);
+}
+
+void CRpcInstance::UpdatePrevUnitSystem()
+{
+    CRhinoDoc* pRhinoDoc = CRhinoDoc::FromRuntimeSerialNumber(Document());
+    if (pRhinoDoc)
+        prevUnitSystem = pRhinoDoc->UnitSystem();
 }
 
 CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const CLBPString& sName,
