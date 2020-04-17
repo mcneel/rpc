@@ -41,6 +41,25 @@ BOOL CRpcAvailDialog::OnInitDialog()
 {
     CDialog::OnInitDialog();
 
+    constexpr int DialogWidth = 244;
+    constexpr int DialogHeight = 319;
+    constexpr int DialogControlsMargin = 5;
+
+    constexpr int textEditYPos = 70;
+    constexpr int siteLinkYPos = 240;
+
+    this->SetWindowPos( nullptr, 0, 0, DialogWidth, DialogHeight, SWP_NOMOVE | SWP_NOZORDER );
+
+    CRect editTextRect;
+    editText.GetWindowRect( &editTextRect );
+    int textEditXPos = (DialogWidth - editTextRect.Width()) / 2 - DialogControlsMargin;
+    editText.SetWindowPos( nullptr, textEditXPos, textEditYPos, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+
+    CRect siteLinkRect;
+    siteLink.GetWindowRect( &siteLinkRect );
+    int siteLinkXPos = (DialogWidth - siteLinkRect.Width()) / 2 - DialogControlsMargin;
+    siteLink.SetWindowPos( nullptr, siteLinkXPos, siteLinkYPos, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+
     setText();
     siteLink.SetWindowText(L"<a href=\"https://www.archvision.com/downloads\">www.archvision.com/downloads</a>");
 
