@@ -198,5 +198,4 @@ void CRpcSelectionDialog::Add(CRpcInstance & m_pRpcInstance)
 	RhinoApp().RunScript(RhinoApp().ActiveDoc()->TargetDocSerialNumber(), sRotateCmd.Wide());
 	Mains().SetSelectedId(m_pRpcInstance.Id());
 	Add(m_pRpcInstance);
-	Mains().SetIsCopy(false);
 }

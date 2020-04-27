@@ -34,7 +34,6 @@
     <ClCompile Include="RpcAddCmd.cpp" />
     <ClCompile Include="RpcAnimationFrameRrp.cpp" />
     <ClCompile Include="RPCApp.cpp" />
-    <ClCompile Include="RpcAvailBrowserDialog.cpp" />
     <ClCompile Include="RpcAvailDialog.cpp" />
     <ClCompile Include="RpcClient.cpp" />
     <ClCompile Include="RpcCommand.cpp" />
@@ -103,7 +102,6 @@
     <ClInclude Include="RpcAddCmd.h" />
     <ClInclude Include="RpcAnimationFrameRrp.h" />
     <ClInclude Include="RPCApp.h" />
-    <ClInclude Include="RpcAvailBrowserDialog.h" />
     <ClInclude Include="RpcAvailDialog.h" />
     <ClInclude Include="RpcClient.h" />
     <ClInclude Include="RpcCommand.h" />

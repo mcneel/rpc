@@ -3,89 +3,113 @@
 #include "resource.h"
 #include "RpcAvailDialog.h"
 
-IMPLEMENT_DYNAMIC(RpcAvailDialog, CDialog)
+IMPLEMENT_DYNAMIC(CRpcAvailDialog, CDialog)
 
-RpcAvailDialog::RpcAvailDialog(CWnd* pParent)
-	: CDialog(IDD_AVAIL, pParent)
+CRpcAvailDialog::CRpcAvailDialog(CWnd* pParent)
+    : CDialog(IDD_AVAIL, pParent)
 {}
 
-RpcAvailDialog::~RpcAvailDialog()
+CRpcAvailDialog::~CRpcAvailDialog()
 {}
 
-BEGIN_MESSAGE_MAP(RpcAvailDialog, CDialog)
-	ON_WM_CLOSE()
-	ON_WM_ERASEBKGND()
-	ON_WM_CTLCOLOR()
-	ON_NOTIFY(NM_CLICK, IDC_DOWNLOADS, &RpcAvailDialog::OnLinkClicked)
+BEGIN_MESSAGE_MAP(CRpcAvailDialog, CDialog)
+    ON_WM_CLOSE()
+    ON_WM_ERASEBKGND()
+    ON_WM_CTLCOLOR()
+    ON_NOTIFY(NM_CLICK, IDC_DOWNLOADS, &CRpcAvailDialog::OnLinkClicked)
 END_MESSAGE_MAP()
 
-void RpcAvailDialog::DoDataExchange(CDataExchange* pDX)
+void CRpcAvailDialog::DoDataExchange(CDataExchange* pDX)
 {
-	CDialog::DoDataExchange(pDX);
+    CDialog::DoDataExchange(pDX);
 
-	DDX_Control(pDX, IDC_DOWNLOADS, editLink);
+    DDX_Control(pDX, IDC_DOWNLOADS, siteLink);
+    DDX_Control(pDX, IDC_AVAILBROW_CONTENT, editText);
 }
 
-BOOL RpcAvailDialog::OnInitDialog()
+void CRpcAvailDialog::setText()
 {
-	CDialog::OnInitDialog();
+    wstring text = L"RPC plugin components missing!";
+    text += L"\n\n- AVAIL Browser";
+    text += L"\n\nThe ArchVision-AVAIL apps are\nrequired to access, download\nand manage the RPC content";
+    text += L"\n\n\nDownload the AVAIL Browser";
 
-	GetDlgItem(IDC_DOWNLOADS)->SetWindowText(
-		L"<a href=\"https://www.archvision.com/downloads\">www.archvision.com/downloads</a>");
-
-	return TRUE;
+    editText.SetWindowText(text.c_str());
 }
 
-BOOL RpcAvailDialog::PreTranslateMessage(MSG * pMsg)
+BOOL CRpcAvailDialog::OnInitDialog()
 {
-	if (pMsg->message == WM_KEYDOWN)
-	{
-		if (pMsg->wParam == VK_ESCAPE)
-		{
-			EndDialog(0);
-			CDialog::OnClose();
+    CDialog::OnInitDialog();
 
-			return TRUE;
-		}
-	}
+    constexpr int DialogWidth = 244;
+    constexpr int DialogHeight = 319;
+    constexpr int DialogControlsMargin = 5;
 
-	return CWnd::PreTranslateMessage(pMsg);
+    constexpr int textEditYPos = 70;
+    constexpr int siteLinkYPos = 240;
+
+    this->SetWindowPos( nullptr, 0, 0, DialogWidth, DialogHeight, SWP_NOMOVE | SWP_NOZORDER );
+
+    CRect editTextRect;
+    editText.GetWindowRect( &editTextRect );
+    int textEditXPos = (DialogWidth - editTextRect.Width()) / 2 - DialogControlsMargin;
+    editText.SetWindowPos( nullptr, textEditXPos, textEditYPos, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+
+    CRect siteLinkRect;
+    siteLink.GetWindowRect( &siteLinkRect );
+    int siteLinkXPos = (DialogWidth - siteLinkRect.Width()) / 2 - DialogControlsMargin;
+    siteLink.SetWindowPos( nullptr, siteLinkXPos, siteLinkYPos, 0, 0, SWP_NOSIZE | SWP_NOZORDER );
+
+    setText();
+    siteLink.SetWindowText(L"<a href=\"https://www.archvision.com/downloads\">www.archvision.com/downloads</a>");
+
+    return TRUE;
 }
 
-BOOL RpcAvailDialog::OnEraseBkgnd(CDC* pDC)
+BOOL CRpcAvailDialog::PreTranslateMessage(MSG* pMsg)
 {
-	CRect rect;
-	GetClientRect(&rect);
-	CBrush* myBrush = new CBrush(GetSysColor(COLOR_WINDOW));
+    if (pMsg->message == WM_KEYDOWN)
+    {
+        if (pMsg->wParam == VK_ESCAPE)
+        {
+            EndDialog(0);
+            CDialog::OnClose();
 
-	pDC->SelectObject(myBrush);
-	BOOL bRes = pDC->PatBlt(0, 0, rect.Width(), rect.Height(), PATCOPY);
+            return TRUE;
+        }
+    }
 
-	return bRes;
+    return CWnd::PreTranslateMessage(pMsg);
 }
 
-HBRUSH RpcAvailDialog::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+BOOL CRpcAvailDialog::OnEraseBkgnd(CDC* pDC)
 {
-	HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+    CRect rect;
+    GetClientRect(&rect);
+    CBrush* myBrush = new CBrush(GetSysColor(COLOR_WINDOW));
 
-	if (pWnd->GetDlgCtrlID() != IDC_TEXT &&
-		pWnd->GetDlgCtrlID() != IDC_TEXT2 &&
-		pWnd->GetDlgCtrlID() != IDC_TEXT3 &&
-		pWnd->GetDlgCtrlID() != IDC_TEXT4 &&
-		pWnd->GetDlgCtrlID() != IDC_TEXT5)
-		pDC->SetTextColor(GetSysColor(COLOR_WINDOW));
-	else if(pWnd->GetDlgCtrlID() == IDC_TEXT5)
-		pDC->SetTextColor(RGB(255,0,0));
+    pDC->SelectObject(myBrush);
+    BOOL bRes = pDC->PatBlt(0, 0, rect.Width(), rect.Height(), PATCOPY);
 
-	pDC->SetBkColor(GetSysColor(COLOR_WINDOW));
-
-	return (HBRUSH)GetStockObject(NULL_BRUSH);
+    return bRes;
 }
 
-void RpcAvailDialog::OnLinkClicked(NMHDR* pNMHDR, LRESULT* pResult)
+HBRUSH CRpcAvailDialog::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
-	PNMLINK pNMLink = (PNMLINK)pNMHDR;
-	ShellExecuteW(NULL, L"open", pNMLink->item.szUrl, NULL, NULL, SW_SHOWNORMAL);
-	EndDialog(0);
-	CDialog::OnClose();
+    HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+
+    if (pWnd->GetDlgCtrlID() != IDC_AVAILBROW_CONTENT)
+        pDC->SetTextColor(GetSysColor(COLOR_WINDOW));
+
+    pDC->SetBkColor(GetSysColor(COLOR_WINDOW));
+
+    return (HBRUSH)GetStockObject(NULL_BRUSH);
+}
+
+void CRpcAvailDialog::OnLinkClicked(NMHDR* pNMHDR, LRESULT* pResult)
+{
+    PNMLINK pNMLink = (PNMLINK)pNMHDR;
+    ShellExecuteW(NULL, L"open", pNMLink->item.szUrl, NULL, NULL, SW_SHOWNORMAL);
+    EndDialog(0);
+    CDialog::OnClose();
 }

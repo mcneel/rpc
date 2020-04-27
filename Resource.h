@@ -10,11 +10,7 @@
 #define IDI_PROP_RPC                    2006
 #define ID_BUTTON_PLACE                 2008
 #define IDC_TEXT                        2009
-#define IDC_TEXT2                       2010
-#define IDC_TEXT3                       2011
-#define IDC_TEXT4                       2012
 #define IDI_SEL                         2013
-#define IDC_TEXT5                       2014
 #define IDC_EDIT1                       2015
 #define IDD_AVAIL                       2017
 #define IDC_PREVIEW_INTERIOR            2019
@@ -27,7 +23,6 @@
 #define IDB_INTERIOR                    2031
 #define IDB_LABEL                       2032
 #define IDD_ABOUT                       2033
-#define IDD_AVAIL_BROWSER               2035
 #define IDB_LABEL_AVAIL                 2038
 #define IDD_FILE_DIALOG                 6033
 #define IDC_STATIC_PREVIEW              6129

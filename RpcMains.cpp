@@ -46,17 +46,16 @@ CRpcMains& Mains(void)
 
 
 CRpcMains::CRpcMains(const CRPCPlugIn& plug)
-: m_PlugIn(plug),
-m_pRpcClient(nullptr),
-m_pRdkPlugIn(nullptr),
-m_pEventMachine(nullptr),
-m_pDragDropHandler(nullptr),
-m_pRpcDocument(nullptr),
-m_pEventWatcher(nullptr),
-m_pRpcPropDlg(nullptr),
-rpcTable(nullptr),
-selectedId(nullptr),
-copyOfRpc(false)
+	: m_PlugIn(plug),
+	m_pRpcClient(nullptr),
+	m_pRdkPlugIn(nullptr),
+	m_pEventMachine(nullptr),
+	m_pDragDropHandler(nullptr),
+	m_pRpcDocument(nullptr),
+	m_pEventWatcher(nullptr),
+	m_pRpcPropDlg(nullptr),
+	rpcTable(nullptr),
+	selectedId(nullptr)
 {
 }
 
@@ -69,7 +68,8 @@ void CRpcMains::CleanUp(void)
 {
 	if (m_pEventWatcher)
 	{
-		m_pEventWatcher->Enable(false);
+		m_pEventWatcher->CRhinoEventWatcher::Enable(false);
+		m_pEventWatcher->CRhinoOnTransformObject::Enable(false);
 		m_pEventWatcher->UnRegister();
 		delete m_pEventWatcher;
 		m_pEventWatcher = nullptr;
@@ -89,7 +89,7 @@ void CRpcMains::CleanUp(void)
 		m_pRpcClient = nullptr;
 	}
 
-	if(m_pEventMachine)
+	if (m_pEventMachine)
 	{
 		m_pEventMachine->EnableEvents(false);
 	}
@@ -131,7 +131,7 @@ bool CRpcMains::Initialize(void)
 	m_pRdkPlugIn = new CRpcRdkPlugIn;
 	if (!m_pRdkPlugIn->Initialize())
 	{
-		RpcMessageBox(_RhLocalizeString( L"Failed to register RDK client.", 32814), MB_ICONERROR);
+		RpcMessageBox(_RhLocalizeString(L"Failed to register RDK client.", 32814), MB_ICONERROR);
 		CleanUp();
 		return false;
 	}
@@ -141,7 +141,7 @@ bool CRpcMains::Initialize(void)
 	m_pRpcClient = new CRpcClient;
 	if (!m_pRpcClient->Initialize())
 	{
-		RpcMessageBox(_RhLocalizeString( L"Failed to register RPC client.", 32815), MB_ICONERROR);
+		RpcMessageBox(_RhLocalizeString(L"Failed to register RPC client.", 32815), MB_ICONERROR);
 		CleanUp();
 		return false;
 	}
@@ -170,8 +170,8 @@ void CRpcMains::Uninitialize(void)
 }
 
 const CRhRdkPlugIn& CRpcMains::RdkPlugIn()
-{ 
-	return *m_pRdkPlugIn; 
+{
+	return *m_pRdkPlugIn;
 }
 
 CRpcClient& CRpcMains::RpcClient(void)
@@ -195,8 +195,10 @@ CRpcEventWatcher& CRpcMains::EventWatcher(void) const
 	if (!m_pEventWatcher)
 	{
 		m_pEventWatcher = new CRpcEventWatcher;
-		m_pEventWatcher->Register();
-		m_pEventWatcher->Enable();
+		m_pEventWatcher->CRhinoEventWatcher::Register();
+		m_pEventWatcher->CRhinoEventWatcher::Enable();
+		m_pEventWatcher->CRhinoOnTransformObject::Register();
+		m_pEventWatcher->CRhinoOnTransformObject::Enable(true);
 	}
 
 	return *m_pEventWatcher;
@@ -242,14 +244,4 @@ const RPCapi::ID* CRpcMains::GetSelectedId()
 void CRpcMains::SetSelectedId(const RPCapi::ID* id)
 {
 	selectedId.reset((RPCapi::ID*)id->copy());
-}
-
-bool CRpcMains::IsCopy()
-{
-	return copyOfRpc;
-}
-
-void CRpcMains::SetIsCopy(bool copied)
-{
-	copyOfRpc = copied;
 }

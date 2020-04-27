@@ -2,6 +2,8 @@
 #include "StdAfx.h"
 #include "RpcClient.h"
 #include "RPCPlugIn.h"
+#include "RpcMains.h"
+#include "RpcInstance.h"
 #include "LBPFileMgr2.h"
 
 const int NUM_METADATA = 9;
@@ -145,7 +147,19 @@ TStringArg CRpcClient::RPCiniPath(void)
 
 void CRpcClient::RPClicenseChange(bool licensed, bool acm)
 {
+    auto& table = PlugIn().Mains().GetRPCInstanceTable();
+    if (table.Count() == 0)
+        return;
 
+    auto iter = table.GetIterator();
+    while (auto pInstance = iter.Next())
+    {
+        CRpcInstance* rpc = *pInstance;
+        if (!rpc)
+            continue;
+
+        rpc->OnRpcInstanceChanged();
+    }
 }
 
 void CRpcClient::RPCpluginMetadata(int &num, const TStringArg*& keys, const RPCapi::Param**& values)
