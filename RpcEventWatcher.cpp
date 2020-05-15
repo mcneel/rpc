@@ -60,6 +60,9 @@ void CRpcEventWatcher::OnEndOpenDocument(CRhinoDoc& doc, const wchar_t* filename
 
 	for (auto pObject = it.First(); pObject; pObject = it.Next())
 	{
+        if (!CRpcObject(pObject).IsTagged())
+            continue;
+
 		if (Mains().GetRPCInstanceTable().Lookup(pObject->Id()))
 			continue;
 
@@ -81,6 +84,9 @@ void CRpcEventWatcher::OnEndOpenDocument(CRhinoDoc& doc, const wchar_t* filename
 
 void CRpcEventWatcher::OnAddObject(CRhinoDoc& doc, CRhinoObject& object)
 {
+    if (!CRpcObject(&object).IsTagged())
+        return;
+
 	if (Mains().GetRPCInstanceTable().Lookup(object.Id()))
 		return;
 
