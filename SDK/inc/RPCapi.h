@@ -1395,6 +1395,17 @@ public:
         */
 		virtual int getRenderData(Mesh *&mesh, Material **&materials, TextureMesh *&textureMesh) const = 0;
 
+        /*! \function virtual int getMaterials(Material**& materials) const
+        *   \brief Retrieves the instance's materials.
+        *
+        * This routine retrieves the materials associated with this Instance.
+        * Parameters:
+        *       materials:      Array of materials, newly allocated and returned by reference.
+        * Returns:
+        *       Number of materials
+        */
+        virtual int getMaterials(Material**& materials) const = 0;
+
 		/*! \function virtual Mesh *getMesh(Mesh *mesh,
 		double cx = 0, double cy = 0, double cz = 0)
 		*	\brief Gets the adjusted render mesh.
@@ -1681,6 +1692,8 @@ public:
 
         // Get all parameters editable by user
         virtual int getEditableParameters(const Editable**& params) = 0;
+
+        virtual bool isLicensed() const = 0;
 	};	// end class Instance
 
 
