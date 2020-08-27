@@ -18,6 +18,28 @@
 // used to build Rhino.
 #define RHINO_SDK_MFC
 
+#if defined (INSITU)
+#include "../../../RhinoCorePlugInStdAfx.h"
+#include "../../RDK/RDK/RhRdkHeaders.h"
+#pragma comment(lib, "\"" RHINO_PLUGIN_DIR "/" "rdk.lib" "\"")
+#include "../../../SDK/inc/rhinoSdkChecks.h"
+
+#include "../../RDK/RDK/RhRdkRegisteredPropertiesEventSink.h"
+#include "../../RDK/RDK/IRhRdkRegisteredPropertyManager.h"
+#include "../../RDK/RDK/IRhRdkRegisteredProperty.h"
+
+#if defined(ON_RUNTIME_WIN)
+#include <afxmt.h>
+#pragma warning(push)
+#pragma warning( disable : 4263 4264 4458 )
+#include "gdiplus.h"
+#pragma comment (lib, "gdiplus.lib")
+#pragma warning(pop)
+#endif
+//Forces standards compliance
+//#define __super _super
+#else
+
 // Plug-ins must use the release version of MFC used by Rhino.
 // Plug-ins that require debugging information need to be built with
 // RHINO_DEBUG_PLUGIN defined.
@@ -57,9 +79,6 @@
 // TODO: include additional commonly used header files here
 #include <afxmt.h> // CriticalSection
 
-using namespace std;
-#include <sstream>
-
 #if defined(_M_X64) && defined(WIN32) && defined(WIN64)
 //  The afxwin.h includes afx.h, which includes afxver_.h, 
 //  which unconditionally defines WIN32  This is a bug.
@@ -80,6 +99,10 @@ using namespace std;
 #include "RhRdkRegisteredPropertiesEventSink.h"
 #include "IRhRdkRegisteredPropertyManager.h"
 #include "IRhRdkRegisteredProperty.h"
+#endif
+
+using namespace std;
+#include <sstream>
 
 // TODO: include additional Rhino-related header files here
 #define LBPRHLIB
@@ -114,4 +137,6 @@ using namespace std;
 #include "RpcDefinitions.h"
 
 // Rhino SDK linking pragmas
+#if !defined (INSITU)
 #include "rhinoSdkPlugInLinkingPragmas.h"
+#endif

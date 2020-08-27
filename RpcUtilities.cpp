@@ -300,7 +300,9 @@ CRhRdkMaterial* CreatePBMaterial(void)
 	return pMaterial;
 }
 
+#if !defined INSITU
 const wchar_t* _RhLocalizeString( const wchar_t* wsz, int nContext)
 {
 	return wsz;
 }
+#endif
