@@ -2,6 +2,8 @@
 #include "StdAfx.h"
 #include "RpcClient.h"
 #include "RPCPlugIn.h"
+#include "RpcMains.h"
+#include "RpcInstance.h"
 #include "LBPFileMgr2.h"
 
 const int NUM_METADATA = 9;
@@ -9,7 +11,6 @@ const int NUM_METADATA = 9;
 CRpcClient::CRpcClient(void)
 {
 	m_pRpcApi = nullptr;
-	m_RpcPaths = nullptr;
 	m_hRpcApiHandle = nullptr;
 
 	m_metaKeys = new RPCapi::TStringArg[NUM_METADATA];
@@ -39,12 +40,6 @@ void CRpcClient::Flush(void)
 		m_numMetaValues = 0;
 	}
 
-	if (nullptr != m_RpcPaths)
-	{
-		delete[] m_RpcPaths;
-		m_RpcPaths = nullptr;
-	}
-
 	if (nullptr != m_pRpcApi)
 	{
 		delete m_pRpcApi;
@@ -72,11 +67,7 @@ void track_memory_deallocate(void *ptr, const char *file, int line)
 
 bool CRpcClient::Initialize(void)
 {
-	const CLBPString sFullPathToPlugIn = PlugIn().PlugInFileName();
-	CLBPString sPathOnly = CLBPFileMgr2::GetPathOnly(sFullPathToPlugIn);
-	CLBPFileMgr2::RemoveTrailingSlash(sPathOnly);
-	
-	const CLBPString sRpcApiDll = sPathOnly + L"\\RPCapi.dll";
+	const CLBPString sRpcApiDll = PlugIn().getRpcApiFilename();
 
 	m_hRpcApiHandle = LoadLibrary(sRpcApiDll);
 	if (nullptr != m_hRpcApiHandle)
@@ -139,22 +130,9 @@ TStringArg* CRpcClient::RPCgetPaths(bool start, int &numPaths)
 	HCURSOR hCursor = (HCURSOR)::LoadImage(NULL, IDC_WAIT, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
 	prevCursor = SetCursor(hCursor);
 
-	numPaths = m_aRpcPath.Count();
+	numPaths = 0;
 
-	if (nullptr == m_RpcPaths)
-	{
-		if (numPaths > 0)
-		{
-			m_RpcPaths = new TStringArg[numPaths];
-			
-			for(int i=0; i<numPaths; i++)
-			{
-				m_RpcPaths[i] = m_aRpcPath[i].Wide();
-			}
-		}
-	}
-
-	return m_RpcPaths;
+	return nullptr;
 }
 
 int CRpcClient::RPCgetMode()
@@ -169,7 +147,19 @@ TStringArg CRpcClient::RPCiniPath(void)
 
 void CRpcClient::RPClicenseChange(bool licensed, bool acm)
 {
+    auto& table = PlugIn().Mains().GetRPCInstanceTable();
+    if (table.Count() == 0)
+        return;
 
+    auto iter = table.GetIterator();
+    while (auto pInstance = iter.Next())
+    {
+        CRpcInstance* rpc = *pInstance;
+        if (!rpc)
+            continue;
+
+        rpc->OnRpcInstanceChanged();
+    }
 }
 
 void CRpcClient::RPCpluginMetadata(int &num, const TStringArg*& keys, const RPCapi::Param**& values)
@@ -255,50 +245,5 @@ bool CRpcClient::RPCuserMessage(int msgType, bool ret, const TString &title, con
 
 void CRpcClient::OnRpcInstanceWillBeCreated(UINT idDoc, const CLBPString& sRpc)
 {
-	CLBPString sRpcPath = CLBPFileMgr2::GetPathOnly(sRpc);
-	CLBPFileMgr2::RemoveTrailingSlash(sRpcPath);
-
-	if (!CRhinoFileUtilities::FileExists(sRpc.Wide()))
-	{
-		ON_wString sPathFound;
-		if (!RhRdkFindFile(idDoc, sRpc, sPathFound))
-		{
-			return;
-		}
-		
-		sRpcPath = sPathFound;
-	}
-	
-	if (!IsRpcPathInList(sRpcPath))
-	{
-		CLBPFileMgr2::RemoveTrailingSlash(sRpcPath);
-		AddRpcPathToList(sRpcPath);
-	}
-}
-
-bool CRpcClient::IsRpcPathInList(const CLBPString& sPath) const
-{
-	for (int i=0; i<m_aRpcPath.Count(); i++)
-	{
-		if (0 == sPath.CompareNoCase(m_aRpcPath[i].Wide()))
-			return true;
-	}
-
-	return false;
-}
-
-void CRpcClient::AddRpcPathToList(const CLBPString& sPath)
-{
-	m_aRpcPath.Append(sPath);
-
-	if (nullptr != m_RpcPaths)
-	{
-		delete[] m_RpcPaths;
-		m_RpcPaths = nullptr;
-	}
-
-	if (nullptr != m_pRpcApi)
-	{
-		m_pRpcApi->updatePaths();
-	}
+	//do nothing
 }

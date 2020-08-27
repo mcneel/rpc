@@ -12,6 +12,18 @@
 #define IDC_TEXT                        2009
 #define IDI_SEL                         2013
 #define IDC_EDIT1                       2015
+#define IDD_AVAIL                       2017
+#define IDC_PREVIEW_INTERIOR            2019
+#define IDC_PREVIEW_LABEL               2020
+#define IDC_DOWNLOADS                   2021
+#define IDC_ARCHSITE                    2022
+#define IDC_ABOUT_TEXT                  2023
+#define IDC_PREV_LBL                    2026
+#define IDC_AVAILBROW_CONTENT           2027
+#define IDB_INTERIOR                    2031
+#define IDB_LABEL                       2032
+#define IDD_ABOUT                       2033
+#define IDB_LABEL_AVAIL                 2038
 #define IDD_FILE_DIALOG                 6033
 #define IDC_STATIC_PREVIEW              6129
 #define IDC_CHECK_PREVIEW               6137
@@ -23,9 +35,9 @@
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        2017
+#define _APS_NEXT_RESOURCE_VALUE        2034
 #define _APS_NEXT_COMMAND_VALUE         32772
-#define _APS_NEXT_CONTROL_VALUE         2016
+#define _APS_NEXT_CONTROL_VALUE         2023
 #define _APS_NEXT_SYMED_VALUE           2002
 #endif
 #endif

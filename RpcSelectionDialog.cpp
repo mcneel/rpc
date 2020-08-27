@@ -80,11 +80,15 @@ void CRpcSelectionDialog::OnBeginCommand(const CRhinoCommand & command, const CR
 	OnButtonClickedSelection();
 }
 
-void CRpcSelectionDialog::OpenPanelInDockBarWithOtherPanel(CRhinoDoc& doc, const ON_UUID& panelToOpen, const ON_UUID& otherPanel, bool makeSelectedPanel)
+bool CRpcSelectionDialog::OpenPanelInDockBarWithOtherPanel(CRhinoDoc& doc, const ON_UUID& panelToOpen, const ON_UUID& otherPanel, bool makeSelectedPanel)
 {
 	ON_SimpleArray<CRhinoUiDockBar*> dockbars;
 	CRhinoTabbedDockBarDialog::DockBarsForTab(doc, otherPanel, dockbars);
-	CRhinoTabbedDockBarDialog::OpenTabOnDockBar(dockbars[0], doc, panelToOpen, makeSelectedPanel);
+
+	if (!dockbars)
+		return true;
+
+	return CRhinoTabbedDockBarDialog::OpenTabOnDockBar(dockbars[0], doc, panelToOpen, makeSelectedPanel);
 }
 
 BEGIN_MESSAGE_MAP(CRpcSelectionDialog, CRhinoTabbedDockBarDialog)
@@ -120,6 +124,10 @@ void CRpcSelectionDialog::OnButtonClickedSelection()
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	CRpcAdvancedFileDialog dlg(pParentWnd);
 	CRpcInstance* m_pRpcInstance = new CRpcInstance(*RhinoApp().ActiveDoc(), (const wchar_t*)dlg.GetPathName());
+
+	if (Mains().GetSelectedId())
+		m_pRpcInstance->SetId(Mains().GetSelectedId());
+
 	selectionText.ShowWindow(SW_HIDE);
 	selectionButton.EnableWindow(false);
 	coloured = true;
@@ -188,5 +196,6 @@ void CRpcSelectionDialog::Add(CRpcInstance & m_pRpcInstance)
 		ptFirstRef.x, ptFirstRef.y, ptFirstRef.z);
 
 	RhinoApp().RunScript(RhinoApp().ActiveDoc()->TargetDocSerialNumber(), sRotateCmd.Wide());
+	Mains().SetSelectedId(m_pRpcInstance.Id());
 	Add(m_pRpcInstance);
 }

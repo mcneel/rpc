@@ -80,7 +80,7 @@ CRhinoCommand::result CRpcAddCmd::RunRpcCommand(const CRhinoCommandContext& cont
 	crmm.OnRhinoDocumentChanged(*pDoc);
 
 	pDoc->Redraw();
-	
+
 	return success;
 }
 

@@ -10,6 +10,7 @@
 #include "RpcSelectionDialog.h"
 #include "RpcEventWatcher.h"
 #include "RpcDocument.h"
+#include "LBPFileMgr2.h"
 
 // The plug-in object must be constructed before any plug-in classes derived
 // from CRhinoCommand. The #pragma init_seg(lib) ensures that this happens.
@@ -206,12 +207,18 @@ void CRPCPlugIn::RefreshToolbar()
 		CRhinoFileUtilities::DeleteFile(path);
 }
 
-void CRPCPlugIn::AddPagesToObjectPropertiesDialog(CRhinoPropertiesPanelPageCollection& collection)
+ON_UUID CRPCPlugIn::PropertiesPlugInId() const
+{
+	return ON_UuidFromString(L"334b4fce-860c-415b-89ff-3beaf65ebf52");
+}
+
+void CRPCPlugIn::GetPropertiesPages(CRhinoPropertiesPanelPageCollection& collection)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 	auto page = &Mains().PropertiesDlg();
-  if (page != nullptr)
-	  collection.Add(page);
+
+	if (page)
+		collection.Add(page);
 }
 
 BOOL CRPCPlugIn::CallWriteDocument(const CRhinoFileWriteOptions& options)
@@ -238,4 +245,15 @@ BOOL CRPCPlugIn::WriteDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const 
 		return FALSE;
 
 	return TRUE;
+}
+
+const wchar_t* CRPCPlugIn::getRpcApiFilename()
+{
+	const CLBPString sFullPathToPlugIn = PlugIn().PlugInFileName();
+	CLBPString sPathOnly = CLBPFileMgr2::GetPathOnly(sFullPathToPlugIn);
+	CLBPFileMgr2::RemoveTrailingSlash(sPathOnly);
+
+	const CLBPString sRpcApiDll = sPathOnly + L"\\RPCapi.dll";
+
+	return sRpcApiDll;
 }

@@ -41,7 +41,7 @@ void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBP
 
 	m_pInstance = dynamic_cast<RPCapi::Instance*>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE));
 
-	if (!m_pInstance) 
+	if (!m_pInstance)
 		return;
 
 	m_pInstance->setClientInstance(this);
@@ -69,6 +69,8 @@ void CRpcInstance::Construct(UINT idDoc, const CRhinoObject* pObject, const CLBP
 		}
 		else
 			return;
+
+    UpdatePrevUnitSystem();
 }
 
 CRhinoMeshObject* CRpcInstance::CreateProxyMesh(CRhinoDoc& doc)
@@ -104,7 +106,7 @@ CRhinoMeshObject* CRpcInstance::CreateProxyMesh(CRhinoDoc& doc)
 bool CRpcInstance::IsValidRpc(const CLBPString& s) // static
 {
 	RPCapi* pApi = Mains().RpcClient().RPCgetAPI();
-	if (!pApi) 
+	if (!pApi)
 		return false;
 
 	RPCapi::ParamList* pRpcFile = pApi->openRPCFile(s.T());
@@ -118,7 +120,7 @@ bool CRpcInstance::IsValidRpc(const CLBPString& s) // static
 bool CRpcInstance::IsValid(void) const
 {
 	RPCapi* pApi = Mains().RpcClient().RPCgetAPI();
-	if (!pApi) 
+	if (!pApi)
 		return false;
 
 	CLBPString sPath = FileName();
@@ -262,7 +264,7 @@ bool CRpcInstance::Data(CLBPBuffer& buf) const
 
 	buf.Set(str.c_str(), strSize);
 
-	delete []buffer;
+	delete[]buffer;
 
 	return true;
 }
@@ -364,7 +366,7 @@ bool CRpcInstance::EditUi(HWND hWndParent, IEditDialogCallback* pCallback)
 	KillEditUi();
 
 	m_pEditInterface = dynamic_cast<RPCapi::InstanceInterface *>(Mains().RpcClient().RPCgetAPI()->newObject(RPCapi::ObjectCodes::INSTANCE_INTERFACE));
-	if (!m_pEditInterface) 
+	if (!m_pEditInterface)
 		return false;
 
 	m_pEditInterface->setInstance(m_pInstance);
@@ -378,9 +380,9 @@ bool CRpcInstance::EditUi(HWND hWndParent, IEditDialogCallback* pCallback)
 	return true;
 }
 
-CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc, bool copied)
+CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc, bool copied, const CRhinoObject* object)
 {
-	const CRhinoInstanceObject* pBlock = CRhinoInstanceObject::Cast(Object());
+	const CRhinoInstanceObject* pBlock = (object) ? CRhinoInstanceObject::Cast(object) : CRhinoInstanceObject::Cast(Object());
 
 	if (!pBlock)
 		return nullptr;
@@ -399,20 +401,45 @@ CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc, bool copied)
 
 		defTable.DeleteInstanceDefinition(iInstanceDefintionId, false, true);
 
-		CRhinoInstanceObject* pAddedObject = AddToDocument(doc, sName, xformInstance, copied);
+		CRhinoInstanceObject* pAddedObject = AddToDocument(doc, sName, xformInstance, attr.m_layer_index);
 		return pAddedObject;
 	}
 
-	ObjectArray objects;
-	objects.Append(CreateProxyMesh(doc));
-	defTable.ModifyInstanceDefinition(*pBlock->InstanceDefinition(), iInstanceDefintionId, ON_InstanceDefinition::all_idef_settings, true);
-	defTable.ModifyInstanceDefinitionGeometry(iInstanceDefintionId, objects, true);
-	return (CRhinoInstanceObject*) pBlock;
+	if (auto proxy = CreateProxyMesh(doc))
+	{
+		ObjectArray objects;
+		objects.Append(proxy);
+		defTable.ModifyInstanceDefinition(*pBlock->InstanceDefinition(), iInstanceDefintionId, ON_InstanceDefinition::all_idef_settings, true);
+		defTable.ModifyInstanceDefinitionGeometry(iInstanceDefintionId, objects, true);
+	}
+
+	return (CRhinoInstanceObject*)pBlock;
+}
+
+void CRpcInstance::OnRpcInstanceChanged()
+{
+	CRhinoDoc* pRhinoDoc = CRhinoDoc::FromRuntimeSerialNumber(Document());
+	if (!pRhinoDoc)
+		return;
+	CRhinoInstanceObject* pBlock = Replace(*pRhinoDoc);
+	if (!pBlock)
+		return;
+
+    const double dUnitsScale = 1.0 / ON::UnitScale(prevUnitSystem, pRhinoDoc->ModelUnits());
+    ON_Xform xformUnitsScale = ON_Xform::DiagonalTransformation(dUnitsScale, dUnitsScale, dUnitsScale);
+    pBlock->SetInstanceTransform(pBlock->InstanceXform() * xformUnitsScale);
+
+	bool selected = pBlock->IsSelected();
+	pBlock->Select();
+	RhRdkCustomRenderMeshManager().OnRhinoDocumentChanged(*pRhinoDoc);
+	pBlock->Select(selected);
+
+    UpdatePrevUnitSystem();
 }
 
 CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const ON_3dPoint& pt)
 {
-    ON_Xform xform = ON_Xform::TranslationTransformation(pt - ON_origin);
+	ON_Xform xform = ON_Xform::TranslationTransformation(pt - ON_origin);
 
 	const CLBPString sName = UnusedRpcName(RpcName());
 
@@ -429,7 +456,7 @@ const CRhinoObject* CRpcInstance::Object(void) const
 	return nullptr;
 }
 
-int CRpcInstance::CreateLayer(wstring& rpcName, bool copied)
+int CRpcInstance::CreateLayer(wstring& rpcName, int copiedLayer)
 {
 	constexpr int NotFoundIndex = -2;
 	constexpr int MultipleFoundIndex = -1;
@@ -438,12 +465,6 @@ int CRpcInstance::CreateLayer(wstring& rpcName, bool copied)
 	wchar_t* contentName = nullptr;
 
 	CRhinoLayerTable& layerTable = RhinoApp().ActiveDoc()->m_layer_table;
-	int index = layerTable.FindLayerFromName(rpcName.c_str(), false, false, NotFoundIndex, MultipleFoundIndex);
-
-	if (index >= 0 && !copied)
-	{
-		return index;
-	}
 
 	if (auto rpcFile = m_pInstance->getRPCFile())
 	{
@@ -451,17 +472,20 @@ int CRpcInstance::CreateLayer(wstring& rpcName, bool copied)
 		contentName = dynamic_cast<RPCapi::TString*>(rpcFile->get("/metadata/contentName"))->extractW();
 		delete rpcFile;
 	}
+	else
+		return copiedLayer;
 
-	int parentLayerIndex = layerTable.CurrentLayerIndex();
+	int parentLayerIndex = layerTable.FindLayerFromName(RpcLayer, false, false, NotFoundIndex, MultipleFoundIndex);
 
-	if (layerTable.CurrentLayer().Name() != RpcLayer)
+	if (parentLayerIndex < 0)
 	{
 		ON_Layer parentLayer;
 		parentLayer.SetName(RpcLayer);
 
 		parentLayerIndex = layerTable.AddLayer(parentLayer);
-		layerTable.SetCurrentLayerIndex(parentLayerIndex);
 	}
+
+	layerTable.SetCurrentLayerIndex(parentLayerIndex);
 
 	const CRhinoLayer& layer = layerTable[parentLayerIndex];
 	int check = layerTable.FindLayerFromName(categoryName, false, false, NotFoundIndex, MultipleFoundIndex);
@@ -495,8 +519,15 @@ int CRpcInstance::CreateLayer(wstring& rpcName, bool copied)
 	return layerTable.AddLayer(rpcLayer);
 }
 
+void CRpcInstance::UpdatePrevUnitSystem()
+{
+    CRhinoDoc* pRhinoDoc = CRhinoDoc::FromRuntimeSerialNumber(Document());
+    if (pRhinoDoc)
+        prevUnitSystem = pRhinoDoc->UnitSystem();
+}
+
 CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const CLBPString& sName,
-												  const ON_Xform& xform, bool copied)
+	const ON_Xform& xform, int copiedLayer)
 {
 	CRhinoInstanceDefinitionTable& defTable = doc.m_instance_definition_table;
 
@@ -505,16 +536,21 @@ CRhinoInstanceObject* CRpcInstance::AddToDocument(CRhinoDoc& doc, const CLBPStri
 	ON_InstanceDefinition idef;
 	idef.SetName(sDefName);
 
-	const int iIndex = defTable.AddInstanceDefinition(idef, CreateProxyMesh(doc));
+	auto proxy = CreateProxyMesh(doc);
+
+	if (!proxy)
+		return nullptr;
+
+	const int iIndex = defTable.AddInstanceDefinition(idef, proxy);
 
 	ON_3dmObjectAttributes* attr = new ON_3dmObjectAttributes();
 	wstring rpcName = sName.Wide();
-	attr->m_layer_index = CreateLayer(rpcName, copied);
+	attr->m_layer_index = CreateLayer(rpcName, copiedLayer);
 	attr->SetName(rpcName.c_str(), true);
 	wstring objectName = L"*_RPC_" + wstring(rpcName);
 	defTable.SetName(iIndex, objectName.c_str());
 
-    CRhinoInstanceObject* pInstObj = defTable.AddInstanceObject(iIndex, xform, attr);
+	CRhinoInstanceObject* pInstObj = defTable.AddInstanceObject(iIndex, xform, attr);
 
 	if (pInstObj)
 	{
