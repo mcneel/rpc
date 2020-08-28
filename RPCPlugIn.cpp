@@ -251,7 +251,7 @@ BOOL CRPCPlugIn::WriteDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const 
 	return TRUE;
 }
 
-const wchar_t* CRPCPlugIn::getRpcApiFilename()
+const CLBPString CRPCPlugIn::getRpcApiFilename()
 {
 	const CLBPString sFullPathToPlugIn = PlugIn().PlugInFileName();
 	CLBPString sPathOnly = CLBPFileMgr2::GetPathOnly(sFullPathToPlugIn);
