@@ -104,6 +104,8 @@
 using namespace std;
 #include <sstream>
 
+#pragma comment (lib, "version.lib")
+
 // TODO: include additional Rhino-related header files here
 #define LBPRHLIB
 #define LBPLIB_RHINOVER 6
