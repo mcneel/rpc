@@ -63,7 +63,7 @@ void RpcAboutDialog::setVersion()
 {
     wstring text = L"RPC Plugin " + getDllVersion(PlugIn().PlugInFileName())
         + L"\n\nRPC Render API\nVersion " + getDllVersion(PlugIn().getRpcApiFilename())
-        + L"\n\nCopyright © 1998-2020\nArchVision Inc."
+        + L"\n\nCopyright Â© 1998-2020\nArchVision Inc."
         + L"\n\nCheck out more information at";
 
     editText.SetWindowText(text.c_str());
@@ -109,7 +109,7 @@ BOOL RpcAboutDialog::OnEraseBkgnd(CDC* pDC)
 
 HBRUSH RpcAboutDialog::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
-    HBRUSH hbr = CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+    /*HBRUSH hbr = */CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 
     if (pWnd->GetDlgCtrlID() != IDC_ABOUT_TEXT)
         pDC->SetTextColor(GetSysColor(COLOR_WINDOW));
