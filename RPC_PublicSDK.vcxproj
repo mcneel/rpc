@@ -257,7 +257,8 @@
       <AdditionalIncludeDirectories>$(IntDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ResourceCompile>
     <PostBuildEvent>
-      <Command>Copy &gt;copylog.txt /Y ".\SDK\lib\$(Configuration)\*.dll" "$(OutDir)*"</Command>
+      <Command>Copy &gt;copylog.txt /Y ".\SDK\lib\$(Configuration)\*.dll" "$(OutDir)*"
+Copy /Y "RPC.rui" "$(OutDir)*"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
