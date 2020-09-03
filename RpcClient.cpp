@@ -25,28 +25,28 @@ CRpcClient::~CRpcClient(void)
 
 void CRpcClient::Flush(void)
 {
-	if (0 != m_metaKeys)
+	if (m_metaKeys)
 	{
 		delete[] m_metaKeys;
-		m_metaKeys = 0;
+		m_metaKeys = nullptr;
 	}
 
-	if (0 != m_metaValues)
+	if (m_metaValues)
 	{
 		for (int i = 0; i < m_numMetaValues; i++)
 			delete m_metaValues[i];
 		delete[] m_metaValues;
-		m_metaValues = 0;
+		m_metaValues = nullptr;
 		m_numMetaValues = 0;
 	}
 
-	if (nullptr != m_pRpcApi)
+	if (m_pRpcApi)
 	{
 		delete m_pRpcApi;
 		m_pRpcApi = nullptr;
 	}
 
-	if (nullptr != m_hRpcApiHandle)
+	if (m_hRpcApiHandle)
 	{
 		FreeLibrary(m_hRpcApiHandle);
 		m_hRpcApiHandle = nullptr;

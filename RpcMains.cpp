@@ -1,4 +1,4 @@
-﻿
+
 #include "stdafx.h"
 #include "RpcMains.h"
 #include "RPCApp.h"
@@ -82,13 +82,6 @@ void CRpcMains::CleanUp(void)
 		m_pRdkPlugIn = nullptr;
 	}
 
-	if (m_pRpcClient)
-	{
-		m_pRpcClient->Uninitialize();
-		delete m_pRpcClient;
-		m_pRpcClient = nullptr;
-	}
-
 	if (m_pEventMachine)
 	{
 		m_pEventMachine->EnableEvents(false);
@@ -124,6 +117,16 @@ void CRpcMains::CleanUp(void)
 		delete rpcTable;
 		rpcTable = nullptr;
 	}
+
+    SetSelectedId(nullptr);
+
+    // Cleanup RPC client last to release resources before RPC API dll is unloaded
+    if (m_pRpcClient)
+    {
+        m_pRpcClient->Uninitialize();
+        delete m_pRpcClient;
+        m_pRpcClient = nullptr;
+    }
 }
 
 bool CRpcMains::Initialize(void)
@@ -243,5 +246,5 @@ const RPCapi::ID* CRpcMains::GetSelectedId()
 
 void CRpcMains::SetSelectedId(const RPCapi::ID* id)
 {
-	selectedId.reset((RPCapi::ID*)id->copy());
+	selectedId.reset(id ? (RPCapi::ID*)id->copy() : nullptr);
 }
