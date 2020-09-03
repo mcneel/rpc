@@ -173,3 +173,4 @@ doxygen_entrydb*.tmp
 doxygen_objdb*.tmp
 /src4/rhino4/RhinoApplication/ShaderBuildErrorSourceCode.txt
 ResourceIds.cs
+/copylog.txt

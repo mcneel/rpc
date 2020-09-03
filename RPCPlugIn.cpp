@@ -1,8 +1,12 @@
-﻿// RPCPlugIn.cpp : defines the initialization routines for the plug-in.
+// RPCPlugIn.cpp : defines the initialization routines for the plug-in.
 //
 
 #include "StdAfx.h"
+#if defined INSITU
+#include "../../../SDK/inc/rhinoSdkPlugInDeclare.h"
+#else
 #include "rhinoSdkPlugInDeclare.h"
+#endif
 #include "RPCPlugIn.h"
 #include "Resource.h"
 #include "RpcMains.h"
@@ -247,7 +251,7 @@ BOOL CRPCPlugIn::WriteDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const 
 	return TRUE;
 }
 
-const wchar_t* CRPCPlugIn::getRpcApiFilename()
+const CLBPString CRPCPlugIn::getRpcApiFilename()
 {
 	const CLBPString sFullPathToPlugIn = PlugIn().PlugInFileName();
 	CLBPString sPathOnly = CLBPFileMgr2::GetPathOnly(sFullPathToPlugIn);

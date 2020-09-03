@@ -117,7 +117,6 @@ public:
 	}
 
 	int Version(void) const { return 2; }
-	void Dump(const TCHAR* szFileName) const { m_pXMLRoot->WriteToFile(szFileName); }
 
 protected:	
 	CLBP_XMLProperty* InternalProperty(const WCHAR * wszXMLPath, const WCHAR * wszPropertyName) const

@@ -24,4 +24,6 @@ CRhinoCommand::result CRpcAboutCmd::RunRpcCommand(const CRhinoCommandContext& co
 
 	if (dlg.DoModal() <= 0)
 		return success;
+
+	return failure;
 }
