@@ -135,6 +135,8 @@ public:
 			} MODE_CODE_T;
 		};
 
+        using RPCapi::InstanceInterface::show;
+
 		virtual int show(HWND parentWindow, int windowToDisplay, int mode,
 			int x = 0, int y = 0, int w = 0, int h = 0, HWND z = NULL) = 0;
 	};  // class InstanceInterfaceEx

@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+#include "StdAfx.h"
 #include "RpcInstance.h"
 #include "RpcClient.h"
 #include "Resource.h"
@@ -409,7 +409,8 @@ CRhinoInstanceObject* CRpcInstance::Replace(CRhinoDoc& doc, bool copied, const C
 	{
 		ObjectArray objects;
 		objects.Append(proxy);
-		defTable.ModifyInstanceDefinition(*pBlock->InstanceDefinition(), iInstanceDefintionId, ON_InstanceDefinition::all_idef_settings, true);
+		defTable.ModifyInstanceDefinition(*pBlock->InstanceDefinition(), iInstanceDefintionId,
+            (unsigned int)ON_InstanceDefinition::all_idef_settings, true);
 		defTable.ModifyInstanceDefinitionGeometry(iInstanceDefintionId, objects, true);
 	}
 
