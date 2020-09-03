@@ -218,4 +218,18 @@ public:
 	virtual HMODULE getModuleHandle(void) const = 0;
 };
 
+/*! \function int getMaterials(Material**& materials) const
+*   \brief Retrieves the instance's materials.
+*
+* This routine retrieves the materials associated with this Instance.
+* Parameters:
+*       materials:      Array of materials, newly allocated and returned by reference.
+* Returns:
+*       Number of materials
+*/
+int RPCgetMaterials(const RPCapi::Instance* rpcInstance, RPCapi::Material*** materials);
+
+// Returns true, if RPC is licensed by ACM
+bool RPCisLicensed(const RPCapi::Instance* rpcInstance);
+
 #endif	// ifndef RPC_API_CLIENT_INTERFACE_H
