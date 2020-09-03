@@ -1,10 +1,10 @@
-﻿
+
 #include "StdAfx.h"
 #include "RpcRenderMeshBuilder.h"
 #include "RpcUtilities.h"
 #include "MaterialParams.h"
 
-using PBRParam = CRhRdkMaterial::PhysicallyBased::ParametersNames;
+using PBRParam = CRhRdkMaterial::PhysicallyBased::ParameterNames;
 
 static class CTestRpcGamma : public CRhinoTestCommand
 {
@@ -457,9 +457,9 @@ bool CRpcRenderMeshBuilder::OldTexture2Material(RPCapi::Texture& RpcTexture, RPC
 	CRhRdkTexture* pRdkTexture = RhRdkNewDibTexture(&rDib, Material.DocumentAssoc(), false, true);
 
 	CRhRdkBasicMaterial::CTextureSlot slot = Material.TextureSlot(slotType);
-	slot.m_bOn = true;
-	slot.m_dAmount = 1.0;
-	slot.m_bFilterOn = true;
+	slot.SetOn(true);
+	slot.SetAmount(1.0);
+	slot.SetFilterOn(true);
 	Material.SetTextureSlot(slotType, slot);
 
 	VERIFY(Material.SetChild(pRdkTexture, textureType));

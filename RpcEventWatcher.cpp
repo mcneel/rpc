@@ -116,8 +116,10 @@ void CRpcEventWatcher::OnDeleteObject(CRhinoDoc& doc, CRhinoObject& object)
 	CRhinoLayerTable& layerTable = doc.m_layer_table;
 	int objIndex = object.Attributes().m_layer_index;
 
-	if (layerTable.DeleteLayer(objIndex, false));
-	Mains().GetRPCInstanceTable().Remove(object.Id());
+	if (layerTable.DeleteLayer(objIndex, false))
+	{
+		Mains().GetRPCInstanceTable().Remove(object.Id());
+	}
 
 	if (Mains().GetRPCInstanceTable().Count() == 0)
 	{
