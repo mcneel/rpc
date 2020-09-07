@@ -370,7 +370,7 @@ void CRpcRenderMeshBuilder::Rgb2Material(RPCapi::Texture& RpcTexture, CRhRdkMate
 	{
 		pRGB = new BYTE[iBytes];
 
-		VERIFY(iBytes = RpcTexture.data(pRGB, false, RPCapi::Texture::Channel::RGB, RPCapi::Texture::Scale::SLOW, iWidth, iHeight));
+		VERIFY(iBytes == RpcTexture.data(pRGB, false, RPCapi::Texture::Channel::RGB, RPCapi::Texture::Scale::SLOW, iWidth, iHeight));
 	}
 	else
 	{

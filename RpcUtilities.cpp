@@ -119,7 +119,7 @@ void DebugSaveTexturesToRoot(const RPCapi::Instance& rpc, const ON_3dPoint& ptCa
 			{
 				pRGB = new BYTE[iBytes];
 
-				VERIFY(iBytes = Texture[i]->data(pRGB, false, RPCapi::Texture::Channel::RGB, RPCapi::Texture::Scale::SLOW, iWidth, iHeight));
+				VERIFY(iBytes == Texture[i]->data(pRGB, false, RPCapi::Texture::Channel::RGB, RPCapi::Texture::Scale::SLOW, iWidth, iHeight));
 			}
 			else
 			{
