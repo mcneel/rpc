@@ -85,7 +85,7 @@ bool CRpcSelectionDialog::OpenPanelInDockBarWithOtherPanel(CRhinoDoc& doc, const
 	ON_SimpleArray<CRhinoUiDockBar*> dockbars;
 	CRhinoTabbedDockBarDialog::DockBarsForTab(doc, otherPanel, dockbars);
 
-	if (!dockbars)
+	if (dockbars.Count() == 0)
 		return true;
 
 	return CRhinoTabbedDockBarDialog::OpenTabOnDockBar(dockbars[0], doc, panelToOpen, makeSelectedPanel);
