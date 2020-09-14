@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RPC.rc" />
+    <ResourceCompile Include="RPC_Version.rc" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\Interior_Office_Preview.bmp" />
