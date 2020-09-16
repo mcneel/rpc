@@ -105,6 +105,9 @@ void CRpcEventWatcher::OnAddObject(CRhinoDoc& doc, CRhinoObject& object)
 
 void CRpcEventWatcher::OnDeleteObject(CRhinoDoc& doc, CRhinoObject& object)
 {
+    //https://mcneel.myjetbrains.com/youtrack/issue/RH-60444
+    return;
+
 	if (doc.ActiveCommand() && wcscmp(doc.ActiveCommand()->EnglishCommandName(), L"Delete") != 0)
 		return;
 
