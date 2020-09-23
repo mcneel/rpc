@@ -57,27 +57,28 @@ public:
   // or tools here.  
   void OnUnloadPlugIn() override;
 
-	plugin_load_time PlugInLoadTime() override { return load_plugin_at_startup; }
+  //https://mcneel.myjetbrains.com/youtrack/issue/RH-60550
+  plugin_load_time PlugInLoadTime() override { return load_plugin_when_needed_ignore_docked; }
 
-	BOOL CallWriteDocument(const CRhinoFileWriteOptions& options) override;
-	BOOL ReadDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const CRhinoFileReadOptions& options) override;
-	BOOL WriteDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const CRhinoFileWriteOptions& options) override;
-	const CLBPString getRpcApiFilename();
+  BOOL CallWriteDocument(const CRhinoFileWriteOptions& options) override;
+  BOOL ReadDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const CRhinoFileReadOptions& options) override;
+  BOOL WriteDocument(CRhinoDoc& doc, ON_BinaryArchive& archive, const CRhinoFileWriteOptions& options) override;
+  const CLBPString getRpcApiFilename();
 
   CRpcMains& Mains(void);
 
 private:
-	void RefreshToolbar();
+  void RefreshToolbar();
 
 private:
-  ON_wString m_plugin_version;
+    ON_wString m_plugin_version;
 
-  // TODO: Add additional class information here
-	CRpcMains* m_pMains = nullptr;
+    // TODO: Add additional class information here
+    CRpcMains* m_pMains = nullptr;
 
-	// Inherited via IRhinoAddPropertiesPages
-	ON_UUID PropertiesPlugInId() const override;
-	void GetPropertiesPages(CRhinoPropertiesPanelPageCollection& collection) override;
+    // Inherited via IRhinoAddPropertiesPages
+    ON_UUID PropertiesPlugInId() const override;
+    void GetPropertiesPages(CRhinoPropertiesPanelPageCollection& collection) override;
 };
 
 // Return a reference to the one and only CRPCPlugIn object

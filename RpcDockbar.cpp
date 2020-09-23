@@ -1,4 +1,4 @@
-
+﻿
 #include "StdAfx.h"
 #include "RpcSelectionDialog.h"
 
@@ -41,9 +41,9 @@ CRhinoCommand::result CRpcDockbar::RunCommand(const CRhinoCommandContext& contex
 
 		CRhinoGetOption go;
 		go.SetCommandPrompt(str);
-		int hOption = go.AddCommandOption(RHCMDOPTNAME(L"Hide"));
-		int sOption = go.AddCommandOption(RHCMDOPTNAME(L"Show"));
-		int tOption = go.AddCommandOption(RHCMDOPTNAME(L"Toggle"));
+		int hOption = go.AddCommandOption(RhLocalizeCommandOptionName( L"Hide", 43368));
+		int sOption = go.AddCommandOption(RhLocalizeCommandOptionName( L"Show", 43369));
+		int tOption = go.AddCommandOption(RhLocalizeCommandOptionName( L"Toggle", 43370));
 		go.GetOption();
 		if (go.CommandResult() != CRhinoCommand::success)
 			return go.CommandResult();

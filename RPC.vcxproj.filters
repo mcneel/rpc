@@ -396,6 +396,9 @@
     <ResourceCompile Include="RPC.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+    <ResourceCompile Include="RPC_Version.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\rpc_acm.ico">
