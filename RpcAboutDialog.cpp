@@ -109,7 +109,7 @@ BOOL RpcAboutDialog::OnEraseBkgnd(CDC* pDC)
 
 HBRUSH RpcAboutDialog::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
-    /*HBRUSH hbr = */CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+    CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 
     if (pWnd->GetDlgCtrlID() != IDC_ABOUT_TEXT)
         pDC->SetTextColor(GetSysColor(COLOR_WINDOW));

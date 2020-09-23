@@ -96,7 +96,7 @@ BOOL CRpcAvailDialog::OnEraseBkgnd(CDC* pDC)
 
 HBRUSH CRpcAvailDialog::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 {
-    /*HBRUSH hbr = */CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
+    CDialog::OnCtlColor(pDC, pWnd, nCtlColor);
 
     if (pWnd->GetDlgCtrlID() != IDC_AVAILBROW_CONTENT)
         pDC->SetTextColor(GetSysColor(COLOR_WINDOW));
