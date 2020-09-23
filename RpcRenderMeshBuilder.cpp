@@ -478,24 +478,16 @@ void CRpcRenderMeshBuilder::SetValue(CRhRdkMaterial& aMaterial, T& value, ON_wSt
 
 void CRpcRenderMeshBuilder::GetTexture(CRhRdkMaterial& aMaterial, RPCapi::Param* param, CRhRdkTexture*& pRdkTexture, bool inverse)
 {
-	if (!param || param->typeCode() != RPCapi::ObjectCodes::TYPE_TEXMAP)
-		return;
+    auto pMap = dynamic_cast<RPCapi::TextureMap*>(param);
+    if (!pMap)
+        return;
 
-	auto pMap = dynamic_cast<RPCapi::TextureMap*>(param);
+    auto imageParam = std::unique_ptr<RPCapi::Param>(pMap->get("map_name"));
+    auto image = dynamic_cast<RPCapi::Texture*>(imageParam.get());
+    if (!image)
+        return;
 
-	if (!pMap)
-		return;
-
-	const RPCapi::TStringArg MAP("map_name");
-
-	param = pMap->get(MAP);
-
-	auto image = dynamic_cast<RPCapi::Texture*>(param);
-
-	if (!image)
-		return;
-
-	Rgb2Material(*image, aMaterial, inverse, pRdkTexture);
+    Rgb2Material(*image, aMaterial, inverse, pRdkTexture);
 }
 
 void CRpcRenderMeshBuilder::SetTexture(CRhRdkMaterial& aMaterial, RPCapi::Param* param, const wchar_t* paramName, bool inverse, RPCapi::Param* cutout)
@@ -535,9 +527,9 @@ void CRpcRenderMeshBuilder::BaseMetalRoughness(RPCapi::Material& aRpcMaterial, C
 
 	if (pColor)
 	{
-		ON_Color *color = new ON_Color();
-		color->SetFractionalRGB(pColor->r, pColor->g, pColor->b);
-		SetValue(aMaterial, *color, PBRParam::BaseColor());
+		ON_Color color;
+		color.SetFractionalRGB(pColor->r, pColor->g, pColor->b);
+		SetValue(aMaterial, color, PBRParam::BaseColor());
 	}
 
 	auto baseColorMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::BASE_COLOR_MAP)));
@@ -690,9 +682,9 @@ void CRpcRenderMeshBuilder::Emission(RPCapi::Material& aRpcMaterial, CRhRdkMater
 
 	if (pColor)
 	{
-		ON_Color *color = new ON_Color();
-		color->SetFractionalRGB(pColor->r, pColor->g, pColor->b);
-		SetValue(aMaterial, *color, PBRParam::Emission());
+		ON_Color color;
+		color.SetFractionalRGB(pColor->r, pColor->g, pColor->b);
+		SetValue(aMaterial, color, PBRParam::Emission());
 	}
 
 	auto emissionColorMap = std::unique_ptr<RPCapi::Param>(aRpcMaterial.get(getMapName(MaterialMaps::EMISSION_COLOR_MAP)));
