@@ -304,7 +304,6 @@ void CRpcRenderMeshBuilder::RpcMesh2RhinoMeshes(const RPCapi::Mesh& RpcMesh,
 	const RPCapi::TextureMesh::Vertex* pTextureVerts = RpcTextureMesh.getConstVertices();
 
 	ASSERT(iFaceCount == iTextureFaceCount);
-	int iBadFaces = 0;
 
 	for (int i=0; i<iTextureFaceCount; i++)
 	{
@@ -332,15 +331,6 @@ void CRpcRenderMeshBuilder::RpcMesh2RhinoMeshes(const RPCapi::Mesh& RpcMesh,
 			pRhinoMesh->m_F.Append(face);
 			ASSERT(pRhinoMesh->IsValid());
 		}
-		else
-		{
-			iBadFaces++;
-		}
-	}
-
-	if (iBadFaces > 0)
-	{
-		RhinoApp().Print(_RhLocalizeString( L"Bad face count = %d\n", 36082), iBadFaces);
 	}
 
 	delete [] pMaps;
