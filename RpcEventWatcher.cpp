@@ -105,8 +105,8 @@ void CRpcEventWatcher::OnAddObject(CRhinoDoc& doc, CRhinoObject& object)
 
 void CRpcEventWatcher::OnDeleteObject(CRhinoDoc& doc, CRhinoObject& object)
 {
-    //https://mcneel.myjetbrains.com/youtrack/issue/RH-60444
-    return;
+    if (!CRpcObject(&object).IsTagged())
+        return;
 
 	if (doc.ActiveCommand() && wcscmp(doc.ActiveCommand()->EnglishCommandName(), L"Delete") != 0)
 		return;
@@ -119,10 +119,8 @@ void CRpcEventWatcher::OnDeleteObject(CRhinoDoc& doc, CRhinoObject& object)
 	CRhinoLayerTable& layerTable = doc.m_layer_table;
 	int objIndex = object.Attributes().m_layer_index;
 
-	if (layerTable.DeleteLayer(objIndex, false))
-	{
-		Mains().GetRPCInstanceTable().Remove(object.Id());
-	}
+    layerTable.DeleteLayer(objIndex, true);
+    Mains().GetRPCInstanceTable().Remove(object.Id());
 
 	if (Mains().GetRPCInstanceTable().Count() == 0)
 	{
@@ -144,7 +142,7 @@ void CRpcEventWatcher::OnReplaceObject(CRhinoDoc & doc, CRhinoObject & old_objec
 
 void CRpcEventWatcher::OnUnDeleteObject(CRhinoDoc& doc, CRhinoObject& object)
 {
-    //https://mcneel.myjetbrains.com/youtrack/issue/RH-63667
+  if (!CRpcObject(&object).IsTagged())
     return;
 
 	auto rpc = new CRpcInstance(doc, object);
