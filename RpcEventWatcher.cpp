@@ -144,6 +144,9 @@ void CRpcEventWatcher::OnReplaceObject(CRhinoDoc & doc, CRhinoObject & old_objec
 
 void CRpcEventWatcher::OnUnDeleteObject(CRhinoDoc& doc, CRhinoObject& object)
 {
+    //https://mcneel.myjetbrains.com/youtrack/issue/RH-63667
+    return;
+
 	auto rpc = new CRpcInstance(doc, object);
 	Mains().GetRPCInstanceTable().SetAt(object.Id(), rpc);
 }
