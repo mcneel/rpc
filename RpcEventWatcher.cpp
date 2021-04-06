@@ -142,8 +142,8 @@ void CRpcEventWatcher::OnReplaceObject(CRhinoDoc & doc, CRhinoObject & old_objec
 
 void CRpcEventWatcher::OnUnDeleteObject(CRhinoDoc& doc, CRhinoObject& object)
 {
-    if (!CRpcObject(&object).IsTagged())
-        return;
+  if (!CRpcObject(&object).IsTagged())
+    return;
 
 	auto rpc = new CRpcInstance(doc, object);
 	Mains().GetRPCInstanceTable().SetAt(object.Id(), rpc);

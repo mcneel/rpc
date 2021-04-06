@@ -734,14 +734,14 @@ bool CLBPRhObjectWrapper<T>::CommitChanges()
 				//Copy the attributes
 				CRhinoObjectAttributes attr = static_cast<CRhinoObject*>(m_pClone)->Attributes();
 				//First replace the object
-				bSucceeded = pDoc->ReplaceObject(CRhinoObjRef(OriginalUuid()), 
+				bSucceeded = pDoc->ReplaceObject(CRhinoObjRef(pDoc->RuntimeSerialNumber(), OriginalUuid()),
 												 static_cast<CRhinoObject*>(m_pClone)
 												 );
 
 				//Then modify the attributes
 				if(bSucceeded)
 				{
-					bSucceeded = pDoc->ModifyObjectAttributes(CRhinoObjRef(OriginalUuid()), attr);
+					bSucceeded = pDoc->ModifyObjectAttributes(CRhinoObjRef(pDoc->RuntimeSerialNumber(), OriginalUuid()), attr);
 				}
 			}
 		}

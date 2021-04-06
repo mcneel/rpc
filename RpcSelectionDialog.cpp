@@ -107,7 +107,7 @@ BOOL CRpcSelectionDialog::OnEraseBkgnd(CDC* pDC)
 	if (!coloured)
 	{
 		//color of the panel
-		ON_Color tabBkColor = RhinoApp().AppSettings().UiPaintColorSettings().m_tab_background;
+		ON_Color tabBkColor = RhinoApp().AppSettings().UiPaintColorSettings().TabBackground();
 		myBrush = new CBrush(tabBkColor);
 	}
 
