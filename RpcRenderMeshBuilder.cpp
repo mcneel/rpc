@@ -369,7 +369,7 @@ void CRpcRenderMeshBuilder::Rgb2Material(RPCapi::Texture& RpcTexture, CRhRdkMate
 
 	BYTE* rgb = pRGB;
 
-	CRhinoDib rdRGB(iWidth, iHeight, 32);
+	auto rdRGB = std::shared_ptr<CRhinoDib>(new CRhinoDib(iWidth, iHeight, 32));
 
 	for(int y=0; y<iHeight; y++)
 	{
@@ -377,14 +377,14 @@ void CRpcRenderMeshBuilder::Rgb2Material(RPCapi::Texture& RpcTexture, CRhRdkMate
 		{
 			if (rgb)
 			{
-				rdRGB.SetPixel(x, y, rgb[0], rgb[1], rgb[2], 255);
+				rdRGB->SetPixel(x, y, rgb[0], rgb[1], rgb[2], 255);
 				rgb += 3;
 			}
 		}
 	}
 	
-	// TODO: [HERE] Possible dib ownership problem - check RDK SDK comments.
-	pRdkTexture = RhRdkNewDibTexture(&rdRGB, Material.DocumentAssoc(), false, true);
+	pRdkTexture = RhRdkNewDibTexture(rdRGB, Material.DocumentAssoc());
+    dibs.Append(rdRGB);
 
 	if (CTestRpcGamma::m_dGamma != 1.0)
 	{
@@ -418,7 +418,7 @@ bool CRpcRenderMeshBuilder::OldTexture2Material(RPCapi::Texture& RpcTexture, RPC
 
 	BYTE* alp = pixels;
 
-	CRhinoDib rDib(iWidth, iHeight, 32);
+	auto rDib = std::shared_ptr<CRhinoDib>(new CRhinoDib(iWidth, iHeight, 32));
 
 	if (channel == RPCapi::Texture::Channel::RGB)
 	{
@@ -426,7 +426,7 @@ bool CRpcRenderMeshBuilder::OldTexture2Material(RPCapi::Texture& RpcTexture, RPC
 		{
 			for (int x = 0; x < iWidth; x++)
 			{
-				rDib.SetPixel(x, y, alp[0], alp[1], alp[2], 255);
+				rDib->SetPixel(x, y, alp[0], alp[1], alp[2], 255);
 				alp += 3;
 			}
 		}
@@ -437,15 +437,14 @@ bool CRpcRenderMeshBuilder::OldTexture2Material(RPCapi::Texture& RpcTexture, RPC
 		{
 			for (int x = 0; x < iWidth; x++)
 			{
-				rDib.SetPixel(x, y, alp[0], alp[0], alp[0], 255);
+				rDib->SetPixel(x, y, alp[0], alp[0], alp[0], 255);
 				alp += 1;
 			}
 		}
 	}
 
-	// TODO: [HERE] Possible dib ownership problem - check RDK SDK comments.
-	CRhRdkTexture* pRdkTexture = RhRdkNewDibTexture(&rDib, Material.DocumentAssoc(), false, true);
-
+	CRhRdkTexture* pRdkTexture = RhRdkNewDibTexture(rDib, Material.DocumentAssoc());
+    dibs.Append(rDib);
 	CRhRdkBasicMaterial::CTextureSlot slot = Material.TextureSlot(slotType);
 	slot.SetOn(true);
 	slot.SetAmount(1.0);

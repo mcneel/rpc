@@ -47,5 +47,6 @@ private:
 private:
 	const RPCapi::Instance& m_Rpc;
 	const CRhinoDoc& m_doc;
+    ON_SimpleArray<std::shared_ptr<CRhinoDib>>  dibs;
 };
 
