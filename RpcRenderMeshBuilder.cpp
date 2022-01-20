@@ -6,6 +6,27 @@
 
 using PBRParam = CRhRdkMaterial::PhysicallyBased::ParameterNames;
 
+namespace
+{
+    struct PixelsData
+    {
+        RPCapi::Texture::Channel::CHANNEL_CODE channel;
+        BYTE* pixels;
+        int height;
+        int width;
+    };
+
+    void ProcessPixels(CRhinoDib::Pixel& pixel, void* data)
+    {
+        auto pData = (PixelsData*)(data);
+        auto lengthOfRow = pData->height > pData->width ? pData->height : pData->width;
+        int index = ((pixel.y * lengthOfRow) + pixel.x) * 3; //find index of current pixel by formula -> (row * length_of_row) + column
+        auto pixels = pData->pixels;
+        if (pData->height * pData->width * 3 > index && pixels != nullptr)
+            pixel.Set(pixels[index], pixels[index + 1], pixels[index + 2], 255);
+    }
+}
+
 static class CTestRpcGamma : public CRhinoTestCommand
 {
 	static double m_dGamma;
@@ -367,24 +388,12 @@ void CRpcRenderMeshBuilder::Rgb2Material(RPCapi::Texture& RpcTexture, CRhRdkMate
 		return;
 	}
 
-	BYTE* rgb = pRGB;
+	auto rdRGB = std::make_shared<CRhinoDib>(CRhinoDib(iWidth, iHeight, 32));
 
-	auto rdRGB = std::shared_ptr<CRhinoDib>(new CRhinoDib(iWidth, iHeight, 32));
-
-	for(int y=0; y<iHeight; y++)
-	{
-		for(int x=0; x<iWidth; x++)
-		{
-			if (rgb)
-			{
-				rdRGB->SetPixel(x, y, rgb[0], rgb[1], rgb[2], 255);
-				rgb += 3;
-			}
-		}
-	}
+    PixelsData data{ RPCapi::Texture::Channel::RGB, pRGB, iHeight, iWidth };
+    rdRGB->ProcessPixels(ProcessPixels, (void*)&data);
 	
 	pRdkTexture = RhRdkNewDibTexture(rdRGB, Material.DocumentAssoc());
-    dibs.Append(rdRGB);
 
 	if (CTestRpcGamma::m_dGamma != 1.0)
 	{
@@ -416,35 +425,13 @@ bool CRpcRenderMeshBuilder::OldTexture2Material(RPCapi::Texture& RpcTexture, RPC
 		return false;
 	}
 
-	BYTE* alp = pixels;
 
-	auto rDib = std::shared_ptr<CRhinoDib>(new CRhinoDib(iWidth, iHeight, 32));
-
-	if (channel == RPCapi::Texture::Channel::RGB)
-	{
-		for (int y = 0; y < iHeight; y++)
-		{
-			for (int x = 0; x < iWidth; x++)
-			{
-				rDib->SetPixel(x, y, alp[0], alp[1], alp[2], 255);
-				alp += 3;
-			}
-		}
-	}
-	else
-	{
-		for (int y = 0; y < iHeight; y++)
-		{
-			for (int x = 0; x < iWidth; x++)
-			{
-				rDib->SetPixel(x, y, alp[0], alp[0], alp[0], 255);
-				alp += 1;
-			}
-		}
-	}
+	auto rDib = std::make_shared<CRhinoDib>(CRhinoDib(iWidth, iHeight, 32));
+  
+    PixelsData data{ channel, pixels, iHeight, iWidth };
+    rDib->ProcessPixels(ProcessPixels, (void*)&data);
 
 	CRhRdkTexture* pRdkTexture = RhRdkNewDibTexture(rDib, Material.DocumentAssoc());
-    dibs.Append(rDib);
 	CRhRdkBasicMaterial::CTextureSlot slot = Material.TextureSlot(slotType);
 	slot.SetOn(true);
 	slot.SetAmount(1.0);
