@@ -10,6 +10,8 @@ public:
 
     BOOL OnInitDialog() override;
     BOOL PreTranslateMessage(MSG* pMsg) override;
+    
+    wstring getVersionString();
 
 public:
     afx_msg BOOL OnEraseBkgnd(CDC* pDC);

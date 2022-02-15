@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <afxdlgs.h>
 #include "resource.h"
 #include "RpcAboutDialog.h"
@@ -61,12 +61,18 @@ wstring RpcAboutDialog::getDllVersion(const wchar_t* path)
 
 void RpcAboutDialog::setVersion()
 {
-    wstring text = L"RPC Plugin " + getDllVersion(PlugIn().PlugInFileName())
-        + L"\n\nRPC Render API\nVersion " + getDllVersion(PlugIn().getRpcApiFilename())
-        + L"\n\nCopyright © 1998-2020\nArchVision Inc."
-        + L"\n\nCheck out more information at";
+    wstring text = getVersionString() + L"\n\nCheck out more information at";
 
     editText.SetWindowText(text.c_str());
+}
+
+wstring RpcAboutDialog::getVersionString()
+{
+    wstring text = L"RPC Plugin " + getDllVersion(PlugIn().PlugInFileName())
+        + L"\n\nRPC Render API\nVersion " + getDllVersion(PlugIn().getRpcApiFilename())
+        + L"\n\nCopyright © 1998-2022\nArchVision Inc.";
+
+    return text;
 }
 
 BOOL RpcAboutDialog::OnInitDialog()

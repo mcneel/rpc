@@ -22,8 +22,17 @@ CRhinoCommand::result CRpcAboutCmd::RunRpcCommand(const CRhinoCommandContext& co
 {
 	RpcAboutDialog dlg(CWnd::GetActiveWindow());
 
-	if (dlg.DoModal() <= 0)
-		return success;
+    if (context.IsInteractive())
+    {
+        if (dlg.DoModal() <= 0)
+            return success;
+    } else {
+
+        wstring text = dlg.getVersionString();
+
+        RhinoApp().Print(text.c_str());
+        RhinoApp().Print("\n");
+    }
 
 	return failure;
 }
