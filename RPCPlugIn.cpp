@@ -219,7 +219,7 @@ ON_UUID CRPCPlugIn::PropertiesPlugInId() const
 void CRPCPlugIn::GetPropertiesPages(CRhinoPropertiesPanelPageCollection& collection)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-	auto page = &Mains().PropertiesDlg();
+    auto page = new CRpcPropertiesDlg();
 
 	if (page)
 		collection.Add(page);

@@ -1,4 +1,4 @@
-﻿
+
 #include "stdafx.h"
 #include "RpcPropertiesDlg.h"
 #include "RpcObject.h"
@@ -14,15 +14,35 @@
 
 #pragma warning(disable : 4355) // 'this' used in base member initialization list.
 
+static ON_SimpleArray<CRpcPropertiesDlg*> g_page_list;
+
+void CRpcPropertiesDlg::Cleanup()
+{
+    for (int i = 0, count = g_page_list.Count(); i < count; i++)
+    {
+        CRpcPropertiesDlg* page = g_page_list[i];
+        if (IsWindow(*page))
+            page->Destroy();
+        delete page;
+    }
+    g_page_list.Destroy();
+}
+
 CRpcPropertiesDlg::CRpcPropertiesDlg(CWnd*)
 	:
 	m_Resize(this),
 	TRhinoPropertiesPanelPage<CRhinoDialog>(IDD, IDI_PROP_RPC, false)
 {
+    g_page_list.Append(this);
 	m_iRpcParamChangedTimer = 0;
 	m_iUpdateUiTimer = 0;
 	m_bSelectionChangeByUi = false;
 	m_rcRpcUiWnd.SetRectEmpty();
+}
+
+CRpcPropertiesDlg::~CRpcPropertiesDlg()
+{
+
 }
 
 void CRpcPropertiesDlg::KillUI(void)
@@ -37,7 +57,7 @@ void CRpcPropertiesDlg::OnDestroy()
 	Enable(false);
 	UnRegister();
 	KillUI();
-	__base_class::OnDestroy();
+    __base_class::OnDestroy();
 }
 
 const wchar_t* CRpcPropertiesDlg::EnglishTitle() const

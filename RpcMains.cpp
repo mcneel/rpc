@@ -53,7 +53,7 @@ CRpcMains::CRpcMains(const CRPCPlugIn& plug)
 	m_pDragDropHandler(nullptr),
 	m_pRpcDocument(nullptr),
 	m_pEventWatcher(nullptr),
-	m_pRpcPropDlg(nullptr),
+	//m_pRpcPropDlg(nullptr),
 	rpcTable(nullptr),
 	selectedId(nullptr)
 {
@@ -93,12 +93,7 @@ void CRpcMains::CleanUp(void)
 		m_pRpcDocument = nullptr;
 	}
 
-	if (m_pRpcPropDlg)
-	{
-		AFX_MANAGE_STATE(AfxGetStaticModuleState());
-		delete m_pRpcPropDlg;
-		m_pRpcPropDlg = nullptr;
-	}
+    CRpcPropertiesDlg::Cleanup();
 
 	if (m_pEventMachine)
 	{
@@ -215,18 +210,6 @@ CRpcDocument& CRpcMains::RpcDocument(void)
 	}
 
 	return *m_pRpcDocument;
-}
-
-CRpcPropertiesDlg& CRpcMains::PropertiesDlg(void)
-{
-	AFX_MANAGE_STATE(AfxGetStaticModuleState());
-
-	if (!m_pRpcPropDlg)
-	{
-		m_pRpcPropDlg = new CRpcPropertiesDlg;
-	}
-
-	return *m_pRpcPropDlg;
 }
 
 ON_SimpleUuidMap<CRpcInstance*>& CRpcMains::GetRPCInstanceTable()

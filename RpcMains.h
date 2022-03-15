@@ -30,7 +30,6 @@ public:
 	CRpcEventMachine& EventMachine(void) const;
 	CRpcDocument& RpcDocument(void);
 	CRpcEventWatcher& EventWatcher(void) const;
-	CRpcPropertiesDlg& PropertiesDlg(void);
 	ON_SimpleUuidMap<CRpcInstance*>& GetRPCInstanceTable();
 	const RPCapi::ID* GetSelectedId();
 	void SetSelectedId(const RPCapi::ID* id);
@@ -47,7 +46,6 @@ private:
 	mutable CRpcEventMachine* m_pEventMachine;
 	mutable CRpcEventWatcher* m_pEventWatcher;
 	const CRPCPlugIn& m_PlugIn;
-	CRpcPropertiesDlg* m_pRpcPropDlg;
 	ON_SimpleUuidMap<CRpcInstance*>* rpcTable;
 	std::unique_ptr<RPCapi::ID> selectedId;
 };

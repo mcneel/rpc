@@ -11,7 +11,8 @@ class CRpcPropertiesDlg : public TRhinoPropertiesPanelPage<CRhinoDialog>,
 {
 public:
 	CRpcPropertiesDlg(CWnd* pParent = nullptr);
-
+    ~CRpcPropertiesDlg();
+    static void Cleanup();
 private:
 	enum { IDD = IDD_EDIT};
 
