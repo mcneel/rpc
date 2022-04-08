@@ -41,7 +41,7 @@ RHINO_PLUG_IN_VERSION(__DATE__ "  " __TIME__)
 
 // Rhino plug-in description
 // Provide a description of this plug-in.
-RHINO_PLUG_IN_DESCRIPTION(L"RPC plug-in for Rhinoceros®");
+RHINO_PLUG_IN_DESCRIPTION(L"RPC plug-in for Rhinoceros");
 
 // Rhino plug-in icon resource id
 // Provide an icon resource this plug-in.
