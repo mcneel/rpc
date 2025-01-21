@@ -55,10 +55,9 @@ RHINO_PLUG_IN_DESCRIPTION(L"RPC plug-in for Rhinoceros®");
 //
 // When completed, delete the following #error directive.
 RHINO_PLUG_IN_DEVELOPER_ORGANIZATION(L"Robert McNeel & Associates");
-RHINO_PLUG_IN_DEVELOPER_ADDRESS     (L"3670 Woodland Park Avenue North\r\nSeattle WA 98103");
+RHINO_PLUG_IN_DEVELOPER_ADDRESS     (L"146 Canal St Suite 320\r\nSeattle WA 98103");
 RHINO_PLUG_IN_DEVELOPER_COUNTRY     (L"United States");
 RHINO_PLUG_IN_DEVELOPER_PHONE       (L"206-545-7000");
-RHINO_PLUG_IN_DEVELOPER_FAX         (L"206-545-7321");
 RHINO_PLUG_IN_DEVELOPER_EMAIL       (L"tech@mcneel.com");
 RHINO_PLUG_IN_DEVELOPER_WEBSITE     (L"http://www.mcneel.com");
 RHINO_PLUG_IN_UPDATE_URL            (L"http://www.mcneel.com");
